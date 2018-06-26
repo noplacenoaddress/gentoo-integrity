@@ -371,6 +371,7 @@ livecd ~ # cat >> .bashrc <<EOF
 > alias wget="wget -c"
 > alias tar="tar -v"
 > alias nano="nano -w"
+> alias cp="cp -v"
 > alias reloadgpg="echo RELOADAGENT | gpg-connect-agent"
 > 
 > export GPG_TTY=$(tty)
@@ -829,6 +830,61 @@ Then we've to extract the **stage3** tarball with an articulated command (*outpu
 - `--numeric-owner`: always use numbers for user/group names.
 
 Next we remove the downloaded tarball with `rm`.
+
+## The Gentoo make.conf file
+
+We start to prepare the correct environment to adquire the perfect optimization for the *emerging*,  download / unpack / prepare / configure / compile / install / merge gentoo cycle, process under our distribution.
+
+```fsharp
+livecd ~ # cat >> .bashrc <<EOF
+> export NUMCPUS=$(nproc)
+> export NUMCPUSPLUSONE=$(( NUMCPUS + 1 ))
+> export MAKEOPTS="-j${NUMCPUSPLUSONE} -l${NUMCPUS}"
+> export EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=${NUMCPUSPLUSONE} --load-average=${NUMCPUS}"
+> EOF
+livecd ~ # source .bashrc
+livecd ~ # cat > /mnt/gentoo/etc/portage/make.conf <<EOF
+> CHOST="x86_64-pc-linux-gnu"
+> CFLAGS="-march=sandybridge -O2 -pipe"
+> CXXFLAGS="${CFLAGS}"
+> 
+> # Note: MAKEOPTS and EMERGE_DEFAULT_OPTS are set in .bashrc
+> 
+> # Only free software, please.
+> ACCEPT_LICENSE="-* @FREE CC-Sampling-Plus-1.0"
+> 
+> # testing branch
+> ACCEPT_KEYWORDS="~amd64"
+> 
+> # Additional USE flags supplementary to those specified by the current profile.
+> USE=""
+> CPU_FLAGS_X86="mmx mmxext sse sse2"
+> 
+> # NOTE: This stage was built with the bindist Use flag enabled
+> PORTDIR="/usr/portage"
+> DISTDIR="/usr/portage/distfiles"
+> PKGDIR="/usr/portage/packages"
+> 
+> # This sets the language of build output to English.
+> # Please keep this setting intact when reporting bugs.
+> LC_MESSAGES=C
+> 
+> # Turn on logging - see http://gentoo-en.vfose.ru/wiki/Gentoo_maintenance.
+> PORTAGE_ELOG_CLASSES="info warn error log qa"
+> # Echo messages after emerge, also save to /var/log/portage/elog
+> PORTAGE_ELOG_SYSTEM="echo save"
+> 
+> # Ensure elogs saved in category subdirectories.
+> # Build binary packages as a byproduct of each emerge, a useful backup.
+> FEATURES="split-elog buildpkg"
+> 
+> # Settings for X11
+> VIDEO_CARDS="intel i915"
+> INPUT_DEVICES="libinput"
+> EOF
+livecd ~ #
+
+```
 
 
 
