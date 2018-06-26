@@ -886,5 +886,34 @@ livecd ~ #
 
 ```
 
+First of all we declare four variables under `.bashrc` of the root directory.  `NUMCPUS` that indicates the numbers of cores of our processor and `NUMCPUSPLUSONE` that is this number plus one.  `MAKEOPTS` indicates the default options that we pass to the command `make` every time we invoque it:
 
+- `-j`: specifies  the  number of jobs (commands) to run simultaneously.
+- `-l`: specifies  that  no  new  jobs (commands) should be started if there are others jobs running and the load average is at least load (a floating-point number).
 
+We do the same with `EMERGE_DEFAULT_OPTS` but those are the options that we pass every time we invoque the program `emerge`:
+
+- `--ask`:  Before performing the action, display what will take place, then ask whether to proceed with the action or abort.
+- `--verbose`: tell  emerge  to  run in verbose mode.
+- `--jobs`: specifies the number of packages to build simultaneously.
+- `--load-avarage`: specifies that no new builds should be started if there are other builds running and the load average is at least load (a floating-point  number).
+
+Then we reload `.bashrc` with `source` as usual. 
+
+In the file `make.conf` located under `/etc/portage` in our distribution Gentoo we can specify more options related to the fact of compiling the source tree.
+
+- `CHOST`: this variable is passed by the ebuild scripts to the configure step as `--host=${CHOST}`.  This way you can force the build-host. More information [here](https://gcc.gnu.org/onlinedocs/gcc-6.1.0/gcc/x86-Options.html#x86-Options).
+- `CFLAGS` and `CXXFLAGS`: use  these  variables  to set the desired optimization/CPU instruction settings for applications that you compile.  These two variables are passed to the C and C++ compilers, respectively. More information [here](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel).
+- `ACCEPT_LICENSE`: this variable is used to mask packages based on licensing restrictions. It may contain both license and group  names,  where  group names  are  prefixed  with  the  '@' symbol.
+- `ACCEPT_KEYWORDS`: enable  testing  of ebuilds that have not yet been deemed 'stable' with the `~` suffix.
+- `USE`: this  variable  contains options that control the build behavior of several packages.
+- `CPU_FLAGS_X86`: is an `USE_EXPAND` variable containing instruction set and other CPU-specific features.
+- `PORTDIR`: defines the location of main repository.
+- `DISTDIR`: defines the location of your local source file repository.
+- `PKGDIR`: defines the location where created `.tbz2` binary packages will be stored when  the  `emerge --buildpkg`  option  is  enabled.
+- `LC_MESSAGES`: programs localizations stored in `/usr/share/locale` for applications that use a message-based localization scheme (the majority of GNU programs).
+- `PORTAGE_ELOG_CLASSES`: selects messages to be logged.
+- `PORTAGE_ELOG_SYSTEM`: selects the module(s) to process the log messages.
+- `FEAUTURES`: defines actions portage takes by default.
+- `VIDEO_CARDS`: used to set the video drivers that you intend to use and is usually based on the kind of video card you have.  More informations [here](https://wiki.gentoo.org/wiki/Intel#Drivers).
+- `INPUT_DEVICES`: is used to determine which drivers are to be built for input devices.
