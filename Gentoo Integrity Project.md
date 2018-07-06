@@ -1008,3 +1008,555 @@ We utilize two new options to the `mount` command:
 - `--rbind`: Remount  a subtree and all possible submounts somewhere else (so that its contents are available in both places).
 - `--make-rslave`: Hence forth any mounts within the /directory done by the process will not show up in any other namespace. However mounts done in the parent namespace under /directory still shows up in the process's namespace.
 
+Next we **chroot** in `/mnt/gentoo` executing the *shell* `/bin/bash`.
+
+```sh
+livecd / # PORTAGE_GPG_DIR="/tmp" FEATURES="webrsync-gpg" emerge-webrsync --keep
+!!! Section 'x-portage' in repos.conf has location attribute set to nonexistent directory: '/usr/portage'
+!!! Section 'gentoo' in repos.conf has location attribute set to nonexistent directory: '/usr/portage'
+
+!!! Invalid Repository Location (not a dir): '/usr/portage'
+Fetching most recent snapshot ...
+Trying to retrieve 20180705 snapshot from ftp://ftp.free.fr/mirrors/ftp.gentoo.org ...
+Fetching file portage-20180705.tar.xz.md5sum ...
+Fetching file portage-20180705.tar.xz.gpgsig ...
+Fetching file portage-20180705.tar.xz ...
+Checking digest ...
+Checking signature ...
+emerge-webrsync: error: cannot check signature: gpg binary not found
+livecd / # ls /usr/portage/distfiles/
+portage-20180705.tar.xz         portage-20180705.tar.xz.md5sum
+portage-20180705.tar.xz.gpgsig
+livecd / #
+```
+
+Because there's no `gpg` binary under our **Stage 3** snapshot that we've *untar* in the last chapter, we've just downloaded the last **Portage** with his digest and digital signature from one of our `GENTOO_MIRRORS` server list. 
+
+Next we verified it out the **chroot** environment:
+
+```sh
+livecd ~ # gpg --recv-key 0xDB6B8C1F96D8BF6D
+gpg: key DB6B8C1F96D8BF6D: 15 signatures not checked due to missing keys
+gpg: /root/.gnupg/trustdb.gpg: trustdb created
+gpg: key DB6B8C1F96D8BF6D: public key "Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>" imported
+gpg: no ultimately trusted keys found
+gpg: Total number processed: 1
+gpg:               imported: 1
+livecd ~ # gpg --edit-key 0xDB6B8C1F96D8BF6D
+gpg (GnuPG) 2.2.4; Copyright (C) 2017 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+
+pub  rsa4096/DB6B8C1F96D8BF6D
+     created: 2011-11-25  expires: 2019-01-01  usage: C   
+     trust: unknown       validity: unknown
+sub  rsa4096/EC590EEAC9189250
+     created: 2011-11-25  expires: 2019-01-01  usage: S   
+[ unknown] (1). Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>
+[ unknown] (2)  Gentoo Portage Snapshot Signing Key (Automated Signing Key)
+
+gpg> fpr
+pub   rsa4096/DB6B8C1F96D8BF6D 2011-11-25 Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>
+ Primary key fingerprint: DCD0 5B71 EAB9 4199 527F  44AC DB6B 8C1F 96D8 BF6D
+
+gpg> trust
+pub  rsa4096/DB6B8C1F96D8BF6D
+     created: 2011-11-25  expires: 2019-01-01  usage: C   
+     trust: unknown       validity: unknown
+sub  rsa4096/EC590EEAC9189250
+     created: 2011-11-25  expires: 2019-01-01  usage: S   
+[ unknown] (1). Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>
+[ unknown] (2)  Gentoo Portage Snapshot Signing Key (Automated Signing Key)
+
+Please decide how far you trust this user to correctly verify other users' keys
+(by looking at passports, checking fingerprints from different sources, etc.)
+
+  1 = I don't know or won't say
+  2 = I do NOT trust
+  3 = I trust marginally
+  4 = I trust fully
+  5 = I trust ultimately
+  m = back to the main menu
+
+Your decision? 5
+Do you really want to set this key to ultimate trust? (y/N) y
+
+pub  rsa4096/DB6B8C1F96D8BF6D
+     created: 2011-11-25  expires: 2019-01-01  usage: C   
+     trust: ultimate      validity: unknown
+sub  rsa4096/EC590EEAC9189250
+     created: 2011-11-25  expires: 2019-01-01  usage: S   
+[ unknown] (1). Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>
+[ unknown] (2)  Gentoo Portage Snapshot Signing Key (Automated Signing Key)
+Please note that the shown key validity is not necessarily correct
+unless you restart the program.
+
+gpg> save
+Key not changed so no update needed.
+livecd ~ # cd /mnt/gentoo/usr/portage/distfiles/
+livecd /mnt/gentoo/usr/portage/distfiles # gpg --verify portage-20180705.tar.xz{.gpgsig,}
+gpg: Signature made Fri Jul  6 00:51:25 2018 UTC
+gpg:                using RSA key E1D6ABB63BFCFB4BA02FDF1CEC590EEAC9189250
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: next trustdb check due at 2019-01-01
+gpg: Good signature from "Gentoo ebuild repository signing key (Automated Signing Key) <infrastructure@gentoo.org>" [ultimate]
+gpg:                 aka "Gentoo Portage Snapshot Signing Key (Automated Signing Key)" [ultimate]
+livecd /mnt/gentoo/usr/portage/distfiles #
+```
+
+The procedure is the same as before, remember that we're searching for the hexadecimal id `0xDB6B8C1F96D8BF6D` in the [official Gentoo page](https://wiki.gentoo.org/wiki/Project:RelEng#Keys), the name of the key is *Gentoo Portage Snapshot signing Key*.
+
+```sh
+livecd /mnt/gentoo/usr/portage/distfiles # !chroot
+chroot /mnt/gentoo /bin/bash 
+livecd / # emerge-webrsync --keep --revert=20180705
+!!! Repository 'x-portage' is missing masters attribute in '/usr/portage/metadata/layout.conf'
+!!! Set 'masters = gentoo' in this file for future compatibility
+Trying to retrieve 20180705 snapshot from ftp://ftp.free.fr/mirrors/ftp.gentoo.org ...
+Checking digest ...
+Getting snapshot timestamp ...
+Syncing local tree ...
+
+Number of files: 161,945 (reg: 134,499, dir: 27,446)
+Number of created files: 161,944 (reg: 134,499, dir: 27,445)
+Number of deleted files: 0
+Number of regular files transferred: 134,499
+Total file size: 218.71M bytes
+Total transferred file size: 218.71M bytes
+Literal data: 218.71M bytes
+Matched data: 0 bytes
+File list size: 4.46M
+File list generation time: 0.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 115.92M
+Total bytes received: 2.68M
+
+sent 115.92M bytes  received 2.68M bytes  6.08M bytes/sec
+total size is 218.71M  speedup is 1.84
+Cleaning up ...
+
+Performing Global Updates
+(Could take a couple of minutes if you have a lot of binary packages.)
+
+
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+livecd / # emerge --ask --verbose --oneshot portage
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] app-crypt/openpgp-keys-gentoo-release-20180703::gentoo  46 KiB
+[ebuild  N     ] dev-libs/libunistring-0.9.10:0/2::gentoo  USE="-doc -static-libs" ABI_X86="(64) -32 (-x32)" 3,658 KiB
+[ebuild  N     ] dev-libs/npth-1.5::gentoo  USE="-static-libs" 293 KiB
+[ebuild  N     ] app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo  45 KiB
+[ebuild  N     ] app-eselect/eselect-pinentry-0.7::gentoo  0 KiB
+[ebuild  N     ] dev-libs/libassuan-2.5.1::gentoo  USE="-static-libs" 552 KiB
+[ebuild  N     ] dev-libs/libksba-1.3.5-r1::gentoo  USE="-static-libs" 607 KiB
+[ebuild  N     ] dev-python/bz2file-0.98::gentoo  PYTHON_TARGETS="python2_7 -pypy" 12 KiB
+[ebuild  N     ] net-dns/libidn2-2.0.5::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 2,043 KiB
+[ebuild  N     ] dev-libs/libtasn1-4.13:0/6::gentoo  USE="-doc -static-libs -valgrind" ABI_X86="(64) -32 (-x32)" 1,848 KiB
+[ebuild  N     ] dev-libs/nettle-3.4:0/6.2::gentoo  USE="gmp -doc (-neon) -static-libs {-test}" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="-aes" 1,890 KiB
+[ebuild  N     ] net-libs/gnutls-3.5.18:0/30::gentoo  USE="cxx idn nls openssl seccomp tls-heartbeat zlib -dane -doc -examples -guile -openpgp -pkcs11 -sslv2 -sslv3 -static-libs {-test} -test-full -tools -valgrind" ABI_X86="(64) -32 (-x32)" 7,092 KiB
+[ebuild  N     ] app-crypt/pinentry-1.1.0-r2::gentoo  USE="ncurses -caps -emacs -fltk -gnome-keyring -gtk -qt5 -static" 457 KiB
+[ebuild  N     ] net-misc/curl-7.60.0-r1::gentoo  USE="ipv6 ssl -adns -brotli -http2 -idn -kerberos -ldap -metalink -rtmp -samba -ssh -static-libs {-test} -threads" ABI_X86="(64) -32 (-x32)" CURL_SSL="openssl -axtls -gnutls -libressl -mbedtls -nss (-winssl)" 2,870 KiB
+[ebuild  N     ] app-admin/metalog-3-r2::gentoo  USE="unicode" 353 KiB
+[ebuild  N     ] virtual/logger-0::gentoo  0 KiB
+[ebuild  N     ] mail-mta/nullmailer-2.0-r2::gentoo  USE="ssl {-test}" 244 KiB
+[ebuild  N     ] virtual/mta-1::gentoo  0 KiB
+[ebuild  N     ] app-crypt/gnupg-2.2.8::gentoo  USE="bzip2 nls readline smartcard ssl -doc -ldap (-selinux) -tofu -tools -usb -wks-server" 6,478 KiB
+[ebuild  N     ] app-portage/gemato-13.1::gentoo  USE="blake2 bzip2 gpg -lzma -sha3 {-test} -tools" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 66 KiB
+[ebuild     U  ] sys-apps/portage-2.3.41::gentoo [2.3.40-r1::gentoo] USE="(ipc) native-extensions rsync-verify* xattr -build -doc -epydoc -gentoo-dev (-selinux)" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 973 KiB
+
+Total: 21 packages (1 upgrade, 20 new), Size of downloads: 29,518 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Emerging (1 of 21) app-crypt/openpgp-keys-gentoo-release-20180703::gentoo
+>>> Emerging (2 of 21) dev-libs/libunistring-0.9.10::gentoo
+>>> Emerging (3 of 21) dev-libs/npth-1.5::gentoo
+>>> Installing (1 of 21) app-crypt/openpgp-keys-gentoo-release-20180703::gentoo
+>>> Installing (3 of 21) dev-libs/npth-1.5::gentoo
+>>> Installing (2 of 21) dev-libs/libunistring-0.9.10::gentoo
+>>> Emerging (4 of 21) app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo
+>>> Installing (4 of 21) app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo
+>>> Emerging (5 of 21) app-eselect/eselect-pinentry-0.7::gentoo
+>>> Installing (5 of 21) app-eselect/eselect-pinentry-0.7::gentoo
+>>> Emerging (6 of 21) dev-libs/libassuan-2.5.1::gentoo
+>>> Installing (6 of 21) dev-libs/libassuan-2.5.1::gentoo
+>>> Emerging (7 of 21) dev-libs/libksba-1.3.5-r1::gentoo
+>>> Installing (7 of 21) dev-libs/libksba-1.3.5-r1::gentoo
+>>> Emerging (8 of 21) dev-python/bz2file-0.98::gentoo
+>>> Installing (8 of 21) dev-python/bz2file-0.98::gentoo
+>>> Emerging (9 of 21) net-dns/libidn2-2.0.5::gentoo
+>>> Installing (9 of 21) net-dns/libidn2-2.0.5::gentoo
+>>> Emerging (10 of 21) dev-libs/libtasn1-4.13::gentoo
+>>> Installing (10 of 21) dev-libs/libtasn1-4.13::gentoo
+>>> Emerging (11 of 21) dev-libs/nettle-3.4::gentoo
+>>> Installing (11 of 21) dev-libs/nettle-3.4::gentoo
+>>> Emerging (12 of 21) net-libs/gnutls-3.5.18::gentoo
+>>> Installing (12 of 21) net-libs/gnutls-3.5.18::gentoo
+>>> Emerging (13 of 21) app-crypt/pinentry-1.1.0-r2::gentoo
+>>> Installing (13 of 21) app-crypt/pinentry-1.1.0-r2::gentoo
+>>> Emerging (14 of 21) net-misc/curl-7.60.0-r1::gentoo
+>>> Installing (14 of 21) net-misc/curl-7.60.0-r1::gentoo
+>>> Emerging (15 of 21) app-admin/metalog-3-r2::gentoo
+>>> Installing (15 of 21) app-admin/metalog-3-r2::gentoo
+>>> Emerging (16 of 21) virtual/logger-0::gentoo
+>>> Installing (16 of 21) virtual/logger-0::gentoo
+>>> Emerging (17 of 21) mail-mta/nullmailer-2.0-r2::gentoo
+>>> Installing (17 of 21) mail-mta/nullmailer-2.0-r2::gentoo
+>>> Emerging (18 of 21) virtual/mta-1::gentoo
+>>> Installing (18 of 21) virtual/mta-1::gentoo
+>>> Emerging (19 of 21) app-crypt/gnupg-2.2.8::gentoo
+>>> Installing (19 of 21) app-crypt/gnupg-2.2.8::gentoo
+>>> Emerging (20 of 21) app-portage/gemato-13.1::gentoo
+>>> Installing (20 of 21) app-portage/gemato-13.1::gentoo
+>>> Emerging (21 of 21) sys-apps/portage-2.3.41::gentoo
+>>> Installing (21 of 21) sys-apps/portage-2.3.41::gentoo
+>>> Jobs: 21 of 21 complete                         Load avg: 2.66, 2.17, 1.24
+
+ * Messages for package app-crypt/openpgp-keys-gentoo-release-20180703:
+
+ * Package:    app-crypt/openpgp-keys-gentoo-release-20180703
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Final size of build directory: 68 KiB
+ * Final size of installed tree:  80 KiB
+
+ * Messages for package dev-libs/npth-1.5:
+
+ * Package:    dev-libs/npth-1.5
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libnpth.la (no static archive)
+ * Final size of build directory: 2396 KiB (2.3 MiB)
+ * Final size of installed tree:   124 KiB
+
+ * Messages for package dev-libs/libunistring-0.9.10:
+
+ * Package:    dev-libs/libunistring-0.9.10
+ * Repository: gentoo
+ * Maintainer: scheme@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Applying libunistring-nodocs.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libunistring.la (no static archive)
+ * Final size of build directory: 38804 KiB (37.8 MiB)
+ * Final size of installed tree:   1904 KiB ( 1.8 MiB)
+
+ * Messages for package app-eselect/eselect-lib-bin-symlink-0.1.1:
+
+ * Package:    app-eselect/eselect-lib-bin-symlink-0.1.1
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * Upstream:   mgorny@gentoo.org https://bitbucket.org/mgorny/eselect-lib-bin-symlink/issues/
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Final size of build directory: 284 KiB
+ * Final size of installed tree:   40 KiB
+
+ * Messages for package app-eselect/eselect-pinentry-0.7:
+
+ * Package:    app-eselect/eselect-pinentry-0.7
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Final size of build directory:  4 KiB
+ * Final size of installed tree:  24 KiB
+
+ * Messages for package dev-libs/libassuan-2.5.1:
+
+ * Package:    dev-libs/libassuan-2.5.1
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libassuan.la (no static archive)
+ * Final size of build directory: 4332 KiB (4.2 MiB)
+ * Final size of installed tree:   400 KiB
+
+ * Messages for package dev-libs/libksba-1.3.5-r1:
+
+ * Package:    dev-libs/libksba-1.3.5-r1
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libksba.la (no static archive)
+ * Final size of build directory: 5472 KiB (5.3 MiB)
+ * Final size of installed tree:   460 KiB
+
+ * Messages for package dev-python/bz2file-0.98:
+
+ * Package:    dev-python/bz2file-0.98
+ * Repository: gentoo
+ * Maintainer: python@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_targets_python2_7 userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_install
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_install_all
+ * Final size of build directory: 96 KiB
+ * Final size of installed tree:  88 KiB
+
+ * Messages for package net-dns/libidn2-2.0.5:
+
+ * Package:    net-dns/libidn2-2.0.5
+ * Repository: gentoo
+ * Maintainer: jer@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/net-dns/libidn2-2.0.5/work/libidn2-2.0.5
+ * abi_x86_64.amd64: copying to /var/tmp/portage/net-dns/libidn2-2.0.5/work/libidn2-2.0.5-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libidn2.la (no static archive)
+ * Final size of build directory: 28712 KiB (28.0 MiB)
+ * Final size of installed tree:    632 KiB
+
+ * Messages for package dev-libs/libtasn1-4.13:
+
+ * Package:    dev-libs/libtasn1-4.13
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libtasn1.la (no static archive)
+ * Final size of build directory: 9888 KiB (9.6 MiB)
+ * Final size of installed tree:   516 KiB
+
+ * Messages for package dev-libs/nettle-3.4:
+
+ * Package:    dev-libs/nettle-3.4
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc gmp kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Running eautoreconf in '/var/tmp/portage/dev-libs/nettle-3.4/work/nettle-3.4' ...
+ * Running autoconf --force ...
+ * Running autoheader ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 11068 KiB (10.8 MiB)
+ * Final size of installed tree:   1012 KiB
+
+ * Messages for package net-libs/gnutls-3.5.18:
+
+ * Package:    net-libs/gnutls-3.5.18
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc idn kernel_linux nls openssl seccomp tls-heartbeat userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libgnutlsxx.la (requested)
+ * Removing unnecessary /usr/lib64/libgnutls.la (requested)
+ * Removing unnecessary /usr/lib64/libgnutls-openssl.la (requested)
+ * Final size of build directory: 74128 KiB (72.3 MiB)
+ * Final size of installed tree:   2496 KiB ( 2.4 MiB)
+
+ * Messages for package app-crypt/pinentry-1.1.0-r2:
+
+ * Package:    app-crypt/pinentry-1.1.0-r2
+ * Repository: gentoo
+ * Maintainer: k_f@gentoo.org crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux ncurses userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Applying pinentry-1.0.0-make-icon-work-under-Plasma-Wayland.patch ...
+ * Applying pinentry-0.8.2-ncurses.patch ...
+ * Running eautoreconf in '/var/tmp/portage/app-crypt/pinentry-1.1.0-r2/work/pinentry-1.1.0' ...
+ * Running aclocal -I m4 ...
+ * Running autoconf --force ...
+ * Running autoheader ...
+ * Running automake --add-missing --copy --force-missing ...
+ * Final size of build directory: 4688 KiB (4.5 MiB)
+ * Final size of installed tree:   332 KiB
+
+ * Messages for package net-misc/curl-7.60.0-r1:
+
+ * Package:    net-misc/curl-7.60.0-r1
+ * Repository: gentoo
+ * Maintainer: blueness@gentoo.org
+ * USE:        abi_x86_64 amd64 curl_ssl_openssl elibc_glibc ipv6 kernel_linux ssl userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Applying curl-7.30.0-prefix.patch ...
+ * Applying curl-respect-cflags-3.patch ...
+ * Applying curl-fix-gnutls-nettle.patch ...
+ * Adjusting to prefix /
+ *   curl-config.in ...
+ * Running eautoreconf in '/var/tmp/portage/net-misc/curl-7.60.0-r1/work/curl-7.60.0' ...
+ * Running libtoolize --install --copy --force --automake ...
+ * Running aclocal -I m4 ...
+ * Running autoconf --force ...
+ * Running autoheader ...
+ * Running automake --add-missing --copy --foreign --force-missing ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * SSL provided by openssl
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * Skipping make test/check due to ebuild restriction.
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libcurl.la (requested)
+ * Final size of build directory: 39960 KiB (39.0 MiB)
+ * Final size of installed tree:   3500 KiB ( 3.4 MiB)
+
+ * Messages for package app-admin/metalog-3-r2:
+
+ * Package:    app-admin/metalog-3-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux unicode userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Applying metalog-0.9-metalog-conf.patch ...
+ * Final size of build directory: 5084 KiB (4.9 MiB)
+ * Final size of installed tree:   180 KiB
+
+ * Messages for package virtual/logger-0:
+
+ * Package:    virtual/logger-0
+ * Repository: gentoo
+ * Maintainer: ultrabug@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package mail-mta/nullmailer-2.0-r2:
+
+ * Package:    mail-mta/nullmailer-2.0-r2
+ * Repository: gentoo
+ * Maintainer: robbat2@gentoo.org net-mail@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux ssl userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Adding group 'nullmail' to your system ...
+ *  - Groupid: 88
+ * Adding user 'nullmail' to your system ...
+ *  - Userid: 88
+ *  - Shell: /sbin/nologin
+ *  - Home: /var/spool/nullmailer
+ *  - Groups: nullmail
+ *  - GECOS: added by portage for nullmailer
+ *  - Creating /var/spool/nullmailer in /
+ * Running eautoreconf in '/var/tmp/portage/mail-mta/nullmailer-2.0-r2/work/nullmailer-2.0' ...
+ * Running aclocal ...
+ * Running autoconf --force ...
+ * Running autoheader ...
+ * Running automake --add-missing --copy --force-missing ...
+ * Final size of build directory: 4236 KiB (4.1 MiB)
+ * Final size of installed tree:   868 KiB
+ * To create an initial setup, please do:
+ * emerge --config =mail-mta/nullmailer-2.0-r2
+ * One or more empty directories installed to /var:
+ * 
+ *   /var/spool/nullmailer/failed
+ * 
+ * If those directories need to be preserved, please make sure to create
+ * or mark them for keeping using 'keepdir'. Future versions of Portage
+ * will strip empty directories from installation image.
+ * >>> SetUID: [chmod go-r] /usr/bin/mailq ...
+ * >>> SetUID: [chmod go-r] /usr/sbin/nullmailer-queue ...
+
+ * Messages for package virtual/mta-1:
+
+ * Package:    virtual/mta-1
+ * Repository: gentoo
+ * Maintainer: net-mail@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-crypt/gnupg-2.2.8:
+
+ * Package:    app-crypt/gnupg-2.2.8
+ * Repository: gentoo
+ * Maintainer: k_f@gentoo.org crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 bzip2 elibc_glibc kernel_linux nls readline smartcard ssl userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Applying gnupg-2.1.20-gpgscm-Use-shorter-socket-path-lengts-to-improve-tes.patch ...
+ * Final size of build directory: 52244 KiB (51.0 MiB)
+ * Final size of installed tree:  12276 KiB (11.9 MiB)
+
+ * Messages for package app-portage/gemato-13.1:
+
+ * Package:    app-portage/gemato-13.1
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * Upstream:   https://github.com/mgorny/gemato/issues/
+ * USE:        abi_x86_64 amd64 blake2 bzip2 elibc_glibc gpg kernel_linux python_targets_python2_7 python_targets_python3_5 userland_GNU
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase distutils-r1_python_compile
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_install
+ * python3_5: running distutils-r1_run_phase distutils-r1_python_install
+ * python3_5: running distutils-r1_run_phase python_install_all
+ * Final size of build directory:  948 KiB
+ * Final size of installed tree:  1100 KiB (1.0 MiB)
+
+ * Messages for package sys-apps/portage-2.3.41:
+
+ * Package:    sys-apps/portage-2.3.41
+ * Repository: gentoo
+ * Maintainer: dev-portage@gentoo.org
+ * Upstream:   dev-portage@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc ipc kernel_linux native-extensions python_targets_python2_7 python_targets_python3_5 rsync-verify userland_GNU xattr
+ * FEATURES:   preserve-libs sandbox userpriv usersandbox
+ * Adding FEATURES=xattr to make.globals ...
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase python_compile_all
+ * python2_7: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install_all
+ * Moving admin scripts to the correct directory
+ * Moving /usr/bin/archive-conf to /usr/sbin/archive-conf
+ * Moving /usr/bin/dispatch-conf to /usr/sbin/dispatch-conf
+ * Moving /usr/bin/emaint to /usr/sbin/emaint
+ * Moving /usr/bin/env-update to /usr/sbin/env-update
+ * Moving /usr/bin/etc-update to /usr/sbin/etc-update
+ * Moving /usr/bin/fixpackages to /usr/sbin/fixpackages
+ * Moving /usr/bin/regenworld to /usr/sbin/regenworld
+ * Final size of build directory: 19820 KiB (19.3 MiB)
+ * Final size of installed tree:  35896 KiB (35.0 MiB)
+ * 
+ * This release of portage NO LONGER contains the repoman code base.
+ * Repoman has its own ebuild and release package.
+ * For repoman functionality please emerge app-portage/repoman
+ * Please report any bugs you may encounter.
+ * 
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * Regenerating GNU info directory index...
+ * Processed 78 info files.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+livecd / #
+```
+
