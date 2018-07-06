@@ -1,4 +1,4 @@
-## Introducing integrity within Gentoo Linux - part 1.
+## Introducing integrity within Gentoo Linux
 
 ![Penguin Integrity](https://fujifilmxgfx.com/wp-content/uploads/2018/01/Antarctica_2017_06042.jpg)
 
@@ -1146,7 +1146,7 @@ Performing Global Updates
  * IMPORTANT: 13 news items need reading for repository 'gentoo'.
  * Use eselect news read to view new items.
 
-livecd / # emerge --ask --verbose --oneshot portage
+livecd / # emerge --oneshot portage
 
  * IMPORTANT: 13 news items need reading for repository 'gentoo'.
  * Use eselect news read to view new items.
@@ -1558,5 +1558,1356 @@ Would you like to merge these packages? [Yes/No] Yes
  * Use eselect news read to view new items.
 
 livecd / #
+```
+
+Next we relaunch the `chroot` program with the special `bash` feature `!` that execute the last command executed after the exclamation sign.
+
+We use `emerge-webrsync` with those options:
+
+- `--keep`: Keep snapshots in `/usr/portage/distfile`.
+- `--revert`: come back to `yyyymmdd`.
+
+Next we update the just installed `portage` with `emerge`. We've used in our `~/.bashrc` file the variable `EMERGE_DEFAULT_OPTS` where we already indicate to use `--ask` and `--verbose`. This time we add `-oneshot` that indicate *emerge as normal, but do not add the packages to the world file for later updating*.
+
+Because we've read *IMPORTANT: 13 news items need reading for repository 'gentoo'*, we can read them:
+
+```sh
+livecd ~ # eselect news list
+News items:
+  [1]   N  2013-09-27  Separate /usr on Linux requires initramfs
+  [2]   N  2014-06-15  GCC 4.8.3 defaults to -fstack-protector
+  [3]   N  2014-10-26  GCC 4.7 Introduced the New C++11 ABI 
+  [4]   N  2015-02-02  New portage plug-in sync system
+  [5]   N  2015-07-25  Python 3.4 enabled by default
+  [6]   N  2015-08-13  OpenSSH 7.0 disables ssh-dss keys by default
+  [7]   N  2015-10-22  GCC 5 Defaults to the New C++11 ABI
+  [8]   N  2016-06-19  L10N USE_EXPAND variable replacing LINGUAS
+  [9]   N  2017-12-26  Experimental amd64 17.1 profiles up for testing
+  [10]  N  2018-01-30  Portage rsync tree verification
+  [11]  N  2018-03-13  Portage rsync tree verification unstable
+  [12]  N  2018-05-22  Python 3.6 to become the default target
+  [13]  N  2018-06-23  (2018-06-23-mpfr-4-update - removed?)
+livecd ~ # eselect news read 12
+2018-05-22-python3-6
+  Title                     Python 3.6 to become the default target
+  Author                    Michał Górny <mgorny@gentoo.org>
+  Posted                    2018-05-22
+  Revision                  1
+
+On 2018-06-22, Python 3.6 will replace Python 3.5 in the default Python
+targets for Gentoo systems.  The new default targets will be:
+
+    PYTHON_TARGETS="python2_7 python3_6"
+    PYTHON_SINGLE_TARGET="python3_6"
+
+If you have not overriden the value of those variables on your system,
+then your package manager will want to use the new targets immediately.
+In order to prevent dependency conflicts, please clean stray packages
+and rebuild/upgrade all packages with USE flag changes after the change,
+e.g.:
+
+    emerge --depclean
+    emerge -1vUD @world
+    emerge --depclean
+
+Please note that upgrading dependencies in place may cause some
+of the package dependencies to be temporarily missing.  While this
+should not affect scripts that are already fully loaded, it may cause
+ImportErrors while starting Python scripts or loading additional
+modules (only scripts running Python 3.5 are affected).
+
+In order to improve stability of the upgrade, you may choose to
+temporarily enable both targets, i.e. set in /etc/portage/make.conf
+or its equivalent:
+
+    PYTHON_TARGETS="python2_7 python3_5 python3_6"
+    PYTHON_SINGLE_TARGET="python3_5"
+
+This will cause the dependencies to include both Python 3.5 and 3.6
+support on the next system upgrade.  Once all packages are updated,
+you can restart your scripts, remove the custom setting and run another
+upgrade to remove support for Python 3.5.
+
+If you would like to postpone the switch to Python 3.6, you can copy
+the current value of PYTHON_TARGETS and/or PYTHON_SINGLE_TARGET
+to /etc/portage/make.conf or its equivalent:
+
+    PYTHON_TARGETS="python2_7 python3_5"
+    PYTHON_SINGLE_TARGET="python3_5"
+
+If you would like to migrate your systems earlier, you can do the same
+with the new value.
+
+If you are still using Python 3.4, please consider switching to a newer
+version as it is reaching its end-of-life.  The end-of-life dates
+for the currently used versions are:
+
+  Python 3.4        2019-03-16
+  Python 2.7        2020-01-01
+  Python 3.5        2020-09-13 [1]
+
+[1]:https://devguide.python.org/#status-of-python-branches
+
+livecd ~ #
+```
+
+I've read the news number `12` because it is very important we've to do some change:
+
+```sh
+livecd ~ # cat >> /etc/portage/make.conf <<EOF
+> PYTHON_TARGETS="python2_7 python3_6"
+> PYTHON_SINGLE_TARGET="python3_6"
+> EOF
+livecd ~ # emerge --depclean
+
+ * Always study the list of packages to be cleaned for any obvious
+ * mistakes. Packages that are part of the world set will always
+ * be kept.  They can be manually added to this set with
+ * `emerge --noreplace <atom>`.  Packages that are listed in
+ * package.provided (see portage(5)) will be removed by
+ * depclean, even if they are part of the world set.
+ * 
+ * As a safety measure, depclean will not remove any packages
+ * unless *all* required dependencies have been resolved.  As a
+ * consequence of this, it often becomes necessary to run 
+ * `emerge --update --newuse --deep @world` prior to depclean.
+!!! You have no world file.
+
+Calculating dependencies... done!
+  app-admin/eselect-1.4.12 pulled in by:
+    app-eselect/eselect-lib-bin-symlink-0.1.1 requires app-admin/eselect
+    app-eselect/eselect-python-20171204 requires >=app-admin/eselect-1.2.3
+    sys-apps/portage-2.3.41 requires >=app-admin/eselect-1.2
+
+  app-admin/metalog-3-r2 pulled in by:
+    virtual/logger-0 requires app-admin/metalog
+
+  app-admin/perl-cleaner-2.25 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires >=app-admin/perl-cleaner-2.5
+
+  app-arch/bzip2-1.0.6-r9 pulled in by:
+    @system requires app-arch/bzip2
+    app-arch/unzip-6.0_p21-r2 requires app-arch/bzip2
+    app-crypt/gnupg-2.2.8 requires app-arch/bzip2
+    dev-lang/perl-5.24.3-r1 requires app-arch/bzip2
+    dev-lang/python-2.7.14-r1 requires app-arch/bzip2:0=, app-arch/bzip2:0/1=
+    dev-lang/python-3.6.6 requires app-arch/bzip2:0/1=, app-arch/bzip2:0=
+    dev-libs/elfutils-0.170-r1 requires >=app-arch/bzip2-1.0.6-r4[abi_x86_64(-)]
+    dev-libs/libpcre-8.42 requires app-arch/bzip2
+
+  app-arch/gzip-1.8 pulled in by:
+    @system requires app-arch/gzip
+    sys-apps/kbd-2.0.4 requires app-arch/gzip
+
+  app-arch/tar-1.30 pulled in by:
+    @system requires app-arch/tar
+    sys-apps/portage-2.3.41 requires >=app-arch/tar-1.27
+
+  app-arch/unzip-6.0_p21-r2 pulled in by:
+    app-text/docbook-xml-dtd-4.1.2-r6 requires >=app-arch/unzip-5.41
+    dev-python/setuptools-38.6.1 requires app-arch/unzip
+
+  app-arch/xz-utils-5.2.3 pulled in by:
+    @system requires app-arch/xz-utils
+    app-admin/metalog-3-r2 requires app-arch/xz-utils
+    app-misc/pax-utils-1.2.3-r1 requires app-arch/xz-utils
+    app-portage/elt-patches-20170815 requires app-arch/xz-utils
+    app-portage/portage-utils-0.64 requires app-arch/xz-utils
+    dev-lang/python-3.6.6 requires app-arch/xz-utils:0/0=, app-arch/xz-utils:0=
+    dev-libs/glib-2.54.3-r6 requires app-arch/xz-utils
+    dev-libs/gmp-6.1.2 requires app-arch/xz-utils
+    dev-libs/libltdl-2.4.6 requires app-arch/xz-utils
+    dev-util/gtk-doc-am-1.25-r1 requires app-arch/xz-utils
+    net-libs/libtirpc-1.0.2-r1 requires app-arch/xz-utils
+    net-misc/wget-1.19.5 requires app-arch/xz-utils
+    sys-apps/coreutils-8.30 requires app-arch/xz-utils
+    sys-apps/diffutils-3.5 requires app-arch/xz-utils
+    sys-apps/iproute2-4.14.1-r2 requires app-arch/xz-utils
+    sys-apps/man-db-2.8.3 requires app-arch/xz-utils
+    sys-apps/net-tools-1.60_p20161110235919 requires app-arch/xz-utils
+    sys-apps/sandbox-2.13 requires app-arch/xz-utils
+    sys-apps/shadow-4.6 requires app-arch/xz-utils
+    sys-apps/texinfo-6.3 requires app-arch/xz-utils
+    sys-auth/pambase-20150213-r1 requires app-arch/xz-utils
+    sys-devel/flex-2.6.4-r1 requires app-arch/xz-utils
+    sys-devel/libtool-2.4.6-r3 requires app-arch/xz-utils
+    sys-devel/m4-1.4.17 requires app-arch/xz-utils
+    sys-kernel/linux-headers-4.13 requires app-arch/xz-utils
+
+  app-crypt/gnupg-2.2.8 pulled in by:
+    app-portage/gemato-13.1 requires app-crypt/gnupg
+    sys-apps/portage-2.3.41 requires >=app-crypt/gnupg-2.2.4-r2[ssl(-)]
+
+  app-crypt/openpgp-keys-gentoo-release-20180703 pulled in by:
+    sys-apps/portage-2.3.41 requires app-crypt/openpgp-keys-gentoo-release
+
+  app-crypt/pinentry-1.1.0-r2 pulled in by:
+    app-crypt/gnupg-2.2.8 requires app-crypt/pinentry
+
+  app-editors/nano-2.8.7 pulled in by:
+    virtual/editor-0-r1 requires app-editors/nano
+
+  app-eselect/eselect-lib-bin-symlink-0.1.1 pulled in by:
+    app-eselect/eselect-pinentry-0.7 requires >=app-eselect/eselect-lib-bin-symlink-0.1.1
+
+  app-eselect/eselect-pinentry-0.7 pulled in by:
+    app-crypt/pinentry-1.1.0-r2 requires app-eselect/eselect-pinentry
+
+  app-eselect/eselect-python-20171204 pulled in by:
+    dev-lang/python-2.7.14-r1 requires >=app-eselect/eselect-python-20140125-r1
+    dev-lang/python-3.6.6 requires >=app-eselect/eselect-python-20140125-r1
+
+  app-misc/c_rehash-1.7-r1 pulled in by:
+    app-misc/ca-certificates-20170717.3.36.1 requires app-misc/c_rehash
+    dev-libs/openssl-1.0.2o-r6 requires >=app-misc/c_rehash-1.7-r1
+
+  app-misc/ca-certificates-20170717.3.36.1 pulled in by:
+    dev-libs/openssl-1.0.2o-r6 requires app-misc/ca-certificates
+    dev-python/certifi-2018.4.16 requires app-misc/ca-certificates
+
+  app-misc/editor-wrapper-4 pulled in by:
+    sys-apps/less-529 requires >=app-misc/editor-wrapper-3
+
+  app-misc/mime-types-9 pulled in by:
+    dev-lang/python-2.7.14-r1 requires app-misc/mime-types
+    dev-lang/python-3.6.6 requires app-misc/mime-types
+
+  app-misc/pax-utils-1.2.3-r1 pulled in by:
+    sys-apps/portage-2.3.41 requires >=app-misc/pax-utils-0.1.17
+    sys-apps/sandbox-2.13 requires >=app-misc/pax-utils-0.1.19
+    sys-libs/glibc-2.27-r5 requires >=app-misc/pax-utils-0.1.10
+
+  app-portage/elt-patches-20170815 pulled in by:
+    app-arch/xz-utils-5.2.3 requires >=app-portage/elt-patches-20170422
+    app-crypt/pinentry-1.1.0-r2 requires >=app-portage/elt-patches-20170422
+    app-eselect/eselect-lib-bin-symlink-0.1.1 requires >=app-portage/elt-patches-20170422
+    app-text/openjade-1.3.2-r7 requires >=app-portage/elt-patches-20170422
+    app-text/opensp-1.5.2-r6 requires >=app-portage/elt-patches-20170422
+    dev-lang/python-2.7.14-r1 requires >=app-portage/elt-patches-20170422
+    dev-lang/python-3.6.6 requires >=app-portage/elt-patches-20170422
+    dev-libs/expat-2.2.5 requires >=app-portage/elt-patches-20170422
+    dev-libs/glib-2.54.3-r6 requires >=app-portage/elt-patches-20170317, >=app-portage/elt-patches-20170422
+    dev-libs/gmp-6.1.2 requires >=app-portage/elt-patches-20170422
+    dev-libs/iniparser-3.1-r1 requires >=app-portage/elt-patches-20170422
+    dev-libs/libassuan-2.5.1 requires >=app-portage/elt-patches-20170422
+    dev-libs/libffi-3.2.1 requires >=app-portage/elt-patches-20170422
+    dev-libs/libgcrypt-1.8.3 requires >=app-portage/elt-patches-20170422
+    dev-libs/libgpg-error-1.29 requires >=app-portage/elt-patches-20170422
+    dev-libs/libpcre-8.42 requires >=app-portage/elt-patches-20170422
+    dev-libs/libtasn1-4.13 requires >=app-portage/elt-patches-20170422
+    dev-libs/libunistring-0.9.10 requires >=app-portage/elt-patches-20170422
+    dev-libs/libxml2-2.9.8 requires >=app-portage/elt-patches-20170422
+    dev-libs/libxslt-1.1.32 requires >=app-portage/elt-patches-20170422
+    dev-libs/mpc-1.0.3 requires >=app-portage/elt-patches-20170422
+    dev-libs/mpfr-3.1.6 requires >=app-portage/elt-patches-20170422
+    dev-libs/nettle-3.4 requires >=app-portage/elt-patches-20170422
+    dev-libs/npth-1.5 requires >=app-portage/elt-patches-20170422
+    dev-libs/popt-1.16-r2 requires >=app-portage/elt-patches-20170422
+    dev-util/pkgconfig-0.29.2 requires >=app-portage/elt-patches-20170422
+    mail-mta/nullmailer-2.0-r2 requires >=app-portage/elt-patches-20170422
+    net-firewall/iptables-1.6.1-r3 requires >=app-portage/elt-patches-20170422
+    net-libs/gnutls-3.5.18 requires >=app-portage/elt-patches-20170422
+    net-libs/libnsl-1.2.0 requires >=app-portage/elt-patches-20170422
+    net-libs/libtirpc-1.0.2-r1 requires >=app-portage/elt-patches-20170422
+    net-misc/curl-7.60.0-r1 requires >=app-portage/elt-patches-20170422
+    net-misc/openssh-7.7_p1-r6 requires >=app-portage/elt-patches-20170422
+    sys-apps/acl-2.2.52-r1 requires >=app-portage/elt-patches-20170422
+    sys-apps/attr-2.4.47-r2 requires >=app-portage/elt-patches-20170422
+    sys-apps/file-5.33-r2 requires >=app-portage/elt-patches-20170422
+    sys-apps/groff-1.22.2 requires >=app-portage/elt-patches-20170422
+    sys-apps/kmod-25 requires >=app-portage/elt-patches-20170422
+    sys-apps/shadow-4.6 requires >=app-portage/elt-patches-20170422
+    sys-apps/util-linux-2.32-r3 requires >=app-portage/elt-patches-20170422
+    sys-devel/binutils-2.30-r2 requires >=app-portage/elt-patches-20170422
+    sys-devel/flex-2.6.4-r1 requires >=app-portage/elt-patches-20170422
+    sys-devel/gcc-7.3.0-r3 requires >=app-portage/elt-patches-20170422
+    sys-devel/gettext-0.19.8.1 requires >=app-portage/elt-patches-20170422, >=app-portage/elt-patches-20170317
+    sys-devel/libtool-2.4.6-r3 requires >=app-portage/elt-patches-20170317, >=app-portage/elt-patches-20170422
+    sys-fs/eudev-3.2.5 requires >=app-portage/elt-patches-20170422
+    sys-libs/cracklib-2.9.6-r1 requires >=app-portage/elt-patches-20170422
+    sys-libs/db-5.3.28-r2 requires >=app-portage/elt-patches-20170422
+    sys-libs/gdbm-1.13-r2 requires >=app-portage/elt-patches-20170422
+    sys-libs/pam-1.3.0-r2 requires >=app-portage/elt-patches-20170422
+    sys-libs/zlib-1.2.11-r1 requires >=app-portage/elt-patches-20170422
+
+  app-portage/gemato-13.1 pulled in by:
+    sys-apps/portage-2.3.41 requires >=app-portage/gemato-12.1[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+
+  app-portage/portage-utils-0.64 pulled in by:
+    app-admin/perl-cleaner-2.25 requires app-portage/portage-utils
+    sys-auth/pambase-20150213-r1 requires app-portage/portage-utils
+
+  app-shells/bash-4.4_p12 pulled in by:
+    @system requires app-shells/bash:0
+    app-admin/perl-cleaner-2.25 requires app-shells/bash
+    sys-apps/portage-2.3.41 requires app-shells/bash:0[readline]
+
+  app-text/build-docbook-catalog-1.21 pulled in by:
+    app-text/docbook-xml-dtd-4.1.2-r6 requires >=app-text/build-docbook-catalog-1.2
+    app-text/docbook-xsl-stylesheets-1.79.1-r2 requires >=app-text/build-docbook-catalog-1.1
+
+  app-text/docbook-xml-dtd-4.1.2-r6 pulled in by:
+    app-text/po4a-0.47-r1 requires app-text/docbook-xml-dtd:4.1.2
+    dev-libs/glib-2.54.3-r6 requires app-text/docbook-xml-dtd:4.1.2
+
+  app-text/docbook-xsl-stylesheets-1.79.1-r2 pulled in by:
+    app-text/docbook-xml-dtd-4.1.2-r6 requires >=app-text/docbook-xsl-stylesheets-1.65
+    app-text/po4a-0.47-r1 requires app-text/docbook-xsl-stylesheets
+
+  app-text/manpager-1 pulled in by:
+    sys-apps/man-db-2.8.3 requires app-text/manpager
+
+  app-text/openjade-1.3.2-r7 pulled in by:
+    app-text/po4a-0.47-r1 requires app-text/openjade
+
+  app-text/opensp-1.5.2-r6 pulled in by:
+    app-text/openjade-1.3.2-r7 requires >=app-text/opensp-1.5.1
+
+  app-text/po4a-0.47-r1 pulled in by:
+    sys-apps/man-db-2.8.3 requires >=app-text/po4a-0.45
+
+  app-text/sgml-common-0.6.3-r6 pulled in by:
+    app-text/docbook-xml-dtd-4.1.2-r6 requires >=app-text/sgml-common-0.6.3-r2
+    app-text/openjade-1.3.2-r7 requires app-text/sgml-common, >=app-text/sgml-common-0.6.3-r2
+
+  dev-lang/perl-5.24.3-r1 pulled in by:
+    app-admin/perl-cleaner-2.25 requires dev-lang/perl
+    app-text/openjade-1.3.2-r7 requires dev-lang/perl
+    app-text/po4a-0.47-r1 requires dev-lang/perl:0/5.24=, dev-lang/perl:=
+    dev-libs/libtasn1-4.13 requires >=dev-lang/perl-5.6
+    dev-libs/openssl-1.0.2o-r6 requires >=dev-lang/perl-5
+    dev-perl/Locale-gettext-1.70.0 requires dev-lang/perl:=, dev-lang/perl:0/5.24=
+    dev-perl/Module-Build-0.421.600 requires dev-lang/perl:0/5.24=, dev-lang/perl:=
+    dev-perl/SGMLSpm-1.03-r7 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    dev-perl/TermReadKey-2.330.0 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    dev-perl/Text-CharWidth-0.40.0-r1 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    dev-perl/Text-Unidecode-1.270.0 requires dev-lang/perl:0/5.24=[-build(-)], dev-lang/perl:=[-build(-)]
+    dev-perl/Text-WrapI18N-0.60.0-r1 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    dev-perl/Unicode-EastAsianWidth-1.330.0-r1 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    dev-perl/XML-Parser-2.440.0 requires dev-lang/perl:0/5.24=[-build(-)], dev-lang/perl:=[-build(-)]
+    dev-perl/libintl-perl-1.240.0-r2 requires dev-lang/perl:0/5.24=, dev-lang/perl:=
+    dev-util/gtk-doc-am-1.25-r1 requires >=dev-lang/perl-5.18
+    dev-util/intltool-0.51.0-r2 requires dev-lang/perl
+    net-dns/libidn2-2.0.5 requires dev-lang/perl
+    perl-core/File-Path-2.130.0 requires dev-lang/perl:0/5.24=, dev-lang/perl:=
+    perl-core/File-Temp-0.230.400-r1 requires dev-lang/perl:=[-build(-)], dev-lang/perl:0/5.24=[-build(-)]
+    sys-apps/groff-1.22.2 requires dev-lang/perl
+    sys-apps/help2man-1.47.4 requires dev-lang/perl
+    sys-apps/texinfo-6.3 requires dev-lang/perl:=, dev-lang/perl:0/5.24=
+    sys-devel/autoconf-2.69-r4 requires >=dev-lang/perl-5.6
+    sys-devel/automake-1.15.1-r2 requires dev-lang/perl
+    sys-kernel/linux-headers-4.13 requires dev-lang/perl
+    virtual/perl-CPAN-Meta-2.150.5-r1 requires dev-lang/perl:0/5.24=, =dev-lang/perl-5.24*, dev-lang/perl:=
+    virtual/perl-CPAN-Meta-YAML-0.18.0-r2 requires dev-lang/perl:=, =dev-lang/perl-5.24*, dev-lang/perl:0/5.24=
+    virtual/perl-Data-Dumper-2.160.0-r1 requires dev-lang/perl:=, dev-lang/perl:0/5.24=, =dev-lang/perl-5.24*
+    virtual/perl-ExtUtils-CBuilder-0.280.225-r2 requires =dev-lang/perl-5.24*, dev-lang/perl:0/5.24=, dev-lang/perl:=
+    virtual/perl-ExtUtils-Install-2.40.0-r3 requires =dev-lang/perl-5.24*, dev-lang/perl:=, dev-lang/perl:0/5.24=
+    virtual/perl-ExtUtils-MakeMaker-7.100.200_rc-r4 requires dev-lang/perl:0/5.24=, dev-lang/perl:=, =dev-lang/perl-5.24.3*
+    virtual/perl-ExtUtils-Manifest-1.700.0-r4 requires dev-lang/perl:=, dev-lang/perl:0/5.24=, =dev-lang/perl-5.24*
+    virtual/perl-ExtUtils-ParseXS-3.310.0-r1 requires dev-lang/perl:0/5.24=, =dev-lang/perl-5.24*, dev-lang/perl:=
+    virtual/perl-File-Path-2.130.0 requires dev-lang/perl:=, dev-lang/perl:0/5.24=
+    virtual/perl-File-Spec-3.630.100_rc-r4 requires dev-lang/perl:=, dev-lang/perl:0/5.24=, =dev-lang/perl-5.24.3*
+    virtual/perl-File-Temp-0.230.400-r5 requires dev-lang/perl:0/5.24=, dev-lang/perl:=
+    virtual/perl-Getopt-Long-2.480.0-r1 requires dev-lang/perl:0/5.24=, =dev-lang/perl-5.24*, dev-lang/perl:=
+    virtual/perl-JSON-PP-2.273.0.100_rc-r6 requires =dev-lang/perl-5.24.3*, dev-lang/perl:0/5.24=, dev-lang/perl:=
+    virtual/perl-Module-Metadata-1.0.31-r1 requires =dev-lang/perl-5.24*, dev-lang/perl:=, dev-lang/perl:0/5.24=
+    virtual/perl-Parse-CPAN-Meta-1.441.700.100_rc-r4 requires =dev-lang/perl-5.24.3*, dev-lang/perl:=, dev-lang/perl:0/5.24=
+    virtual/perl-Perl-OSType-1.9.0-r1 requires =dev-lang/perl-5.24*, dev-lang/perl:0/5.24=, dev-lang/perl:=
+    virtual/perl-Test-Harness-3.360.100_rc-r3 requires dev-lang/perl:0/5.24=, dev-lang/perl:=, =dev-lang/perl-5.24.3*
+    virtual/perl-Text-ParseWords-3.300.0-r3 requires dev-lang/perl:=, =dev-lang/perl-5.24*, dev-lang/perl:0/5.24=
+    virtual/perl-version-0.991.600-r1 requires =dev-lang/perl-5.24*, dev-lang/perl:=, dev-lang/perl:0/5.24=
+
+  dev-lang/python-2.7.14-r1 pulled in by:
+    app-portage/gemato-13.1 requires >=dev-lang/python-2.7.5-r2:2.7[threads(+)]
+    dev-python/bz2file-0.98 requires >=dev-lang/python-2.7.5-r2:2.7
+    dev-python/certifi-2018.4.16 requires >=dev-lang/python-2.7.5-r2:2.7
+    dev-python/pyblake2-1.1.2 requires >=dev-lang/python-2.7.5-r2:2.7
+    dev-python/pyxattr-0.6.0-r1 requires >=dev-lang/python-2.7.5-r2:2.7
+    dev-python/setuptools-38.6.1 requires >=dev-lang/python-2.7.5-r2:2.7[xml(+)]
+    sys-apps/portage-2.3.41 requires >=dev-lang/python-2.7.5-r2:2.7[bzip2(+),threads(+)], >=dev-lang/python-2.7.5-r2:2.7[ssl(+)]
+
+  dev-lang/python-3.6.6 pulled in by:
+    app-misc/ca-certificates-20170717.3.36.1 requires dev-lang/python:3.6
+    app-portage/gemato-13.1 requires dev-lang/python:3.6[threads(+)]
+    dev-libs/glib-2.54.3-r6 requires dev-lang/python:3.6
+    dev-python/certifi-2018.4.16 requires dev-lang/python:3.6
+    dev-python/pyblake2-1.1.2 requires dev-lang/python:3.6
+    dev-python/pyxattr-0.6.0-r1 requires dev-lang/python:3.6
+    dev-python/setuptools-38.6.1 requires dev-lang/python:3.6[xml(+)]
+    sys-apps/portage-2.3.41 requires dev-lang/python:3.6[bzip2(+),threads(+)], dev-lang/python:3.6[ssl(+)]
+
+  dev-lang/python-exec-2.4.5 pulled in by:
+    app-eselect/eselect-python-20171204 requires >=dev-lang/python-exec-2.4.2
+    app-portage/gemato-13.1 requires >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-libs/glib-2.54.3-r6 requires >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_jython2_7(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python3_4(-),python_single_target_python3_6(+)], >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_jython2_7(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python3_4(-),python_single_target_python3_6(+)]
+    dev-python/bz2file-0.98 requires >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),-python_single_target_pypy(-),-python_single_target_python2_7(-)], >=dev-lang/python-exec-2:=[python_targets_python2_7(-),-python_single_target_pypy(-),-python_single_target_python2_7(-)]
+    dev-python/certifi-2018.4.16 requires >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/pyblake2-1.1.2 requires >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/pyxattr-0.6.0-r1 requires >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/setuptools-38.6.1 requires >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    sys-apps/portage-2.3.41 requires >=dev-lang/python-exec-2:=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-lang/python-exec-2:2/2=[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], dev-lang/python-exec:2
+
+  dev-libs/elfutils-0.170-r1 pulled in by:
+    virtual/libelf-3 requires >=dev-libs/elfutils-0.155-r1:0/0[abi_x86_64(-)]
+
+  dev-libs/expat-2.2.5 pulled in by:
+    dev-lang/python-2.7.14-r1 requires >=dev-libs/expat-2.1
+    dev-lang/python-3.6.6 requires >=dev-libs/expat-2.1:0=, >=dev-libs/expat-2.1:0/0=
+    dev-perl/XML-Parser-2.440.0 requires >=dev-libs/expat-1.95.1-r1
+    sys-devel/gettext-0.19.8.1 requires dev-libs/expat
+
+  dev-libs/glib-2.54.3-r6 pulled in by:
+    dev-util/pkgconfig-0.29.2 requires >=dev-libs/glib-2.34.3[abi_x86_64(-)]
+    x11-misc/shared-mime-info-1.9 requires >=dev-libs/glib-2
+
+  dev-libs/gmp-6.1.2 pulled in by:
+    dev-libs/mpc-1.0.3 requires >=dev-libs/gmp-4.3.2[abi_x86_64(-)]
+    dev-libs/mpfr-3.1.6 requires >=dev-libs/gmp-4.1.4-r2[abi_x86_64(-)]
+    dev-libs/nettle-3.4 requires >=dev-libs/gmp-5.0:0=[abi_x86_64(-)], >=dev-libs/gmp-5.0:0/10.4=[abi_x86_64(-)]
+    net-libs/gnutls-3.5.18 requires >=dev-libs/gmp-5.1.3-r1:=[abi_x86_64(-)], >=dev-libs/gmp-5.1.3-r1:0/10.4=[abi_x86_64(-)]
+    sys-devel/gcc-7.3.0-r3 requires >=dev-libs/gmp-4.3.2:0=, >=dev-libs/gmp-4.3.2:0/10.4=
+
+  dev-libs/iniparser-3.1-r1 pulled in by:
+    app-portage/portage-utils-0.64 requires dev-libs/iniparser:0
+
+  dev-libs/libassuan-2.5.1 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=dev-libs/libassuan-2.5.0
+    app-crypt/pinentry-1.1.0-r2 requires >=dev-libs/libassuan-2.1
+
+  dev-libs/libffi-3.2.1 pulled in by:
+    virtual/libffi-3.0.13-r1 requires >=dev-libs/libffi-3.0.13-r1[abi_x86_64(-)]
+
+  dev-libs/libgcrypt-1.8.3 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=dev-libs/libgcrypt-1.7.3
+    app-crypt/pinentry-1.1.0-r2 requires >=dev-libs/libgcrypt-1.6.3
+    dev-libs/libxslt-1.1.32 requires >=dev-libs/libgcrypt-1.5.3:0/20=[abi_x86_64(-)], >=dev-libs/libgcrypt-1.5.3:0=[abi_x86_64(-)]
+
+  dev-libs/libgpg-error-1.29 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=dev-libs/libgpg-error-1.28
+    app-crypt/pinentry-1.1.0-r2 requires >=dev-libs/libgpg-error-1.17
+    dev-libs/libassuan-2.5.1 requires >=dev-libs/libgpg-error-1.8
+    dev-libs/libgcrypt-1.8.3 requires >=dev-libs/libgpg-error-1.25[abi_x86_64(-)]
+    dev-libs/libksba-1.3.5-r1 requires >=dev-libs/libgpg-error-1.8
+
+  dev-libs/libksba-1.3.5-r1 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=dev-libs/libksba-1.3.4
+
+  dev-libs/libltdl-2.4.6 pulled in by:
+    sys-devel/libtool-2.4.6-r3 requires dev-libs/libltdl:0
+
+  dev-libs/libpcre-8.42 pulled in by:
+    app-admin/metalog-3-r2 requires >=dev-libs/libpcre-3.4
+    dev-libs/glib-2.54.3-r6 requires >=dev-libs/libpcre-8.13:3[abi_x86_64(-)]
+    net-misc/wget-1.19.5 requires dev-libs/libpcre
+    sys-apps/grep-3.0 requires >=dev-libs/libpcre-7.8-r1
+    sys-apps/less-529 requires dev-libs/libpcre
+
+  dev-libs/libpipeline-1.5.0 pulled in by:
+    sys-apps/man-db-2.8.3 requires >=dev-libs/libpipeline-1.5.0
+
+  dev-libs/libtasn1-4.13 pulled in by:
+    net-libs/gnutls-3.5.18 requires >=dev-libs/libtasn1-4.9:0/6=[abi_x86_64(-)], >=dev-libs/libtasn1-4.9:=[abi_x86_64(-)]
+
+  dev-libs/libunistring-0.9.10 pulled in by:
+    net-dns/libidn2-2.0.5 requires dev-libs/libunistring[abi_x86_64(-)]
+    net-libs/gnutls-3.5.18 requires dev-libs/libunistring:=[abi_x86_64(-)], dev-libs/libunistring:0/2=[abi_x86_64(-)]
+
+  dev-libs/libxml2-2.9.8 pulled in by:
+    app-text/build-docbook-catalog-1.21 requires dev-libs/libxml2
+    dev-libs/libxslt-1.1.32 requires >=dev-libs/libxml2-2.9.1-r5:2[abi_x86_64(-)]
+    sys-devel/gettext-0.19.8.1 requires >=dev-libs/libxml2-2.9.3:2/2=, >=dev-libs/libxml2-2.9.3:=
+    x11-misc/shared-mime-info-1.9 requires dev-libs/libxml2
+
+  dev-libs/libxslt-1.1.32 pulled in by:
+    app-text/po4a-0.47-r1 requires dev-libs/libxslt
+    dev-libs/glib-2.54.3-r6 requires >=dev-libs/libxslt-1.0
+
+  dev-libs/mpc-1.0.3 pulled in by:
+    sys-devel/gcc-7.3.0-r3 requires >=dev-libs/mpc-0.8.1:0=, >=dev-libs/mpc-0.8.1:0/0=
+
+  dev-libs/mpfr-3.1.6 pulled in by:
+    dev-libs/mpc-1.0.3 requires >=dev-libs/mpfr-2.4.2[abi_x86_64(-)], <dev-libs/mpfr-4.0.0
+    sys-devel/gcc-7.3.0-r3 requires >=dev-libs/mpfr-2.4.2:0=, >=dev-libs/mpfr-2.4.2:0/4=
+
+  dev-libs/nettle-3.4 pulled in by:
+    net-libs/gnutls-3.5.18 requires >=dev-libs/nettle-3.1:0/6.2=[gmp,abi_x86_64(-)], >=dev-libs/nettle-3.1:=[gmp,abi_x86_64(-)]
+
+  dev-libs/npth-1.5 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=dev-libs/npth-1.2
+
+  dev-libs/openssl-1.0.2o-r6 pulled in by:
+    dev-lang/python-2.7.14-r1 requires dev-libs/openssl:0/0=, dev-libs/openssl:0=
+    dev-lang/python-3.6.6 requires dev-libs/openssl:0=, dev-libs/openssl:0/0=
+    net-misc/curl-7.60.0-r1 requires dev-libs/openssl:0/0=[abi_x86_64(-)], dev-libs/openssl:0=[abi_x86_64(-)]
+    net-misc/iputils-20171016_pre-r1 requires dev-libs/openssl:0=, dev-libs/openssl:0/0=
+    net-misc/openssh-7.7_p1-r6 requires >=dev-libs/openssl-1.0.1:0/0=[-bindist], >=dev-libs/openssl-1.0.1:0=[-bindist], dev-libs/openssl:0/0=, dev-libs/openssl:0=
+    net-misc/wget-1.19.5 requires dev-libs/openssl:0/0=, dev-libs/openssl:0=
+
+  dev-libs/popt-1.16-r2 pulled in by:
+    net-misc/rsync-3.1.3 requires >=dev-libs/popt-1.5
+
+  dev-perl/Locale-gettext-1.70.0 pulled in by:
+    app-text/po4a-0.47-r1 requires dev-perl/Locale-gettext
+    sys-apps/help2man-1.47.4 requires dev-perl/Locale-gettext
+
+  dev-perl/Module-Build-0.421.600 pulled in by:
+    app-text/po4a-0.47-r1 requires >=dev-perl/Module-Build-0.380.0
+
+  dev-perl/SGMLSpm-1.03-r7 pulled in by:
+    app-text/po4a-0.47-r1 requires dev-perl/SGMLSpm
+
+  dev-perl/TermReadKey-2.330.0 pulled in by:
+    app-text/po4a-0.47-r1 requires dev-perl/TermReadKey
+
+  dev-perl/Text-CharWidth-0.40.0-r1 pulled in by:
+    dev-perl/Text-WrapI18N-0.60.0-r1 requires dev-perl/Text-CharWidth
+
+  dev-perl/Text-Unidecode-1.270.0 pulled in by:
+    sys-apps/texinfo-6.3 requires dev-perl/Text-Unidecode
+
+  dev-perl/Text-WrapI18N-0.60.0-r1 pulled in by:
+    app-text/po4a-0.47-r1 requires dev-perl/Text-WrapI18N
+
+  dev-perl/Unicode-EastAsianWidth-1.330.0-r1 pulled in by:
+    sys-apps/texinfo-6.3 requires dev-perl/Unicode-EastAsianWidth
+
+  dev-perl/XML-Parser-2.440.0 pulled in by:
+    dev-util/intltool-0.51.0-r2 requires dev-perl/XML-Parser
+
+  dev-perl/libintl-perl-1.240.0-r2 pulled in by:
+    sys-apps/texinfo-6.3 requires dev-perl/libintl-perl
+
+  dev-python/bz2file-0.98 pulled in by:
+    app-portage/gemato-13.1 requires dev-python/bz2file[-python_single_target_pypy(-),python_targets_python2_7(-),-python_single_target_python2_7(-)]
+
+  dev-python/certifi-2018.4.16 pulled in by:
+    dev-python/setuptools-38.6.1 requires >=dev-python/certifi-2016.9.26[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+
+  dev-python/pyblake2-1.1.2 pulled in by:
+    app-portage/gemato-13.1 requires dev-python/pyblake2[-python_single_target_pypy(-),python_targets_python2_7(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-)]
+    sys-apps/portage-2.3.41 requires dev-python/pyblake2[-python_single_target_pypy(-),python_targets_python2_7(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-)]
+
+  dev-python/pyxattr-0.6.0-r1 pulled in by:
+    sys-apps/portage-2.3.41 requires dev-python/pyxattr[-python_single_target_pypy(-),python_targets_python2_7(-),-python_single_target_python2_7(-)]
+
+  dev-python/setuptools-38.6.1 pulled in by:
+    app-portage/gemato-13.1 requires dev-python/setuptools[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)], >=dev-python/setuptools-34[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/certifi-2018.4.16 requires dev-python/setuptools[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/pyblake2-1.1.2 requires dev-python/setuptools[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_pypy3(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+    dev-python/pyxattr-0.6.0-r1 requires dev-python/setuptools[python_targets_python2_7(-),python_targets_python3_6(-),-python_single_target_pypy(-),-python_single_target_python2_7(-),-python_single_target_python3_4(-),-python_single_target_python3_5(-),-python_single_target_python3_6(-)]
+
+  dev-util/gperf-3.0.4 pulled in by:
+    sys-fs/eudev-3.2.5 requires dev-util/gperf
+
+  dev-util/gtk-doc-am-1.25-r1 pulled in by:
+    dev-libs/glib-2.54.3-r6 requires >=dev-util/gtk-doc-am-1.20
+    dev-libs/libxml2-2.9.8 requires dev-util/gtk-doc-am
+
+  dev-util/intltool-0.51.0-r2 pulled in by:
+    sys-fs/eudev-3.2.5 requires >=dev-util/intltool-0.50
+    x11-misc/shared-mime-info-1.9 requires dev-util/intltool
+
+  dev-util/pkgconfig-0.29.2 pulled in by:
+    virtual/pkgconfig-0-r1 requires >=dev-util/pkgconfig-0.28-r1[abi_x86_64(-)]
+
+  mail-mta/nullmailer-2.0-r2 pulled in by:
+    virtual/mta-1 requires mail-mta/nullmailer
+
+  net-dns/libidn2-2.0.5 pulled in by:
+    net-libs/gnutls-3.5.18 requires >=net-dns/libidn2-0.16-r1[abi_x86_64(-)]
+
+  net-firewall/iptables-1.6.1-r3 pulled in by:
+    sys-apps/iproute2-4.14.1-r2 requires >=net-firewall/iptables-1.4.20:0/12=, >=net-firewall/iptables-1.4.20:=
+
+  net-libs/gnutls-3.5.18 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=net-libs/gnutls-3.0:0/30=, >=net-libs/gnutls-3.0:0=
+    mail-mta/nullmailer-2.0-r2 requires net-libs/gnutls:0=, net-libs/gnutls:0/30=
+
+  net-libs/libmnl-1.0.4 pulled in by:
+    sys-apps/iproute2-4.14.1-r2 requires net-libs/libmnl
+
+  net-libs/libnsl-1.2.0 pulled in by:
+    app-text/opensp-1.5.2-r6 requires net-libs/libnsl:0/2=, net-libs/libnsl:0=
+
+  net-libs/libtirpc-1.0.2-r1 pulled in by:
+    net-libs/libnsl-1.2.0 requires net-libs/libtirpc[abi_x86_64(-)]
+
+  net-misc/curl-7.60.0-r1 pulled in by:
+    app-crypt/gnupg-2.2.8 requires >=net-misc/curl-7.10
+
+  net-misc/iputils-20171016_pre-r1 pulled in by:
+    @system requires net-misc/iputils
+
+  net-misc/netifrc-0.5.1 pulled in by:
+    sys-apps/openrc-0.34.11 requires net-misc/netifrc
+
+  net-misc/openssh-7.7_p1-r6 pulled in by:
+    virtual/ssh-0 requires net-misc/openssh
+
+  net-misc/rsync-3.1.3 pulled in by:
+    @system requires net-misc/rsync
+    sys-apps/portage-2.3.41 requires >=net-misc/rsync-2.6.4
+
+  net-misc/wget-1.19.5 pulled in by:
+    @system requires net-misc/wget
+
+  perl-core/File-Path-2.130.0 pulled in by:
+    virtual/perl-File-Path-2.130.0 requires ~perl-core/File-Path-2.130.0
+
+  perl-core/File-Temp-0.230.400-r1 pulled in by:
+    virtual/perl-File-Temp-0.230.400-r5 requires ~perl-core/File-Temp-0.230.400
+
+  sys-apps/acl-2.2.52-r1 pulled in by:
+    sys-apps/coreutils-8.30 requires sys-apps/acl
+    sys-apps/shadow-4.6 requires sys-apps/acl:0/0=, sys-apps/acl:0=
+    virtual/acl-0-r2 requires >=sys-apps/acl-2.2.52-r1[abi_x86_64(-)]
+
+  sys-apps/attr-2.4.47-r2 pulled in by:
+    app-arch/tar-1.30 requires sys-apps/attr
+    dev-libs/glib-2.54.3-r6 requires >=sys-apps/attr-2.4.47-r1[abi_x86_64(-)]
+    dev-python/pyxattr-0.6.0-r1 requires sys-apps/attr
+    net-misc/rsync-3.1.3 requires sys-apps/attr
+    sys-apps/acl-2.2.52-r1 requires >=sys-apps/attr-2.4.47-r1[abi_x86_64(-)]
+    sys-apps/coreutils-8.30 requires sys-apps/attr
+    sys-apps/shadow-4.6 requires sys-apps/attr:0=, sys-apps/attr:0/0=
+    sys-devel/patch-2.7.6-r1 requires sys-apps/attr
+    sys-libs/libcap-2.25-r1 requires >=sys-apps/attr-2.4.47-r1[abi_x86_64(-)]
+
+  sys-apps/baselayout-2.6 pulled in by:
+    @system requires >=sys-apps/baselayout-2
+
+  sys-apps/busybox-1.28.0 pulled in by:
+    @system requires sys-apps/busybox
+
+  sys-apps/coreutils-8.30 pulled in by:
+    @system requires sys-apps/coreutils
+    app-admin/eselect-1.4.12 requires sys-apps/coreutils
+    sys-apps/portage-2.3.41 requires >=sys-apps/coreutils-6.4
+
+  sys-apps/debianutils-4.8.6 pulled in by:
+    app-misc/ca-certificates-20170717.3.36.1 requires sys-apps/debianutils
+
+  sys-apps/diffutils-3.5 pulled in by:
+    @system requires sys-apps/diffutils
+
+  sys-apps/file-5.33-r2 pulled in by:
+    @system requires sys-apps/file
+    app-admin/eselect-1.4.12 requires sys-apps/file
+    app-editors/nano-2.8.7 requires sys-apps/file
+
+  sys-apps/findutils-4.6.0-r1 pulled in by:
+    @system requires >=sys-apps/findutils-4.4
+
+  sys-apps/gawk-4.1.4 pulled in by:
+    @system requires sys-apps/gawk
+
+  sys-apps/gentoo-functions-0.12 pulled in by:
+    app-portage/elt-patches-20170815 requires sys-apps/gentoo-functions
+    net-misc/netifrc-0.5.1 requires sys-apps/gentoo-functions
+    sys-devel/binutils-config-5-r4 requires sys-apps/gentoo-functions
+    sys-devel/gcc-config-1.8-r1 requires >=sys-apps/gentoo-functions-0.10
+    sys-libs/glibc-2.27-r5 requires sys-apps/gentoo-functions
+
+  sys-apps/grep-3.0 pulled in by:
+    @system requires sys-apps/grep
+
+  sys-apps/groff-1.22.2 pulled in by:
+    mail-mta/nullmailer-2.0-r2 requires sys-apps/groff
+    sys-apps/man-db-2.8.3 requires sys-apps/groff
+
+  sys-apps/help2man-1.47.4 pulled in by:
+    dev-libs/libtasn1-4.13 requires sys-apps/help2man
+    net-dns/libidn2-2.0.5 requires sys-apps/help2man
+    sys-devel/automake-1.15.1-r2 requires sys-apps/help2man
+
+  sys-apps/hwids-20171003 pulled in by:
+    sys-fs/eudev-3.2.5 requires >=sys-apps/hwids-20140304[udev]
+
+  sys-apps/install-xattr-0.5 pulled in by:
+    sys-apps/portage-2.3.41 requires >=sys-apps/install-xattr-0.3
+
+  sys-apps/iproute2-4.14.1-r2 pulled in by:
+    @system requires sys-apps/iproute2
+
+  sys-apps/kbd-2.0.4 pulled in by:
+    @system requires sys-apps/kbd
+
+  sys-apps/kmod-25 pulled in by:
+    sys-fs/eudev-3.2.5 requires >=sys-apps/kmod-16
+    virtual/modutils-0 requires sys-apps/kmod[tools]
+
+  sys-apps/less-529 pulled in by:
+    @system requires sys-apps/less
+    virtual/pager-0 requires sys-apps/less
+
+  sys-apps/man-db-2.8.3 pulled in by:
+    virtual/man-0-r1 requires sys-apps/man-db
+
+  sys-apps/man-pages-4.14 pulled in by:
+    @system requires sys-apps/man-pages
+
+  sys-apps/man-pages-posix-2013a pulled in by:
+    sys-apps/man-pages-4.14 requires sys-apps/man-pages-posix
+
+  sys-apps/net-tools-1.60_p20161110235919 pulled in by:
+    @system requires sys-apps/net-tools
+
+  sys-apps/openrc-0.34.11 pulled in by:
+    net-misc/netifrc-0.5.1 requires >=sys-apps/openrc-0.15
+    virtual/service-manager-0 requires sys-apps/openrc
+
+  sys-apps/opentmpfiles-0.1.3 pulled in by:
+    virtual/tmpfiles-0 requires sys-apps/opentmpfiles
+
+  sys-apps/portage-2.3.41 pulled in by:
+    app-admin/perl-cleaner-2.25 requires sys-apps/portage
+    virtual/package-manager-1 requires sys-apps/portage
+
+  sys-apps/sandbox-2.13 pulled in by:
+    sys-apps/portage-2.3.41 requires >=sys-apps/sandbox-2.2
+
+  sys-apps/sed-4.5 pulled in by:
+    @system requires sys-apps/sed
+    app-admin/eselect-1.4.12 requires sys-apps/sed
+    dev-libs/glib-2.54.3-r6 requires >=sys-apps/sed-4
+    sys-apps/portage-2.3.41 requires >=sys-apps/sed-4.0.5
+    sys-devel/gcc-7.3.0-r3 requires >=sys-apps/sed-4
+
+  sys-apps/shadow-4.6 pulled in by:
+    virtual/shadow-0 requires >=sys-apps/shadow-4.1
+
+  sys-apps/sysvinit-2.88-r9 pulled in by:
+    sys-apps/openrc-0.34.11 requires >=sys-apps/sysvinit-2.86-r6
+
+  sys-apps/texinfo-6.3 pulled in by:
+    sys-fs/e2fsprogs-1.43.9 requires sys-apps/texinfo
+
+  sys-apps/util-linux-2.32-r3 pulled in by:
+    @system requires sys-apps/util-linux
+    app-text/build-docbook-catalog-1.21 requires sys-apps/util-linux
+    dev-libs/glib-2.54.3-r6 requires sys-apps/util-linux[abi_x86_64(-)]
+    sys-fs/e2fsprogs-1.43.9 requires >=sys-apps/util-linux-2.16
+    sys-fs/eudev-3.2.5 requires >=sys-apps/util-linux-2.20
+
+  sys-apps/which-2.21 pulled in by:
+    @system requires sys-apps/which
+
+  sys-auth/pambase-20150213-r1 pulled in by:
+    net-misc/openssh-7.7_p1-r6 requires >=sys-auth/pambase-20081028
+    sys-apps/openrc-0.34.11 requires sys-auth/pambase
+    sys-apps/shadow-4.6 requires >=sys-auth/pambase-20150213
+    sys-libs/pam-1.3.0-r2 requires sys-auth/pambase
+
+  sys-devel/autoconf-2.69-r4 pulled in by:
+    app-crypt/pinentry-1.1.0-r2 requires >=sys-devel/autoconf-2.69
+    app-text/openjade-1.3.2-r7 requires >=sys-devel/autoconf-2.69
+    app-text/opensp-1.5.2-r6 requires >=sys-devel/autoconf-2.69
+    dev-lang/python-2.7.14-r1 requires >=sys-devel/autoconf-2.65, >=sys-devel/autoconf-2.69
+    dev-lang/python-3.6.6 requires >=sys-devel/autoconf-2.69
+    dev-libs/expat-2.2.5 requires >=sys-devel/autoconf-2.69
+    dev-libs/glib-2.54.3-r6 requires >=sys-devel/autoconf-2.69
+    dev-libs/iniparser-3.1-r1 requires >=sys-devel/autoconf-2.69
+    dev-libs/libgcrypt-1.8.3 requires >=sys-devel/autoconf-2.69
+    dev-libs/libxml2-2.9.8 requires >=sys-devel/autoconf-2.69
+    dev-libs/libxslt-1.1.32 requires >=sys-devel/autoconf-2.69
+    dev-libs/nettle-3.4 requires >=sys-devel/autoconf-2.69
+    mail-mta/nullmailer-2.0-r2 requires >=sys-devel/autoconf-2.69
+    net-libs/libnsl-1.2.0 requires >=sys-devel/autoconf-2.69
+    net-libs/libtirpc-1.0.2-r1 requires >=sys-devel/autoconf-2.69
+    net-misc/curl-7.60.0-r1 requires >=sys-devel/autoconf-2.69
+    net-misc/openssh-7.7_p1-r6 requires sys-devel/autoconf, >=sys-devel/autoconf-2.69
+    sys-apps/attr-2.4.47-r2 requires sys-devel/autoconf
+    sys-apps/groff-1.22.2 requires >=sys-devel/autoconf-2.69
+    sys-devel/automake-1.15.1-r2 requires >=sys-devel/autoconf-2.69:*
+    sys-devel/libtool-2.4.6-r3 requires >=sys-devel/autoconf-2.69
+    sys-fs/eudev-3.2.5 requires >=sys-devel/autoconf-2.69
+    sys-libs/db-5.3.28-r2 requires >=sys-devel/autoconf-2.69
+    sys-libs/gdbm-1.13-r2 requires >=sys-devel/autoconf-2.69
+
+  sys-devel/autoconf-wrapper-13-r1 pulled in by:
+    sys-devel/autoconf-2.69-r4 requires >=sys-devel/autoconf-wrapper-13
+
+  sys-devel/automake-1.15.1-r2 pulled in by:
+    app-crypt/pinentry-1.1.0-r2 requires >=sys-devel/automake-1.15.1:1.15
+    app-text/openjade-1.3.2-r7 requires >=sys-devel/automake-1.15.1:1.15
+    app-text/opensp-1.5.2-r6 requires >=sys-devel/automake-1.15.1:1.15
+    dev-lang/python-2.7.14-r1 requires >=sys-devel/automake-1.15.1:1.15
+    dev-lang/python-3.6.6 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/expat-2.2.5 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/glib-2.54.3-r6 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/iniparser-3.1-r1 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/libgcrypt-1.8.3 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/libxml2-2.9.8 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/libxslt-1.1.32 requires >=sys-devel/automake-1.15.1:1.15
+    dev-libs/nettle-3.4 requires >=sys-devel/automake-1.15.1:1.15
+    mail-mta/nullmailer-2.0-r2 requires >=sys-devel/automake-1.15.1:1.15
+    net-libs/libnsl-1.2.0 requires >=sys-devel/automake-1.15.1:1.15
+    net-libs/libtirpc-1.0.2-r1 requires >=sys-devel/automake-1.15.1:1.15
+    net-misc/curl-7.60.0-r1 requires >=sys-devel/automake-1.15.1:1.15
+    net-misc/openssh-7.7_p1-r6 requires >=sys-devel/automake-1.15.1:1.15
+    sys-apps/groff-1.22.2 requires >=sys-devel/automake-1.15.1:1.15
+    sys-devel/libtool-2.4.6-r3 requires >=sys-devel/automake-1.13, >=sys-devel/automake-1.15.1:1.15
+    sys-fs/eudev-3.2.5 requires >=sys-devel/automake-1.15.1:1.15
+    sys-libs/db-5.3.28-r2 requires >=sys-devel/automake-1.15.1:1.15
+    sys-libs/gdbm-1.13-r2 requires >=sys-devel/automake-1.15.1:1.15
+
+  sys-devel/automake-wrapper-10 pulled in by:
+    sys-devel/automake-1.15.1-r2 requires >=sys-devel/automake-wrapper-10
+
+  sys-devel/binutils-2.30-r2 pulled in by:
+    @system requires sys-devel/binutils
+    sys-devel/gcc-7.3.0-r3 requires >=sys-devel/binutils-2.20
+    sys-libs/db-5.3.28-r2 requires >=sys-devel/binutils-2.16.1
+    sys-libs/glibc-2.27-r5 requires >=sys-devel/binutils-2.24
+
+  sys-devel/binutils-config-5-r4 pulled in by:
+    sys-devel/binutils-2.30-r2 requires >=sys-devel/binutils-config-3
+
+  sys-devel/bison-3.0.4-r1 pulled in by:
+    sys-apps/iproute2-4.14.1-r2 requires >=sys-devel/bison-2.4
+    sys-devel/gcc-7.3.0-r3 requires >=sys-devel/bison-1.875
+    sys-libs/glibc-2.27-r5 requires sys-devel/bison
+    virtual/yacc-0 requires sys-devel/bison
+
+  sys-devel/flex-2.6.4-r1 pulled in by:
+    dev-libs/elfutils-0.170-r1 requires >=sys-devel/flex-2.5.4a
+    sys-apps/iproute2-4.14.1-r2 requires sys-devel/flex
+    sys-devel/binutils-2.30-r2 requires sys-devel/flex
+    sys-devel/bison-3.0.4-r1 requires sys-devel/flex
+    sys-devel/gcc-7.3.0-r3 requires >=sys-devel/flex-2.5.4
+    sys-libs/pam-1.3.0-r2 requires >=sys-devel/flex-2.5.39-r1[abi_x86_64(-)]
+
+  sys-devel/gcc-7.3.0-r3 pulled in by:
+    @system requires sys-devel/gcc
+    sys-libs/glibc-2.27-r5 requires >=sys-devel/gcc-4.9
+
+  sys-devel/gcc-config-1.8-r1 pulled in by:
+    sys-devel/gcc-7.3.0-r3 requires >=sys-devel/gcc-config-1.7
+
+  sys-devel/gettext-0.19.8.1 pulled in by:
+    app-arch/tar-1.30 requires >=sys-devel/gettext-0.10.35
+    app-crypt/gnupg-2.2.8 requires sys-devel/gettext
+    app-crypt/pinentry-1.1.0-r2 requires sys-devel/gettext
+    app-editors/nano-2.8.7 requires sys-devel/gettext
+    app-text/opensp-1.5.2-r6 requires sys-devel/gettext
+    app-text/po4a-0.47-r1 requires >=sys-devel/gettext-0.13
+    dev-libs/elfutils-0.170-r1 requires sys-devel/gettext
+    dev-libs/glib-2.54.3-r6 requires >=sys-devel/gettext-0.11
+    dev-libs/libgpg-error-1.29 requires sys-devel/gettext
+    dev-libs/popt-1.16-r2 requires sys-devel/gettext
+    dev-perl/Locale-gettext-1.70.0 requires sys-devel/gettext
+    dev-util/intltool-0.51.0-r2 requires sys-devel/gettext
+    net-libs/gnutls-3.5.18 requires sys-devel/gettext
+    net-misc/wget-1.19.5 requires sys-devel/gettext
+    sys-apps/acl-2.2.52-r1 requires sys-devel/gettext
+    sys-apps/attr-2.4.47-r2 requires sys-devel/gettext
+    sys-apps/diffutils-3.5 requires sys-devel/gettext
+    sys-apps/findutils-4.6.0-r1 requires sys-devel/gettext
+    sys-apps/gawk-4.1.4 requires sys-devel/gettext
+    sys-apps/grep-3.0 requires sys-devel/gettext
+    sys-apps/man-db-2.8.3 requires sys-devel/gettext
+    sys-apps/sed-4.5 requires sys-devel/gettext
+    sys-apps/shadow-4.6 requires sys-devel/gettext
+    sys-apps/texinfo-6.3 requires >=sys-devel/gettext-0.19.6
+    sys-apps/util-linux-2.32-r3 requires sys-devel/gettext
+    sys-devel/binutils-2.30-r2 requires sys-devel/gettext
+    sys-devel/bison-3.0.4-r1 requires sys-devel/gettext
+    sys-devel/flex-2.6.4-r1 requires sys-devel/gettext
+    sys-devel/gcc-7.3.0-r3 requires sys-devel/gettext
+    sys-devel/make-4.2.1 requires sys-devel/gettext
+    sys-fs/e2fsprogs-1.43.9 requires sys-devel/gettext
+    sys-libs/e2fsprogs-libs-1.43.9 requires sys-devel/gettext
+    sys-libs/pam-1.3.0-r2 requires sys-devel/gettext
+    sys-process/psmisc-23.1-r1 requires sys-devel/gettext
+    x11-misc/shared-mime-info-1.9 requires sys-devel/gettext
+
+  sys-devel/gnuconfig-20170101 pulled in by:
+    @system requires sys-devel/gnuconfig
+    sys-devel/automake-1.15.1-r2 requires sys-devel/gnuconfig
+    sys-devel/binutils-2.30-r2 requires sys-devel/gnuconfig
+    sys-devel/gcc-7.3.0-r3 requires sys-devel/gnuconfig
+    sys-devel/libtool-2.4.6-r3 requires sys-devel/gnuconfig
+    sys-libs/glibc-2.27-r5 requires sys-devel/gnuconfig
+
+  sys-devel/libtool-2.4.6-r3 pulled in by:
+    app-crypt/pinentry-1.1.0-r2 requires >=sys-devel/libtool-2.4
+    app-text/openjade-1.3.2-r7 requires >=sys-devel/libtool-2.4
+    app-text/opensp-1.5.2-r6 requires >=sys-devel/libtool-2.4
+    dev-libs/expat-2.2.5 requires >=sys-devel/libtool-2.4
+    dev-libs/glib-2.54.3-r6 requires >=sys-devel/libtool-2.4
+    dev-libs/iniparser-3.1-r1 requires sys-devel/libtool, >=sys-devel/libtool-2.4
+    dev-libs/libgcrypt-1.8.3 requires >=sys-devel/libtool-2.4
+    dev-libs/libxml2-2.9.8 requires >=sys-devel/libtool-2.4
+    dev-libs/libxslt-1.1.32 requires >=sys-devel/libtool-2.4
+    dev-libs/nettle-3.4 requires >=sys-devel/libtool-2.4
+    mail-mta/nullmailer-2.0-r2 requires >=sys-devel/libtool-2.4
+    net-libs/libnsl-1.2.0 requires >=sys-devel/libtool-2.4
+    net-libs/libtirpc-1.0.2-r1 requires >=sys-devel/libtool-2.4
+    net-misc/curl-7.60.0-r1 requires >=sys-devel/libtool-2.4
+    net-misc/openssh-7.7_p1-r6 requires >=sys-devel/libtool-2.4
+    sys-apps/groff-1.22.2 requires >=sys-devel/libtool-2.4
+    sys-fs/eudev-3.2.5 requires >=sys-devel/libtool-2.4
+    sys-libs/db-5.3.28-r2 requires >=sys-devel/libtool-2.4
+    sys-libs/gdbm-1.13-r2 requires >=sys-devel/libtool-2.4
+    sys-libs/pam-1.3.0-r2 requires >=sys-devel/libtool-2
+    sys-process/psmisc-23.1-r1 requires >=sys-devel/libtool-2.2.6b
+
+  sys-devel/m4-1.4.17 pulled in by:
+    dev-libs/elfutils-0.170-r1 requires sys-devel/m4
+    dev-libs/gmp-6.1.2 requires sys-devel/m4
+    sys-devel/autoconf-2.69-r4 requires >=sys-devel/m4-1.4.16
+    sys-devel/bison-3.0.4-r1 requires >=sys-devel/m4-1.4.16
+    sys-devel/flex-2.6.4-r1 requires sys-devel/m4
+
+  sys-devel/make-4.2.1 pulled in by:
+    @system requires sys-devel/make
+    sys-fs/eudev-3.2.5 requires >=sys-devel/make-3.82-r4
+
+  sys-devel/patch-2.7.6-r1 pulled in by:
+    @system requires >=sys-devel/patch-2.7
+    sys-apps/portage-2.3.41 requires sys-devel/patch
+
+  sys-fs/e2fsprogs-1.43.9 pulled in by:
+    @system requires sys-fs/e2fsprogs
+
+  sys-fs/eudev-3.2.5 pulled in by:
+    virtual/udev-217 requires >=sys-fs/eudev-2.1.1
+
+  sys-fs/udev-init-scripts-32 pulled in by:
+    sys-fs/eudev-3.2.5 requires >=sys-fs/udev-init-scripts-26
+
+  sys-kernel/linux-headers-4.13 pulled in by:
+    net-firewall/iptables-1.6.1-r3 requires >=sys-kernel/linux-headers-4.4:0
+    sys-apps/busybox-1.28.0 requires >=sys-kernel/linux-headers-2.6.39
+    sys-apps/iproute2-4.14.1-r2 requires >=sys-kernel/linux-headers-3.16
+    sys-fs/eudev-3.2.5 requires >=sys-kernel/linux-headers-2.6.39
+    sys-libs/libcap-2.25-r1 requires sys-kernel/linux-headers
+    sys-libs/libseccomp-2.3.3 requires >=sys-kernel/linux-headers-4.3
+    virtual/os-headers-0 requires sys-kernel/linux-headers:0
+
+  sys-libs/cracklib-2.9.6-r1 pulled in by:
+    sys-apps/shadow-4.6 requires >=sys-libs/cracklib-2.7-r3:0/0=, >=sys-libs/cracklib-2.7-r3:0=
+    sys-libs/pam-1.3.0-r2 requires >=sys-libs/cracklib-2.9.1-r1[abi_x86_64(-)]
+
+  sys-libs/db-5.3.28-r2 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires sys-libs/db:=, sys-libs/db:5.3/5.3=
+    sys-apps/iproute2-4.14.1-r2 requires sys-libs/db:=, sys-libs/db:5.3/5.3=
+    sys-apps/man-db-2.8.3 requires sys-libs/db:5.3/5.3=, sys-libs/db:=
+    sys-libs/pam-1.3.0-r2 requires >=sys-libs/db-4.8.30-r1:=[abi_x86_64(-)], >=sys-libs/db-4.8.30-r1:5.3/5.3=[abi_x86_64(-)]
+
+  sys-libs/e2fsprogs-libs-1.43.9 pulled in by:
+    sys-fs/e2fsprogs-1.43.9 requires ~sys-libs/e2fsprogs-libs-1.43.9
+
+  sys-libs/gdbm-1.13-r2 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires >=sys-libs/gdbm-1.8.3:0/1.13=, >=sys-libs/gdbm-1.8.3:=
+    dev-lang/python-2.7.14-r1 requires sys-libs/gdbm:0/1.13=[berkdb], sys-libs/gdbm:0=[berkdb]
+    dev-lang/python-3.6.6 requires sys-libs/gdbm:0=[berkdb], sys-libs/gdbm:0/1.13=[berkdb]
+    sys-apps/man-db-2.8.3 requires sys-libs/gdbm:=, sys-libs/gdbm:0/1.13=
+
+  sys-libs/glibc-2.27-r5 pulled in by:
+    sys-apps/iproute2-4.14.1-r2 requires >=sys-libs/glibc-2.7
+    sys-devel/gcc-7.3.0-r3 requires >=sys-libs/glibc-2.13
+    virtual/libc-1 requires sys-libs/glibc:2.2
+
+  sys-libs/libcap-2.25-r1 pulled in by:
+    net-misc/iputils-20171016_pre-r1 requires sys-libs/libcap
+    sys-libs/pam-1.3.0-r2 requires sys-libs/libcap
+
+  sys-libs/libseccomp-2.3.3 pulled in by:
+    app-misc/pax-utils-1.2.3-r1 requires sys-libs/libseccomp
+    sys-apps/man-db-2.8.3 requires sys-libs/libseccomp
+
+  sys-libs/ncurses-6.1-r2 pulled in by:
+    app-admin/eselect-1.4.12 requires sys-libs/ncurses:0
+    app-crypt/pinentry-1.1.0-r2 requires sys-libs/ncurses:0=, sys-libs/ncurses:0/6=
+    app-editors/nano-2.8.7 requires sys-libs/ncurses:0=, sys-libs/ncurses:0/6=, >=sys-libs/ncurses-5.9-r1:0/6=[unicode], >=sys-libs/ncurses-5.9-r1:0=[unicode]
+    app-shells/bash-4.4_p12 requires >=sys-libs/ncurses-5.2-r2:0=, >=sys-libs/ncurses-5.2-r2:0/6=
+    dev-lang/python-2.7.14-r1 requires >=sys-libs/ncurses-5.2:0=, >=sys-libs/ncurses-5.2:0/6=
+    dev-lang/python-3.6.6 requires >=sys-libs/ncurses-5.2:0/6=, >=sys-libs/ncurses-5.2:0=
+    sys-apps/less-529 requires >=sys-libs/ncurses-5.2:0=, >=sys-libs/ncurses-5.2:0/6=
+    sys-apps/openrc-0.34.11 requires sys-libs/ncurses:0=, sys-libs/ncurses:0/6=
+    sys-apps/texinfo-6.3 requires >=sys-libs/ncurses-5.2-r2:0/6=, >=sys-libs/ncurses-5.2-r2:0=
+    sys-apps/util-linux-2.32-r3 requires >=sys-libs/ncurses-5.2-r2:0/6=[unicode], >=sys-libs/ncurses-5.2-r2:0=[unicode]
+    sys-devel/gettext-0.19.8.1 requires sys-libs/ncurses:0=, sys-libs/ncurses:0/6=
+    sys-libs/readline-7.0_p3 requires >=sys-libs/ncurses-5.9-r3:0=[abi_x86_64(-)], >=sys-libs/ncurses-5.9-r3:0/6=[abi_x86_64(-)]
+    sys-process/procps-3.3.15-r1 requires >=sys-libs/ncurses-5.7-r7:=[unicode], >=sys-libs/ncurses-5.7-r7:0/6=[unicode]
+    sys-process/psmisc-23.1-r1 requires >=sys-libs/ncurses-5.7-r7:0=, >=sys-libs/ncurses-5.7-r7:0/6=
+
+  sys-libs/pam-1.3.0-r2 pulled in by:
+    sys-apps/util-linux-2.32-r3 requires sys-libs/pam
+    sys-auth/pambase-20150213-r1 requires >=sys-libs/pam-1.1.3, sys-libs/pam[cracklib]
+    virtual/pam-0-r1 requires >=sys-libs/pam-1.1.6-r2[abi_x86_64(-)]
+
+  sys-libs/readline-7.0_p3 pulled in by:
+    app-crypt/gnupg-2.2.8 requires sys-libs/readline:0/7=, sys-libs/readline:0=
+    app-shells/bash-4.4_p12 requires >=sys-libs/readline-7.0:0=, >=sys-libs/readline-7.0:0/7=
+    dev-lang/python-2.7.14-r1 requires >=sys-libs/readline-4.1:0=, >=sys-libs/readline-4.1:0/7=
+    dev-lang/python-3.6.6 requires >=sys-libs/readline-4.1:0=, >=sys-libs/readline-4.1:0/7=
+    dev-libs/libpcre-8.42 requires sys-libs/readline:0/7=, sys-libs/readline:0=
+    dev-libs/libxml2-2.9.8 requires sys-libs/readline:0/7=, sys-libs/readline:=
+    sys-apps/gawk-4.1.4 requires sys-libs/readline:0/7=, sys-libs/readline:0=
+    sys-apps/util-linux-2.32-r3 requires sys-libs/readline:0/7=, sys-libs/readline:0=
+    sys-libs/gdbm-1.13-r2 requires sys-libs/readline:0/7=[abi_x86_64(-)], sys-libs/readline:0=[abi_x86_64(-)]
+
+  sys-libs/timezone-data-2018d pulled in by:
+    sys-libs/glibc-2.27-r5 requires sys-libs/timezone-data
+
+  sys-libs/zlib-1.2.11-r1 pulled in by:
+    app-crypt/gnupg-2.2.8 requires sys-libs/zlib
+    dev-lang/perl-5.24.3-r1 requires sys-libs/zlib
+    dev-lang/python-2.7.14-r1 requires >=sys-libs/zlib-1.1.3:0=, >=sys-libs/zlib-1.1.3:0/1=
+    dev-lang/python-3.6.6 requires >=sys-libs/zlib-1.1.3:0/1=, >=sys-libs/zlib-1.1.3:0=
+    dev-libs/elfutils-0.170-r1 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+    dev-libs/glib-2.54.3-r6 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+    dev-libs/libpcre-8.42 requires sys-libs/zlib
+    dev-libs/libxml2-2.9.8 requires >=sys-libs/zlib-1.2.8-r1:=[abi_x86_64(-)], >=sys-libs/zlib-1.2.8-r1:0/1=[abi_x86_64(-)]
+    dev-libs/openssl-1.0.2o-r6 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+    net-libs/gnutls-3.5.18 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+    net-misc/curl-7.60.0-r1 requires sys-libs/zlib[abi_x86_64(-)]
+    net-misc/openssh-7.7_p1-r6 requires >=sys-libs/zlib-1.2.3:0/1=, >=sys-libs/zlib-1.2.3:=
+    net-misc/wget-1.19.5 requires sys-libs/zlib
+    sys-apps/file-5.33-r2 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+    sys-apps/kmod-25 requires >=sys-libs/zlib-1.2.6
+    sys-apps/man-db-2.8.3 requires sys-libs/zlib
+    sys-apps/util-linux-2.32-r3 requires sys-libs/zlib:=, sys-libs/zlib:0/1=
+    sys-devel/binutils-2.30-r2 requires sys-libs/zlib
+    sys-devel/gcc-7.3.0-r3 requires sys-libs/zlib
+    sys-libs/cracklib-2.9.6-r1 requires >=sys-libs/zlib-1.2.8-r1[abi_x86_64(-)]
+
+  sys-process/procps-3.3.15-r1 pulled in by:
+    @system requires sys-process/procps
+
+  sys-process/psmisc-23.1-r1 pulled in by:
+    @system requires sys-process/psmisc
+    sys-apps/openrc-0.34.11 requires sys-process/psmisc
+
+  virtual/acl-0-r2 pulled in by:
+    app-arch/tar-1.30 requires virtual/acl, =virtual/acl-0-r2
+    net-misc/rsync-3.1.3 requires virtual/acl, =virtual/acl-0-r2
+    sys-apps/sed-4.5 requires virtual/acl, =virtual/acl-0-r2
+    sys-devel/gettext-0.19.8.1 requires =virtual/acl-0-r2, virtual/acl
+
+  virtual/dev-manager-0-r1 pulled in by:
+    @system requires virtual/dev-manager
+
+  virtual/editor-0-r1 pulled in by:
+    @system requires virtual/editor
+
+  virtual/libc-1 pulled in by:
+    @system requires virtual/libc
+
+  virtual/libelf-3 pulled in by:
+    sys-apps/iproute2-4.14.1-r2 requires =virtual/libelf-3, virtual/libelf
+
+  virtual/libffi-3.0.13-r1 pulled in by:
+    dev-lang/python-2.7.14-r1 requires virtual/libffi, =virtual/libffi-3.0.13-r1
+    dev-lang/python-3.6.6 requires virtual/libffi, =virtual/libffi-3.0.13-r1
+    dev-libs/glib-2.54.3-r6 requires =virtual/libffi-3.0.13-r1[abi_x86_64(-)], >=virtual/libffi-3.0.13-r1[abi_x86_64(-)]
+
+  virtual/libiconv-0-r2 pulled in by:
+    dev-libs/glib-2.54.3-r6 requires >=virtual/libiconv-0-r1[abi_x86_64(-)], =virtual/libiconv-0-r2[abi_x86_64(-)]
+    net-misc/rsync-3.1.3 requires virtual/libiconv, =virtual/libiconv-0-r2
+    sys-apps/grep-3.0 requires virtual/libiconv, =virtual/libiconv-0-r2
+    sys-devel/gcc-7.3.0-r3 requires virtual/libiconv, =virtual/libiconv-0-r2
+    sys-devel/gettext-0.19.8.1 requires =virtual/libiconv-0-r2[abi_x86_64(-)], >=virtual/libiconv-0-r1[abi_x86_64(-)]
+
+  virtual/libintl-0-r2 pulled in by:
+    app-crypt/gnupg-2.2.8 requires virtual/libintl, =virtual/libintl-0-r2
+    app-editors/nano-2.8.7 requires =virtual/libintl-0-r2, virtual/libintl
+    app-shells/bash-4.4_p12 requires virtual/libintl, =virtual/libintl-0-r2
+    dev-lang/python-2.7.14-r1 requires =virtual/libintl-0-r2, virtual/libintl
+    dev-lang/python-3.6.6 requires virtual/libintl, =virtual/libintl-0-r2
+    dev-libs/glib-2.54.3-r6 requires =virtual/libintl-0-r2[abi_x86_64(-)], >=virtual/libintl-0-r2[abi_x86_64(-)]
+    dev-libs/libgpg-error-1.29 requires >=virtual/libintl-0-r1[abi_x86_64(-)], =virtual/libintl-0-r2[abi_x86_64(-)]
+    dev-libs/popt-1.16-r2 requires =virtual/libintl-0-r2[abi_x86_64(-)], >=virtual/libintl-0-r1[abi_x86_64(-)]
+    dev-perl/libintl-perl-1.240.0-r2 requires =virtual/libintl-0-r2, virtual/libintl
+    dev-util/pkgconfig-0.29.2 requires virtual/libintl, =virtual/libintl-0-r2
+    net-libs/gnutls-3.5.18 requires >=virtual/libintl-0-r1[abi_x86_64(-)], =virtual/libintl-0-r2[abi_x86_64(-)]
+    sys-apps/coreutils-8.30 requires =virtual/libintl-0-r2, virtual/libintl
+    sys-apps/findutils-4.6.0-r1 requires virtual/libintl, =virtual/libintl-0-r2
+    sys-apps/grep-3.0 requires =virtual/libintl-0-r2, virtual/libintl
+    sys-apps/sed-4.5 requires virtual/libintl, =virtual/libintl-0-r2
+    sys-apps/shadow-4.6 requires virtual/libintl, =virtual/libintl-0-r2
+    sys-apps/texinfo-6.3 requires =virtual/libintl-0-r2, virtual/libintl
+    sys-apps/util-linux-2.32-r3 requires virtual/libintl[abi_x86_64(-)], =virtual/libintl-0-r2[abi_x86_64(-)]
+    sys-devel/gcc-7.3.0-r3 requires virtual/libintl, =virtual/libintl-0-r2
+    sys-devel/gettext-0.19.8.1 requires >=virtual/libintl-0-r2[abi_x86_64(-)], =virtual/libintl-0-r2[abi_x86_64(-)]
+    sys-devel/make-4.2.1 requires =virtual/libintl-0-r2, virtual/libintl
+    sys-fs/e2fsprogs-1.43.9 requires virtual/libintl, =virtual/libintl-0-r2
+    sys-libs/pam-1.3.0-r2 requires >=virtual/libintl-0-r1[abi_x86_64(-)], =virtual/libintl-0-r2[abi_x86_64(-)]
+    sys-libs/timezone-data-2018d requires =virtual/libintl-0-r2, virtual/libintl
+    sys-process/psmisc-23.1-r1 requires =virtual/libintl-0-r2, virtual/libintl
+
+  virtual/logger-0 pulled in by:
+    mail-mta/nullmailer-2.0-r2 requires virtual/logger, =virtual/logger-0
+
+  virtual/man-0-r1 pulled in by:
+    @system requires virtual/man
+    sys-apps/man-pages-4.14 requires =virtual/man-0-r1, virtual/man
+    sys-apps/man-pages-posix-2013a requires virtual/man, =virtual/man-0-r1
+
+  virtual/modutils-0 pulled in by:
+    @system requires virtual/modutils
+
+  virtual/mta-1 pulled in by:
+    app-crypt/gnupg-2.2.8 requires =virtual/mta-1, virtual/mta
+
+  virtual/os-headers-0 pulled in by:
+    @system requires virtual/os-headers
+    net-firewall/iptables-1.6.1-r3 requires virtual/os-headers, =virtual/os-headers-0
+    net-misc/iputils-20171016_pre-r1 requires virtual/os-headers, =virtual/os-headers-0
+    net-misc/openssh-7.7_p1-r6 requires =virtual/os-headers-0, virtual/os-headers
+    sys-apps/openrc-0.34.11 requires =virtual/os-headers-0, virtual/os-headers
+    sys-apps/sysvinit-2.88-r9 requires =virtual/os-headers-0, virtual/os-headers
+    sys-apps/util-linux-2.32-r3 requires virtual/os-headers, =virtual/os-headers-0
+    sys-fs/eudev-3.2.5 requires =virtual/os-headers-0, virtual/os-headers
+    sys-libs/glibc-2.27-r5 requires virtual/os-headers, =virtual/os-headers-0
+
+  virtual/package-manager-1 pulled in by:
+    @system requires virtual/package-manager
+
+  virtual/pager-0 pulled in by:
+    @system requires virtual/pager
+
+  virtual/pam-0-r1 pulled in by:
+    net-misc/openssh-7.7_p1-r6 requires =virtual/pam-0-r1, virtual/pam
+    sys-apps/kbd-2.0.4 requires =virtual/pam-0-r1, virtual/pam
+    sys-apps/openrc-0.34.11 requires =virtual/pam-0-r1, virtual/pam
+    sys-apps/shadow-4.6 requires virtual/pam:0=, =virtual/pam-0-r1, virtual/pam:0/0=
+    sys-libs/libcap-2.25-r1 requires virtual/pam, =virtual/pam-0-r1
+
+  virtual/perl-CPAN-Meta-2.150.5-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires =virtual/perl-CPAN-Meta-2.150.5-r1, >=virtual/perl-CPAN-Meta-2.142.60
+
+  virtual/perl-CPAN-Meta-YAML-0.18.0-r2 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-CPAN-Meta-YAML-0.3.0
+    virtual/perl-CPAN-Meta-2.150.5-r1 requires >=virtual/perl-CPAN-Meta-YAML-0.11.0
+
+  virtual/perl-Data-Dumper-2.160.0-r1 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires >=virtual/perl-Data-Dumper-2.154.0
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-Data-Dumper
+
+  virtual/perl-ExtUtils-CBuilder-0.280.225-r2 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-ExtUtils-CBuilder-0.270.0
+
+  virtual/perl-ExtUtils-Install-2.40.0-r3 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-ExtUtils-Install
+
+  virtual/perl-ExtUtils-MakeMaker-7.100.200_rc-r4 pulled in by:
+    dev-perl/Locale-gettext-1.70.0 requires virtual/perl-ExtUtils-MakeMaker
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-ExtUtils-MakeMaker
+    dev-perl/TermReadKey-2.330.0 requires virtual/perl-ExtUtils-MakeMaker
+    dev-perl/Text-Unidecode-1.270.0 requires virtual/perl-ExtUtils-MakeMaker
+    dev-perl/Unicode-EastAsianWidth-1.330.0-r1 requires virtual/perl-ExtUtils-MakeMaker
+    dev-perl/libintl-perl-1.240.0-r2 requires virtual/perl-ExtUtils-MakeMaker
+
+  virtual/perl-ExtUtils-Manifest-1.700.0-r4 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-ExtUtils-Manifest
+
+  virtual/perl-ExtUtils-ParseXS-3.310.0-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-ExtUtils-ParseXS-2.210.0
+
+  virtual/perl-File-Path-2.130.0 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires >=virtual/perl-File-Path-2.130.0
+
+  virtual/perl-File-Spec-3.630.100_rc-r4 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-File-Spec-0.820.0
+    dev-perl/Unicode-EastAsianWidth-1.330.0-r1 requires virtual/perl-File-Spec
+
+  virtual/perl-File-Temp-0.230.400-r5 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires >=virtual/perl-File-Temp-0.230.400-r2
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-File-Temp-0.150.0
+
+  virtual/perl-Getopt-Long-2.480.0-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-Getopt-Long
+
+  virtual/perl-JSON-PP-2.273.0.100_rc-r6 pulled in by:
+    virtual/perl-CPAN-Meta-2.150.5-r1 requires >=virtual/perl-JSON-PP-2.271.30
+
+  virtual/perl-Module-Metadata-1.0.31-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-Module-Metadata-1.0.2
+
+  virtual/perl-Parse-CPAN-Meta-1.441.700.100_rc-r4 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-Parse-CPAN-Meta-1.440.100
+    virtual/perl-CPAN-Meta-2.150.5-r1 requires >=virtual/perl-Parse-CPAN-Meta-1.441.400
+
+  virtual/perl-Perl-OSType-1.9.0-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-Perl-OSType-1
+
+  virtual/perl-Test-Harness-3.360.100_rc-r3 pulled in by:
+    dev-lang/perl-5.24.3-r1 requires virtual/perl-Test-Harness
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-Test-Harness
+
+  virtual/perl-Text-ParseWords-3.300.0-r3 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires virtual/perl-Text-ParseWords
+
+  virtual/perl-version-0.991.600-r1 pulled in by:
+    dev-perl/Module-Build-0.421.600 requires >=virtual/perl-version-0.870.0
+
+  virtual/pkgconfig-0-r1 pulled in by:
+    app-admin/metalog-3-r2 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    app-crypt/gnupg-2.2.8 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    app-crypt/pinentry-1.1.0-r2 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    app-editors/nano-2.8.7 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    app-misc/pax-utils-1.2.3-r1 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    dev-lang/python-2.7.14-r1 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    dev-lang/python-3.6.6 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    dev-libs/libpcre-8.42 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    dev-libs/libpipeline-1.5.0 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    dev-libs/libxml2-2.9.8 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    dev-util/gtk-doc-am-1.25-r1 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    mail-mta/nullmailer-2.0-r2 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    net-firewall/iptables-1.6.1-r3 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    net-libs/gnutls-3.5.18 requires =virtual/pkgconfig-0-r1[abi_x86_64(-)], >=virtual/pkgconfig-0-r1[abi_x86_64(-)]
+    net-libs/libtirpc-1.0.2-r1 requires >=virtual/pkgconfig-0-r1[abi_x86_64(-)], =virtual/pkgconfig-0-r1[abi_x86_64(-)]
+    net-misc/curl-7.60.0-r1 requires >=virtual/pkgconfig-0-r1[abi_x86_64(-)], =virtual/pkgconfig-0-r1[abi_x86_64(-)]
+    net-misc/netifrc-0.5.1 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    net-misc/openssh-7.7_p1-r6 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    net-misc/rsync-3.1.3 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    net-misc/wget-1.19.5 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-apps/grep-3.0 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-apps/hwids-20171003 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-apps/iproute2-4.14.1-r2 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-apps/kbd-2.0.4 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-apps/kmod-25 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-apps/man-db-2.8.3 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-apps/openrc-0.34.11 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-apps/portage-2.3.41 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-apps/util-linux-2.32-r3 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-fs/e2fsprogs-1.43.9 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-fs/eudev-3.2.5 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-libs/e2fsprogs-libs-1.43.9 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-libs/glibc-2.27-r5 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+    sys-libs/readline-7.0_p3 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    sys-process/procps-3.3.15-r1 requires =virtual/pkgconfig-0-r1, virtual/pkgconfig
+    x11-misc/shared-mime-info-1.9 requires virtual/pkgconfig, =virtual/pkgconfig-0-r1
+
+  virtual/service-manager-0 pulled in by:
+    @system requires virtual/service-manager
+
+  virtual/shadow-0 pulled in by:
+    @system requires virtual/shadow
+    mail-mta/nullmailer-2.0-r2 requires =virtual/shadow-0, virtual/shadow
+    net-misc/openssh-7.7_p1-r6 requires =virtual/shadow-0, virtual/shadow
+
+  virtual/ssh-0 pulled in by:
+    @system requires virtual/ssh
+
+  virtual/tmpfiles-0 pulled in by:
+    sys-apps/openrc-0.34.11 requires virtual/tmpfiles, =virtual/tmpfiles-0
+
+  virtual/udev-217 pulled in by:
+    sys-apps/hwids-20171003 requires =virtual/udev-217, virtual/udev
+    sys-fs/udev-init-scripts-32 requires =virtual/udev-217, >=virtual/udev-217
+    virtual/dev-manager-0-r1 requires =virtual/udev-217, virtual/udev
+
+  virtual/yacc-0 pulled in by:
+    dev-libs/libtasn1-4.13 requires virtual/yacc, =virtual/yacc-0
+    sys-devel/binutils-2.30-r2 requires =virtual/yacc-0, virtual/yacc
+
+  x11-misc/shared-mime-info-1.9 pulled in by:
+    dev-libs/glib-2.54.3-r6 requires x11-misc/shared-mime-info
+
+>>> Calculating removal order...
+
+>>> These are the packages that would be unmerged:
+
+ dev-lang/python
+    selected: 3.5.5 
+   protected: none 
+     omitted: 2.7.14-r1 3.6.6 
+
+All selected packages: =dev-lang/python-3.5.5
+
+>>> 'Selected' packages are slated for removal.
+>>> 'Protected' and 'omitted' packages will not be removed.
+
+Would you like to unmerge these packages? [Yes/No] Yes
+>>> Waiting 5 seconds before starting...
+>>> (Control-C to abort)...
+>>> Unmerging in: 5 4 3 2 1
+>>> Unmerging (1 of 1) dev-lang/python-3.5.5...
+Packages installed:   205
+Packages in world:    0
+Packages in system:   43
+Required packages:    205
+Number removed:       1
+
+ * GNU info directory index is up-to-date.
+livecd ~ #
+```
+
+We add two variables to our `/etc/portage/make.conf` file, `PYTHON_TARGETS` and `PYTHON_SINGLE_TARGET`. 
+
+To update our system we use `emerge` with differens options:
+
+- `--depclean`: cleans the system by removing packages that are not associated with explicitly merged packages.
+- `-1`: it's the same of `--oneshot`.
+- `-U`: the same as `--changed-use`, tells emerge to include installed packages where `USE` flags have changed since installation.
+- `-D`: the same as `--deep`, this  flag forces emerge to consider the entire dependency tree of packages, instead of checking only the immediate dependencies of the packages.
+
+We use `--deepclean` two times.
+
+```sh
+livecd ~ # eselect profile list
+Available profile symlink targets:
+  [1]   default/linux/amd64/13.0 (stable)
+  [2]   default/linux/amd64/13.0/selinux (dev)
+  [3]   default/linux/amd64/13.0/desktop (stable)
+  [4]   default/linux/amd64/13.0/desktop/gnome (stable)
+  [5]   default/linux/amd64/13.0/desktop/gnome/systemd (stable)
+  [6]   default/linux/amd64/13.0/desktop/plasma (stable)
+  [7]   default/linux/amd64/13.0/desktop/plasma/systemd (stable)
+  [8]   default/linux/amd64/13.0/developer (stable)
+  [9]   default/linux/amd64/13.0/no-multilib (stable)
+  [10]  default/linux/amd64/13.0/systemd (stable)
+  [11]  default/linux/amd64/13.0/x32 (dev)
+  [12]  default/linux/amd64/17.0 (stable) *
+  [13]  default/linux/amd64/17.0/selinux (stable)
+  [14]  default/linux/amd64/17.0/hardened (stable)
+  [15]  default/linux/amd64/17.0/hardened/selinux (stable)
+  [16]  default/linux/amd64/17.0/desktop (stable)
+  [17]  default/linux/amd64/17.0/desktop/gnome (stable)
+  [18]  default/linux/amd64/17.0/desktop/gnome/systemd (stable)
+  [19]  default/linux/amd64/17.0/desktop/plasma (stable)
+  [20]  default/linux/amd64/17.0/desktop/plasma/systemd (stable)
+  [21]  default/linux/amd64/17.0/developer (stable)
+  [22]  default/linux/amd64/17.0/no-multilib (stable)
+  [23]  default/linux/amd64/17.0/no-multilib/hardened (stable)
+  [24]  default/linux/amd64/17.0/no-multilib/hardened/selinux (stable)
+  [25]  default/linux/amd64/17.0/systemd (stable)
+  [26]  default/linux/amd64/17.0/x32 (dev)
+  [27]  default/linux/amd64/17.1 (exp)
+  [28]  default/linux/amd64/17.1/selinux (exp)
+  [29]  default/linux/amd64/17.1/hardened (exp)
+  [30]  default/linux/amd64/17.1/hardened/selinux (exp)
+  [31]  default/linux/amd64/17.1/desktop (exp)
+  [32]  default/linux/amd64/17.1/desktop/gnome (exp)
+  [33]  default/linux/amd64/17.1/desktop/gnome/systemd (exp)
+  [34]  default/linux/amd64/17.1/desktop/plasma (exp)
+  [35]  default/linux/amd64/17.1/desktop/plasma/systemd (exp)
+  [36]  default/linux/amd64/17.1/developer (exp)
+  [37]  default/linux/amd64/17.1/no-multilib (exp)
+  [38]  default/linux/amd64/17.1/no-multilib/hardened (exp)
+  [39]  default/linux/amd64/17.1/no-multilib/hardened/selinux (exp)
+  [40]  default/linux/amd64/17.1/systemd (exp)
+  [41]  hardened/linux/amd64 (stable)
+  [42]  hardened/linux/amd64/selinux (stable)
+  [43]  hardened/linux/amd64/no-multilib (stable)
+  [44]  hardened/linux/amd64/no-multilib/selinux (stable)
+  [45]  hardened/linux/amd64/x32 (dev)
+  [46]  default/linux/musl/amd64 (exp)
+  [47]  hardened/linux/musl/amd64 (exp)
+  [48]  default/linux/musl/amd64/x32 (exp)
+  [49]  hardened/linux/musl/amd64/x32 (exp)
+  [50]  default/linux/amd64/17.0/musl (exp)
+  [51]  default/linux/amd64/17.0/musl/hardened (exp)
+  [52]  default/linux/amd64/17.0/musl/hardened/selinux (exp)
+  [53]  default/linux/uclibc/amd64 (exp)
+  [54]  hardened/linux/uclibc/amd64 (exp)
+livecd ~ # eselect profile set 15
+livecd ~ # eselect profile list | grep 15
+  [15]  default/linux/amd64/17.0/hardened/selinux (stable) *
+livecd ~ #
 ```
 
