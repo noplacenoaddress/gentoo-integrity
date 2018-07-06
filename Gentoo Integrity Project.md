@@ -837,10 +837,10 @@ We start to prepare the correct environment to adquire the perfect optimization 
 
 ```fsharp
 livecd ~ # cat >> .bashrc <<EOF
-> export NUMCPUS=$(nproc)
-> export NUMCPUSPLUSONE=$(( NUMCPUS + 1 ))
-> export MAKEOPTS="-j${NUMCPUSPLUSONE} -l${NUMCPUS}"
-> export EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=${NUMCPUSPLUSONE} --load-average=${NUMCPUS}"
+    > export NUMCPUS=$(nproc)
+    > export NUMCPUSPLUSONE=$(( NUMCPUS + 1 ))
+    > export MAKEOPTS="-j${NUMCPUSPLUSONE} -l${NUMCPUS}"
+    > export EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=${NUMCPUSPLUSONE} --load-average=${NUMCPUS}"
 > EOF
 livecd ~ # source .bashrc
 livecd ~ # cat > /mnt/gentoo/etc/portage/make.conf <<EOF
@@ -917,3 +917,94 @@ In the file `make.conf` located under `/etc/portage` in our distribution Gentoo 
 - `FEAUTURES`: defines actions portage takes by default.
 - `VIDEO_CARDS`: used to set the video drivers that you intend to use and is usually based on the kind of video card you have.  More informations [here](https://wiki.gentoo.org/wiki/Intel#Drivers).
 - `INPUT_DEVICES`: is used to determine which drivers are to be built for input devices.
+
+## Build the Gentoo base system under chroot
+
+![Gentoo penguin nido in the Antartida](https://previews.123rf.com/images/vladsilver/vladsilver1603/vladsilver160300026/56089631-ping%C3%BCino-de-gentoo-en-el-nido-con-huevos-en-la-ant%C3%A1rtida.jpg)
+
+Like this beatiful Gentoo penguin have build his nido in the Antartida, we've got to compile all the *base system* of our new **Gentoo Linux system** installation above our HP laptop.
+
+Start with those customizations in our `/mnt/gentoo/etc/portage` directory:
+
+```sh
+livecd /mnt/gentoo/etc/portage # mirrorselect -i -o >> make.conf
+* Using url: https://api.gentoo.org/mirrors/distfiles.xml
+* Downloading a list of mirrors...
+ Got 133 mirrors.
+livecd /mnt/gentoo/etc/portage # tail -n1 make.conf 
+GENTOO_MIRRORS="ftp://ftp.free.fr/mirrors/ftp.gentoo.org/ http://gentoo.modulix.net/gentoo/ http://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://mirrors.soeasyto.com/distfiles.gentoo.org/ http://mirrors.soeasyto.com/distfiles.gentoo.org/"
+livecd /mnt/gentoo/etc/portage # 
+```
+
+ ![](/home/taglio/Work/npna/Gentoo/Integrity/Resources/mirrorselect.png)
+
+With `mirroselect` we assign to the variable `GENTOO_MIRRORS` a list of servers choosing the closer ones. This are the options used:
+
+- `-i`: Interactive Mode, this will present a list to make it possible to select mirrors you wish to use.
+- `-o`: Output Only Mode, this is especially useful when being used during installation, to redirect output to a file other than `/etc/portage/make.conf`.
+
+```sh
+livecd /mnt/gentoo/etc/portage # mkdir repos.conf
+mkdir: created directory 'repos.conf'
+livecd /mnt/gentoo/etc/portage # cd repos.conf/
+livecd /mnt/gentoo/etc/portage/repos.conf # cat > gentoo.conf <<EOF
+> [DEFAULT]
+> main-repo = gentoo
+> 
+> [gentoo]
+> location = /usr/portage
+> sync-type = rsync
+> auto-sync = no
+> EOF
+livecd /mnt/gentoo/etc/portage/repos.conf # mirrorselect -i -r -o | sed 's/^SYNC=/sync-uri = /;s/"//g' >> gentoo.conf 
+* Using url: https://api.gentoo.org/mirrors/rsync.xml
+* Downloading a list of mirrors...
+ Got 68 mirrors.
+livecd /mnt/gentoo/etc/portage/repos.conf # tail -n 1 gentoo.conf 
+sync-uri = rsync://rsync.fr.gentoo.org/gentoo-portage
+livecd /mnt/gentoo/etc/portage/repos.conf # 
+```
+
+![rsync Gentoo mirrorselect](/home/taglio/Work/npna/Gentoo/Integrity/Resources/rsyncgentoo.png)
+
+We create the directory `repos.conf` and then we create the file  `gentoo.conf` that use the [`ini`](https://en.wikipedia.org/wiki/INI_file) syntax. From [Sahaki EFI guide](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Building_the_Gentoo_Base_System_Minus_Kernel) the explanation:
+
+> - The main repository is set to be gentoo, for all other repositories (such as overlays) that do not specify masters;
+> - The repository location is set to be /usr/portage (within the chroot, that is);
+> - The repository will **not** be synced during emerge --sync and emaint sync --auto runs;
+> - The repository is set to synchronize using the rsync protocol (this is unauthenticated, but don't worry, in this tutorial, we won't actually call for any syncs to be performed in this manner, and have specified changing the auto-sync value to no in the above, to prevent it happening inadvertently).
+> - **sync-uri** variable, which tells Portage where to look for the rsync server, when bringing your Portage tree of ebuilds up to date.
+
+```sh
+livecd ~ # cp .bashrc /mnt/gentoo/root/
+'.bashrc' -> '/mnt/gentoo/root/.bashrc'
+livecd ~ # cp /etc/resolv.conf /mnt/gentoo/etc/
+'/etc/resolv.conf' -> '/mnt/gentoo/etc/resolv.conf'
+livecd ~ # mount -t proc none /mnt/gentoo/proc
+mount: none mounted on /mnt/gentoo/proc.
+livecd ~ # mount --rbind /sys /mnt/gentoo/sys
+mount: /sys bound on /mnt/gentoo/sys.
+livecd ~ # mount --rbind /dev /mnt/gentoo/dev
+mount: /dev bound on /mnt/gentoo/dev.
+livecd ~ # mount --make-rslave /mnt/gentoo/sys
+mount: /mnt/gentoo/sys propagation flags changed.
+livecd ~ # mount --make-rslave /mnt/gentoo/dev
+mount: /mnt/gentoo/dev propagation flags changed.
+livecd ~ # chroot /mnt/gentoo /bin/bash 
+livecd / # source /etc/profile
+livecd / #
+```
+
+The last passes to obtain a good [**chroot jail**](https://en.wikipedia.org/wiki/Chroot) compail envioronment. We copy the `.bashrc` file that we're using to the new `/root` directory. We do the same with the `resolv.conf` file (*resolver configuration file*).
+
+Next we mount `procfs`, `sysfs` and `devfs` for the **chroot** system. But what are them?
+
+- `procfs`: The  proc filesystem is a pseudo-filesystem which provides an interfac to kernel data structures.
+- `sysfs`: Like `procfs` but the files under sysfs  provide  information  about devices, kernel modules, filesystems, and other kernel components.
+- `devfs`: Devfs is an alternative to "real" character and block special devices on your root filesystem. Kernel device drivers can register devices by name rather than major and minor numbers. These devices will appear in devfs automatically, with whatever default ownership and protection the driver specified.
+
+We utilize two new options to the `mount` command:
+
+- `--rbind`: Remount  a subtree and all possible submounts somewhere else (so that its contents are available in both places).
+- `--make-rslave`: Hence forth any mounts within the /directory done by the process will not show up in any other namespace. However mounts done in the parent namespace under /directory still shows up in the process's namespace.
+
