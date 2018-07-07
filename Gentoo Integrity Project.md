@@ -2908,6 +2908,254 @@ Available profile symlink targets:
 livecd ~ # eselect profile set 15
 livecd ~ # eselect profile list | grep 15
   [15]  default/linux/amd64/17.0/hardened/selinux (stable) *
-livecd ~ #
+livecd ~ # cd /etc/portage/
+livecd /etc/portage # ls -al
+total 40
+drwxr-xr-x  8 root root 4096 Jul  6 20:42 .
+drwxr-xr-x 32 root root 4096 Jul  6 20:06 ..
+-rw-r--r--  1 root root 1468 Jul  6 19:24 make.conf
+lrwxrwxrwx  1 root root   68 Jul  6 20:42 make.profile -> ../../usr/portage/profiles/default/linux/amd64/17.0/hardened/selinux
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.accept_keywords
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.mask
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.use
+drwxr-xr-x  2 root root 4096 Jul  6 19:57 repo.postsync.d
+drwxr-xr-x  2 root root 4096 Jul  6 10:23 repos.conf
+drwxr-xr-x  3 root root 4096 Jun 25 00:57 savedconfig
+livecd /etc/portage #
+```
+
+With `eselect` we can *select* various options to configure our Gentoo system.
+
+With `eselect profile` we change the symbolic link `/etc/portage/make.profile` to indicate what kind of system we're going to install. There's a lot of.  In this case we're selecting an [hardened + selinux](https://wiki.gentoo.org/wiki/Project:Hardened) installation (*take care is different from the Sakaki EFI install guide*). We can visualize all the variables of this kind of `profile`:
+
+```sh
+livecd /etc/portage # emerge --info
+Portage 2.3.41 (python 3.6.6-final-0, default/linux/amd64/17.0/hardened/selinux, gcc-7.3.0, glibc-2.27-r5, 4.9.76-gentoo-r1 x86_64)
+=================================================================
+System uname: Linux-4.9.76-gentoo-r1-x86_64-Intel-R-_Core-TM-_i7-2620M_CPU_@_2.70GHz-with-gentoo-2.6
+KiB Mem:     3963424 total,   1381068 free
+KiB Swap:          0 total,         0 free
+Timestamp of repository gentoo: Fri, 06 Jul 2018 00:45:01 +0000
+Head commit of repository gentoo: f8f48a7991916da84d772315003d334f6c5a9699
+sh bash 4.4_p12
+ld GNU ld (Gentoo 2.30 p2) 2.30.0
+app-shells/bash:          4.4_p12::gentoo
+dev-lang/perl:            5.24.3-r1::gentoo
+dev-lang/python:          2.7.14-r1::gentoo, 3.6.6::gentoo
+dev-util/pkgconfig:       0.29.2::gentoo
+sys-apps/baselayout:      2.6::gentoo
+sys-apps/openrc:          0.34.11::gentoo
+sys-apps/sandbox:         2.13::gentoo
+sys-devel/autoconf:       2.69-r4::gentoo
+sys-devel/automake:       1.15.1-r2::gentoo
+sys-devel/binutils:       2.30-r2::gentoo
+sys-devel/gcc:            7.3.0-r3::gentoo
+sys-devel/gcc-config:     1.8-r1::gentoo
+sys-devel/libtool:        2.4.6-r3::gentoo
+sys-devel/make:           4.2.1::gentoo
+sys-kernel/linux-headers: 4.13::gentoo (virtual/os-headers)
+sys-libs/glibc:           2.27-r5::gentoo
+Repositories:
+
+gentoo
+    location: /usr/portage
+    sync-type: rsync
+    sync-uri: rsync://rsync.fr.gentoo.org/gentoo-portage
+    priority: -1000
+    sync-rsync-extra-opts: 
+    sync-rsync-verify-metamanifest: yes
+    sync-rsync-verify-jobs: 1
+    sync-rsync-verify-max-age: 24
+
+ABI="amd64"
+ABI_X86="64"
+ACCEPT_KEYWORDS="amd64 ~amd64"
+ACCEPT_LICENSE="@FREE CC-Sampling-Plus-1.0"
+ACCEPT_PROPERTIES="*"
+ACCEPT_RESTRICT="*"
+ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci"
+APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias"
+ARCH="amd64"
+AUTOCLEAN="yes"
+BOOTSTRAP_USE="cxx unicode internal-glib split-usr python_targets_python3_5 python_targets_python2_7 multilib hardened pic xtpax -jit -orc"
+BROOT=""
+CALLIGRA_FEATURES="karbon plan sheets stage words"
+CBUILD="x86_64-pc-linux-gnu"
+CFLAGS="-march=sandybridge -O2 -pipe"
+CFLAGS_amd64="-m64"
+CFLAGS_x32="-mx32"
+CFLAGS_x86="-m32"
+CHOST="x86_64-pc-linux-gnu"
+CHOST_amd64="x86_64-pc-linux-gnu"
+CHOST_x32="x86_64-pc-linux-gnux32"
+CHOST_x86="i686-pc-linux-gnu"
+CLEAN_DELAY="5"
+COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog"
+COLLISION_IGNORE="/lib/modules/* *.py[co] *$py.class */dropin.cache"
+CONFIG_PROTECT="/etc /usr/share/gnupg/qualified.txt"
+CONFIG_PROTECT_MASK="/etc/ca-certificates.conf /etc/env.d /etc/gconf /etc/gentoo-release /etc/sandbox.d /etc/terminfo"
+CPU_FLAGS_X86="mmx mmxext sse sse2"
+CXXFLAGS=""
+DEFAULT_ABI="amd64"
+DISTDIR="/usr/portage/distfiles"
+EDITOR="/bin/nano"
+ELIBC="glibc"
+EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=5 --load-average=4"
+EMERGE_WARNING_DELAY="10"
+ENV_UNSET="DBUS_SESSION_BUS_ADDRESS DISPLAY PERL5LIB PERL5OPT PERLPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
+EPREFIX=""
+EROOT="/"
+ESYSROOT="/"
+FCFLAGS="-O2 -pipe"
+FEATURES="assume-digests binpkg-logs buildpkg config-protect-if-modified distlocks ebuild-locks fixlafiles merge-sync multilib-strict news parallel-fetch preserve-libs protect-owned sandbox selinux sesandbox sfperms split-elog strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
+FETCHCOMMAND="wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
+FETCHCOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
+FETCHCOMMAND_SFTP="bash -c "x=\${2#sftp://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; eval \"declare -a ssh_opts=(\${3})\" ; exec sftp \${port:+-P \${port}} \"\${ssh_opts[@]}\" \"\${host}:/\${x#*/}\" \"\$1\"" sftp "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+FETCHCOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+FFLAGS="-O2 -pipe"
+GCC_SPECS=""
+GENTOO_MIRRORS="ftp://ftp.free.fr/mirrors/ftp.gentoo.org/ http://gentoo.modulix.net/gentoo/ http://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://mirrors.soeasyto.com/distfiles.gentoo.org/ http://mirrors.soeasyto.com/distfiles.gentoo.org/"
+GPG_TTY="/dev/pts/0"
+GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx"
+GRUB_PLATFORMS=""
+HOME="/root"
+INFOPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/info:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/info:/usr/share/info"
+INPUT_DEVICES="libinput"
+IUSE_IMPLICIT="abi_x86_64 prefix prefix-chain prefix-guest"
+KERNEL="linux"
+LANG="en_GB.utf8"
+LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text"
+LC_COLLATE="C"
+LC_MESSAGES="C"
+LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+LDFLAGS_amd64="-m elf_x86_64"
+LDFLAGS_x32="-m elf32_x86_64"
+LDFLAGS_x86="-m elf_i386"
+LESS="-R -M --shift 5"
+LESSOPEN="|lesspipe %s"
+LIBDIR_amd64="lib64"
+LIBDIR_x32="libx32"
+LIBDIR_x86="lib32"
+LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer"
+LOGNAME="root"
+LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.cfg=00;32:*.conf=00;32:*.diff=00;32:*.doc=00;32:*.ini=00;32:*.log=00;32:*.patch=00;32:*.pdf=00;32:*.ps=00;32:*.tex=00;32:*.txt=00;32:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
+MAIL="/var/mail/root"
+MAKEOPTS="-j5 -l4"
+MANPAGER="manpager"
+MANPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/man:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/man:/usr/local/share/man:/usr/share/man"
+MULTILIB_ABIS="amd64 x86"
+MULTILIB_STRICT_DENY="64-bit.*shared object"
+MULTILIB_STRICT_DIRS="/lib32 /lib /usr/lib32 /usr/lib /usr/kde/*/lib32 /usr/kde/*/lib /usr/qt/*/lib32 /usr/qt/*/lib /usr/X11R6/lib32 /usr/X11R6/lib"
+MULTILIB_STRICT_EXEMPT="(perl5|gcc|gcc-lib|binutils|eclipse-3|debug|portage|udev|systemd|clang|python-exec|llvm)"
+NETBEANS="apisupport cnd groovy gsf harness ide identity j2ee java mobility nb php profiler soa visualweb webcommon websvccommon xml"
+NUMCPUS="4"
+NUMCPUSPLUSONE="5"
+OFFICE_IMPLEMENTATION="libreoffice"
+OLDPWD="/etc/portage"
+PAGER="/usr/bin/less"
+PATH="/usr/x86_64-pc-linux-gnu/gcc-bin/6.4.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+PAX_MARKINGS="XT"
+PHP_TARGETS="php5-6 php7-0"
+PKGDIR="/usr/portage/packages"
+POLICY_TYPES="strict targeted"
+PORTAGE_ARCHLIST="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 arm64-linux hppa ia64 m68k m68k-mint mips ppc ppc-aix ppc-macos ppc64 ppc64-linux s390 sh sparc sparc-solaris sparc64-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
+PORTAGE_BIN_PATH="/usr/lib/portage/python3.6"
+PORTAGE_COMPRESS_EXCLUDE_SUFFIXES="css gif htm[l]? jp[e]?g js pdf png"
+PORTAGE_CONFIGROOT="/"
+PORTAGE_DEBUG="0"
+PORTAGE_DEPCACHEDIR="/var/cache/edb/dep"
+PORTAGE_ELOG_CLASSES="info warn error log qa"
+PORTAGE_ELOG_MAILFROM="portage@localhost"
+PORTAGE_ELOG_MAILSUBJECT="[portage] ebuild log for ${PACKAGE} on ${HOST}"
+PORTAGE_ELOG_MAILURI="root"
+PORTAGE_ELOG_SYSTEM="echo save"
+PORTAGE_FETCH_CHECKSUM_TRY_MIRRORS="5"
+PORTAGE_FETCH_RESUME_MIN_SIZE="350K"
+PORTAGE_FETCH_T="portage_fetch_t"
+PORTAGE_GID="250"
+PORTAGE_GPG_SIGNING_COMMAND="gpg --sign --digest-algo SHA256 --clearsign --yes --default-key "${PORTAGE_GPG_KEY}" --homedir "${PORTAGE_GPG_DIR}" "${FILE}""
+PORTAGE_INST_GID="0"
+PORTAGE_INST_UID="0"
+PORTAGE_INTERNAL_CALLER="1"
+PORTAGE_OVERRIDE_EPREFIX=""
+PORTAGE_PYM_PATH="/usr/lib64/python3.6/site-packages"
+PORTAGE_PYTHONPATH="/usr/lib64/python3.6/site-packages"
+PORTAGE_RSYNC_OPTS="--recursive --links --safe-links --perms --times --omit-dir-times --compress --force --whole-file --delete --stats --human-readable --timeout=180 --exclude=/distfiles --exclude=/local --exclude=/packages --exclude=/.git"
+PORTAGE_RSYNC_RETRIES="-1"
+PORTAGE_SANDBOX_T="portage_sandbox_t"
+PORTAGE_SYNC_STALE="30"
+PORTAGE_T="portage_t"
+PORTAGE_TMPDIR="/var/tmp"
+PORTAGE_VERBOSE="1"
+PORTAGE_WORKDIR_MODE="0700"
+PORTAGE_XATTR_EXCLUDE="btrfs.* security.evm security.ima 	security.selinux system.nfs4_acl user.apache_handler 	user.Beagle.* user.dublincore.* user.mime_encoding user.xdg.*"
+PORT_LOGDIR_CLEAN="find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +7 -delete"
+POSTGRES_TARGETS="postgres9_5 postgres10"
+PROFILE_IS_HARDENED="1"
+PROFILE_ONLY_VARIABLES="ARCH ELIBC IUSE_IMPLICIT KERNEL USERLAND USE_EXPAND_IMPLICIT USE_EXPAND_UNPREFIXED USE_EXPAND_VALUES_ARCH USE_EXPAND_VALUES_ELIBC USE_EXPAND_VALUES_KERNEL USE_EXPAND_VALUES_USERLAND"
+PWD="/etc/portage"
+PYTHONDONTWRITEBYTECODE="1"
+PYTHON_SINGLE_TARGET="python3_6"
+PYTHON_TARGETS="python2_7 python3_6"
+RESUMECOMMAND="wget -c -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
+RESUMECOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
+RESUMECOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+ROOT="/"
+ROOTPATH="/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+RPMDIR="/usr/portage/rpm"
+RUBY_TARGETS="ruby23"
+SHELL="/bin/bash"
+SHLVL="2"
+SSH_CLIENT="10.3.30.1 35898 22"
+SSH_CONNECTION="10.3.30.1 35898 10.3.30.2 22"
+SSH_TTY="/dev/pts/0"
+SYMLINK_LIB="yes"
+SYSROOT="/"
+TERM="xterm-256color"
+TWISTED_DISABLE_WRITING_OF_PLUGIN_CACHE="1"
+UNINSTALL_IGNORE="/lib/modules/* /var/run /var/lock"
+USE="acl amd64 bzip2 crypt cxx hardened iconv ipv6 libtirpc multilib ncurses nls nptl openmp pam pcre pie readline seccomp selinux ssl ssp unicode xattr xtpax zlib" ABI_X86="64" ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias" CALLIGRA_FEATURES="karbon plan sheets stage words" COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog" CPU_FLAGS_X86="mmx mmxext sse sse2" ELIBC="glibc" GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx" INPUT_DEVICES="libinput" KERNEL="linux" LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer" OFFICE_IMPLEMENTATION="libreoffice" PHP_TARGETS="php5-6 php7-0" POSTGRES_TARGETS="postgres9_5 postgres10" PYTHON_SINGLE_TARGET="python3_6" PYTHON_TARGETS="python2_7 python3_6" RUBY_TARGETS="ruby23" USERLAND="GNU" VIDEO_CARDS="intel i915" XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
+USER="root"
+USERLAND="GNU"
+USE_EXPAND="ABI_MIPS ABI_PPC ABI_S390 ABI_X86 ALSA_CARDS APACHE2_MODULES APACHE2_MPMS CALLIGRA_EXPERIMENTAL_FEATURES CALLIGRA_FEATURES CAMERAS COLLECTD_PLUGINS CPU_FLAGS_ARM CPU_FLAGS_X86 CURL_SSL ELIBC ENLIGHTENMENT_MODULES FFTOOLS GPSD_PROTOCOLS GRUB_PLATFORMS INPUT_DEVICES KERNEL L10N LCD_DEVICES LIBREOFFICE_EXTENSIONS LIRC_DEVICES LLVM_TARGETS MONKEYD_PLUGINS NETBEANS_MODULES NGINX_MODULES_HTTP NGINX_MODULES_MAIL NGINX_MODULES_STREAM OFED_DRIVERS OFFICE_IMPLEMENTATION OPENMPI_FABRICS OPENMPI_OFED_FEATURES OPENMPI_RM PHP_TARGETS POSTGRES_TARGETS PYTHON_SINGLE_TARGET PYTHON_TARGETS QEMU_SOFTMMU_TARGETS QEMU_USER_TARGETS ROS_MESSAGES RUBY_TARGETS SANE_BACKENDS USERLAND UWSGI_PLUGINS VIDEO_CARDS VOICEMAIL_STORAGE XFCE_PLUGINS XTABLES_ADDONS"
+USE_EXPAND_HIDDEN="ABI_MIPS ABI_PPC ABI_S390 CPU_FLAGS_ARM ELIBC KERNEL USERLAND"
+USE_EXPAND_IMPLICIT="ARCH ELIBC KERNEL USERLAND"
+USE_EXPAND_UNPREFIXED="ARCH"
+USE_EXPAND_VALUES_ARCH="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 hppa ia64 m68k m68k-mint mips ppc ppc64 ppc64-linux ppc-aix ppc-macos s390 sh sparc sparc64-solaris sparc-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
+USE_EXPAND_VALUES_ELIBC="AIX bionic Cygwin Darwin DragonFly FreeBSD glibc HPUX Interix mingw mintlib musl NetBSD OpenBSD SunOS uclibc Winnt"
+USE_EXPAND_VALUES_KERNEL="AIX Darwin FreeBSD freemint HPUX linux NetBSD OpenBSD SunOS Winnt"
+USE_EXPAND_VALUES_USERLAND="BSD GNU"
+USE_ORDER="env:pkg:conf:defaults:pkginternal:repo:env.d"
+VIDEO_CARDS="intel i915"
+XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
+
+livecd /etc/portage #
+```
+
+Go ahead with the customization:
+
+```sh
+livecd /etc/portage # echo "Europe/Madrid" > /etc/timezone
+livecd /etc/portage # emerge --config timezone-data
+
+
+Ready to configure sys-libs/timezone-data-2018d? [Yes/No] Yes
+
+!!! SELinux module not found. Please verify that it was installed.
+ * Updating /etc/localtime with /usr/share/zoneinfo/Europe/Madrid
+
+livecd /etc/portage # 
+```
+
+We've configured local time to our current  zone. Then another type of `emerge` option:
+
+- `--config`: run package specific actions needed to be executed after the emerge process has completed.
+
+```sh
+livecd /etc # cat >> locale.gen <<EOF
+> en_GB ISO-8859-1
+> en_GB.UTF-8 UTF-8
+> EOF
+livecd /etc #
 ```
 
