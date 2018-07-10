@@ -695,12 +695,12 @@ Writing superblocks and filesystem accounting information: done
 
 livecd /dev/mapper # mount -t ext4 /dev/mapper/vg1-root /mnt/gentoo/
 mount: /dev/mapper/vg1-root mounted on /mnt/gentoo.
-livecd ~ # mkfs.ext4 -m 0 -L "home" /dev/mapper/vg1-home^C
+livecd ~ # mkfs.ext4 -m 0 -L "home" /dev/mapper/vg1-home
 livecd ~ # mkdir /mnt/gentoo/{home,boot,boot/efi}
 mkdir: created directory '/mnt/gentoo/home'
 mkdir: created directory '/mnt/gentoo/boot'
 mkdir: created directory '/mnt/gentoo/boot/efi'
-livecd ~ # mount -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home/
+        livecd ~ # mount -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home/
 mount: /dev/mapper/vg1-home mounted on /mnt/gentoo/home.
 livecd ~ # umount /tmp/efi/
 umount: /tmp/efi/ unmounted
@@ -811,7 +811,7 @@ This process is exactly the same of the boot ISO image download. The only differ
 Then we secure transfer from the helper machine to the laptop using `scp`.
 
 ```sh
-livecd /mnt/gentoo # tar xJpf stage3-amd64-20180624T214502Z.tar.xz --xattrs-include='*.*' --numeric-owner
+livecd /mnt/gentoo # tar -xJpf stage3-amd64-20180624T214502Z.tar.xz --xattrs-include='*.*' --numeric-owner
 .
 .
 .
@@ -3156,6 +3156,3178 @@ livecd /etc # cat >> locale.gen <<EOF
 > en_GB ISO-8859-1
 > en_GB.UTF-8 UTF-8
 > EOF
-livecd /etc #
+livecd /etc # cd conf.d
+livecd /etc/conf.d # sed -i 's/keymap="us"/keymap="es"/g' keymaps 
+livecd /etc/conf.d # emerge --verbose --oneshot app-portage/cpuid2cpuflags
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] app-portage/cpuid2cpuflags-5::gentoo  71 KiB
+
+Total: 1 package (1 new), Size of downloads: 71 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Emerging (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
+>>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.00, 0.00, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.08, 0.02, 0.01!!! SELinux module not found. Please verify that it was installed.
+>>> Installing (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
+>>> Jobs: 1 of 1 complete                           Load avg: 0.15, 0.03, 0.01
+
+ * Messages for package app-portage/cpuid2cpuflags-5:
+
+ * Package:    app-portage/cpuid2cpuflags-5
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 488 KiB
+ * Final size of installed tree:   44 KiB
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * GNU info directory index is up-to-date.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+livecd /etc/conf.d # cpuid2cpuflags
+CPU_FLAGS_X86: aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3
+livecd /etc/conf.d # cd ../portage/
+livecd /etc/portage # sed -i 's/CPU_FLAGS_X86=.*/CPU_FLAGS_X86="aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3"/g' make.conf
+livecd /etc/portage #
+```
+
+Next we add [english locale](https://en.wikipedia.org/wiki/Locale_(computer_software)) to our chroot subsystem and configure the keymap under `/etc/conf.d` with a `sed` (*stream editor for filtering and transforming text*) command:
+
+- `-i`: in-place (i.e. save back to the original file).
+- `s`: the substitute command.
+- `g`: global (i.e. replace all and not just the first occurrence).
+
+We also install `cpuid2cpuflags` to better identify `CPU_FLAGS_X86` variable depending on what processor are we using. The `sed` command is the same of the one before but the `.*` that is used to substitute all the line beggin with.
+
+Now we're going to bootstrap the Gentoo Linux [toolchain](https://elinux.org/Toolchains):
+
+```sh
+livecd /usr/portage/scripts # ./bootstrap.sh --pretend
+
+Gentoo Linux; http://www.gentoo.org/
+Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
+-------------------------------------------------------------------------------
+  [[ (0/3) Locating packages ]]
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+ * Using baselayout : >=sys-apps/baselayout-2
+ * Using portage    : portage
+ * Using os-headers : >=sys-kernel/linux-headers-4.17
+ * Using binutils   : sys-devel/binutils
+ * Using gcc        : sys-devel/gcc
+ * Using gettext    : gettext
+ * Using libc       : virtual/libc
+ * Using texinfo    : sys-apps/texinfo
+ * Using zlib       : zlib
+ * Using ncurses    : ncurses
+-------------------------------------------------------------------------------
+  [[ (1/3) Configuring environment ]]
+-------------------------------------------------------------------------------
+!!! SELinux module not found. Please verify that it was installed.
+  [[ (2/3) Updating portage ]]
+!!! CONFIG_PROTECT is empty
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
+[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
+[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+
+Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+  [[ (3/3) Emerging packages ]]
+!!! CONFIG_PROTECT is empty
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
+[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
+[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
+[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
+[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
+[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
+
+Total: 8 packages (5 upgrades, 3 reinstalls), Size of downloads: 113,345 KiB
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+livecd /usr/portage/scripts #
+```
+
+With `--pretend` we only visualize the upgoing work.
+
+ From the Sakaki Guide:
+
+> In Gentoo parlance, people speak of three ['stages'](http://en.wikipedia.org/wiki/Gentoo_Linux#Stages) of bootstrapping (and their corresponding file system tarballs):
+>
+> 1. **Stage 1**: When starting from a stage 1 tarball, the base toolchain (GCC, standard C libary etc.) must be built using the existing (binary) host system toolchain, under direction of the /usr/portage/scripts/bootstrap.sh script. This yields a:
+> 2. **Stage 2** system. Here, we still need to emerge (build) the core [@world](https://wiki.gentoo.org/wiki/World_set_(Portage)) package set, using our new toolchain. This yields a:
+> 3. **Stage 3** system, in which the toolchain has been bootstrapped, and the important system binaries and libraries have been compiled using it. A tarball of such a stage 3 system's directories is now provided as a default part of the Gentoo distribution (stage 1 and stage 2 tarballs are not available to end-users anymore).
+>
+> Although we have [already](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Installing_the_Gentoo_Stage_3_Files#download_stage_3_tarball) downloaded a stage 3 tarball, we're going to pretend we haven't, and instead build up from stage 1.
+
+[![asciicast](https://asciinema.org/a/190924.png)](https://asciinema.org/a/190924)
+
+In this rapid *asciicast* we edit `bootstrap.sh` file changing a line of text, explanation by Sakaki:
+
+> The Gentoo [FAQ](https://wiki.gentoo.org/wiki/FAQ#How_do_I_Install_Gentoo_Using_a_Stage1_or_Stage2_Tarball.3F) suggests you may wish to edit the /usr/portage/scripts/bootstrap.sh script after reviewing it - and indeed, we will do so, because there are two 'gotchas' lurking in the above proposed emerge list. The first problem is that the [C standard library](http://en.wikipedia.org/wiki/C_standard_library) that the bootstrap intends to rebuild is a [*virtual*](https://devmanual.gentoo.org/general-concepts/virtuals/) ([virtual/libc](https://packages.gentoo.org/packages/virtual/libc)); however, in Portage, emerging a virtual package does *not*, by default, cause any already-installed package that satisfies that virtual (in our case, [sys-libs/glibc](https://packages.gentoo.org/packages/sys-libs/glibc)) to be rebuilt - which we want.
+
+```sh
+livecd /usr/portage/scripts # ./bootstrap.sh 
+
+Gentoo Linux; http://www.gentoo.org/
+Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
+Starting Bootstrap of base system ...
+-------------------------------------------------------------------------------
+  [[ (0/3) Locating packages ]]
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+ * Using baselayout : >=sys-apps/baselayout-2
+ * Using portage    : portage
+ * Using os-headers : >=sys-kernel/linux-headers-4.17
+ * Using binutils   : sys-devel/binutils
+ * Using gcc        : sys-devel/gcc
+ * Using gettext    : gettext
+ * Using libc       : sys-libs/glibc:2.2
+ * Using texinfo    : sys-apps/texinfo
+ * Using zlib       : zlib
+ * Using ncurses    : ncurses
+-------------------------------------------------------------------------------
+  [[ (1/3) Configuring environment ]]
+-------------------------------------------------------------------------------
+!!! SELinux module not found. Please verify that it was installed.
+  [[ (2/3) Updating portage ]]
+!!! CONFIG_PROTECT is empty
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
+[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
+[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+
+Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Emerging (1 of 4) sys-libs/libsepol-2.8::gentoo
+>>> Emerging (2 of 4) dev-lang/swig-3.0.12::gentoo
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.08, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.07, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 1.92, 0.46, 0.14!!! SELinux module not found. Please verify that it was installed.
+>>> Installing (2 of 4) dev-lang/swig-3.0.12::gentoo
+>>> Installing (1 of 4) sys-libs/libsepol-2.8::gentoo
+>>> Emerging (3 of 4) sys-libs/libselinux-2.8::gentoo
+>>> Installing (3 of 4) sys-libs/libselinux-2.8::gentoo
+>>> Emerging (4 of 4) sys-apps/portage-2.3.41::gentoo
+>>> Installing (4 of 4) sys-apps/portage-2.3.41::gentoo
+>>> Jobs: 4 of 4 complete                           Load avg: 2.20, 0.99, 0.37
+
+ * Messages for package dev-lang/swig-3.0.12:
+
+ * Package:    dev-lang/swig-3.0.12
+ * Repository: gentoo
+ * Maintainer: radhermit@gentoo.org scheme@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 52588 KiB (51.3 MiB)
+ * Final size of installed tree:   8212 KiB ( 8.0 MiB)
+
+ * Messages for package sys-libs/libsepol-2.8:
+
+ * Package:    sys-libs/libsepol-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * Skipping make test/check due to ebuild restriction.
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 14300 KiB (13.9 MiB)
+ * Final size of installed tree:   2720 KiB ( 2.6 MiB)
+
+ * Messages for package sys-libs/libselinux-2.8:
+
+ * Package:    sys-libs/libselinux-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python python_targets_python2_7 python_targets_python3_5 static-libs userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * python2_7: running building
+ * python3_5: running building
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * python2_7: running installation
+ * python3_5: running installation
+ * Final size of build directory: 8208 KiB (8.0 MiB)
+ * Final size of installed tree:  3740 KiB (3.6 MiB)
+
+ * Messages for package sys-apps/portage-2.3.41:
+
+ * Package:    sys-apps/portage-2.3.41
+ * Repository: gentoo
+ * Maintainer: dev-portage@gentoo.org
+ * Upstream:   dev-portage@gentoo.org
+ * USE:        abi_x86_64 amd64 build elibc_glibc ipc kernel_linux python_targets_python2_7 python_targets_python3_5 selinux userland_GNU xattr
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Adding FEATURES=xattr to make.globals ...
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase python_compile_all
+ * python2_7: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install_all
+ * Moving admin scripts to the correct directory
+ * Moving /usr/bin/archive-conf to /usr/sbin/archive-conf
+ * Moving /usr/bin/dispatch-conf to /usr/sbin/dispatch-conf
+ * Moving /usr/bin/emaint to /usr/sbin/emaint
+ * Moving /usr/bin/env-update to /usr/sbin/env-update
+ * Moving /usr/bin/etc-update to /usr/sbin/etc-update
+ * Moving /usr/bin/fixpackages to /usr/sbin/fixpackages
+ * Moving /usr/bin/regenworld to /usr/sbin/regenworld
+ * Final size of build directory: 19728 KiB (19.2 MiB)
+ * Final size of installed tree:  35852 KiB (35.0 MiB)
+ * 
+ * This release of portage NO LONGER contains the repoman code base.
+ * Repoman has its own ebuild and release package.
+ * For repoman functionality please emerge app-portage/repoman
+ * Please report any bugs you may encounter.
+ * 
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * GNU info directory index is up-to-date.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+  [[ (3/3) Emerging packages ]]
+!!! CONFIG_PROTECT is empty
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
+[ebuild     U  ] sys-libs/glibc-2.27-r5:2.2::gentoo [2.26-r7:2.2::gentoo] USE="hardened* (multilib) (selinux*) -audit -caps (-compile-locales) -doc -gd -headers-only -multiarch% -nscd (-profile) -suid -systemtap (-vanilla) (-debug%)" 17,499 KiB
+[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
+[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
+[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
+[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
+
+Total: 8 packages (6 upgrades, 2 reinstalls), Size of downloads: 130,844 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Running pre-merge checks for sys-libs/glibc-2.27-r5
+ * Checking general environment sanity.
+make -j5 -l4 -s glibc-test 
+ * Checking that IA32 emulation is enabled in the running kernel ...                             [ ok ]
+ * Checking gcc for __thread support ...                                                         [ ok ]
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...                               [ ok ]
+ * Checking linux-headers version (4.13.0 >= 3.2.0) ...                                          [ ok ]
+>>> Running pre-merge checks for sys-devel/gcc-7.3.0-r3
+>>> Emerging (1 of 8) sys-kernel/linux-headers-4.17::gentoo
+>>> Installing (1 of 8) sys-kernel/linux-headers-4.17::gentoo
+>>> Emerging (2 of 8) sys-libs/glibc-2.27-r5::gentoo
+>>> Installing (2 of 8) sys-libs/glibc-2.27-r5::gentoo
+>>> Emerging (3 of 8) sys-apps/baselayout-2.6::gentoo
+>>> Installing (3 of 8) sys-apps/baselayout-2.6::gentoo
+>>> Emerging (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Installing (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Emerging (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
+>>> Installing (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
+>>> Emerging (6 of 8) sys-devel/binutils-2.30-r3::gentoo
+>>> Installing (6 of 8) sys-devel/binutils-2.30-r3::gentoo
+>>> Emerging (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Jobs: 6 of 8 complete, 1 running                Load avg: 2.41, 3.27, 3.58
+>>> Installing (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Emerging (8 of 8) sys-apps/texinfo-6.5::gentoo
+>>> Installing (8 of 8) sys-apps/texinfo-6.5::gentoo
+>>> Jobs: 8 of 8 complete                           Load avg: 1.60, 2.71, 3.27
+
+ * Messages for package sys-libs/glibc-2.27-r5:
+
+ * Package:    sys-libs/glibc-2.27-r5
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Checking general environment sanity.
+ * Checking that IA32 emulation is enabled in the running kernel ...
+ * Checking gcc for __thread support ...
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
+ * Checking linux-headers version (4.13.0 >= 3.2.0) ...
+
+ * Messages for package sys-devel/gcc-7.3.0-r3:
+
+ * Package:    sys-devel/gcc-7.3.0-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package sys-kernel/linux-headers-4.17:
+
+ * Package:    sys-kernel/linux-headers-4.17
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 00_all_0001-linux-stat.h-remove-__GLIBC__-checks.patch ...
+ * Applying 00_all_0002-netfilter-pull-in-limits.h.patch ...
+ * Applying 00_all_0003-convert-PAGE_SIZE-usage.patch ...
+ * Applying 00_all_0004-asm-generic-fcntl.h-namespace-kernel-file-structs.patch ...
+ * Applying 00_all_0005-unifdef-drop-unused-errno.h-include.patch ...
+ * Applying 00_all_0006-x86-do-not-build-relocs-tool-when-installing-headers.patch ...
+ * Applying 00_all_0007-netlink-drop-int-cast-on-length-arg-in-NLMSG_OK.patch ...
+ * Applying 00_all_0008-uapi-fix-System-V-buf-header-includes.patch ...
+ * Final size of build directory: 70664 KiB (69.0 MiB)
+ * Final size of installed tree:   6764 KiB ( 6.6 MiB)
+
+ * Messages for package sys-libs/glibc-2.27-r5:
+
+ * Package:    sys-libs/glibc-2.27-r5
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Checking that IA32 emulation is enabled in the running kernel ...
+ * Checking gcc for __thread support ...
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
+ * Checking linux-headers version (4.17.0 >= 3.2.0) ...
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Applying Gentoo Glibc Patchset 2.27-2
+ * Applying patches from /var/tmp/portage/sys-libs/glibc-2.27-r5/work/patches ...
+ *   0001-Gentoo-disable-ldconfig-during-install.patch ...
+ *   0002-Gentoo-support-running-tests-under-sandbox.patch ...
+ *   0004-Revert-sysdeps-posix-getaddrinfo.c-gaih_inet-Only-us.patch ...
+ *   0005-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
+ *   0006-libidn-libidn-punycode.c-decode_digit-Fix-integer-ov.patch ...
+ *   0007-libidn-Fix-out-of-bounds-stack-read.-Report-and-patc.patch ...
+ *   0009-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
+ *   0010-Gentoo-Disable-test-that-fails-because-of-the-gethos.patch ...
+ *   0011-sparc-Check-PIC-instead-of-SHARED-in-start.S.patch ...
+ *   0012-sys-types.h-drop-sys-sysmacros.h-include.patch ...
+ *   0014-Record-CVE-2018-6551-in-NEWS-and-ChangeLog-BZ-22774.patch ...
+ *   0015-sparc-Check-PIC-instead-of-SHARED-in-start.S-BZ-2263.patch ...
+ *   0016-NEWS-add-an-entry-for-bug-22638.patch ...
+ *   0017-Add-a-missing-ChangeLog-item-in-commit-371b220f620.patch ...
+ *   0018-Linux-use-reserved-name-__key-in-pkey_get-BZ-22797.patch ...
+ *   0019-RISC-V-Fix-parsing-flags-in-ELF64-files.patch ...
+ *   0020-Update-SH-libm-tests-ulps.patch ...
+ *   0021-et_EE-Add-missing-reorder-end-keyword-bug-22861.patch ...
+ *   0022-NEWS-add-an-entry-for-bug-22827.patch ...
+ *   0023-linux-aarch64-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
+ *   0024-time-Reference-CLOCKS_PER_SEC-in-clock-comment-BZ-22.patch ...
+ *   0025-Fix-posix-tst-glob_lstat_compat-on-alpha-BZ-22818.patch ...
+ *   0026-manual-Fix-Texinfo-warnings-about-improper-node-name.patch ...
+ *   0027-manual-Fix-a-syntax-error.patch ...
+ *   0028-manual-Improve-documentation-of-get_current_dir_name.patch ...
+ *   0029-powerpc-Fix-TLE-build-for-SPE-BZ-22926.patch ...
+ *   0030-sparc32-Add-nop-before-__startcontext-to-stop-unwind.patch ...
+ *   0031-NEWS-add-entries-for-bugs-22919-and-22926.patch ...
+ *   0032-manual-Document-missing-feature-test-macros.patch ...
+ *   0033-manual-Update-the-_ISOC99_SOURCE-description.patch ...
+ *   0034-Fix-a-typo-in-a-comment.patch ...
+ *   0035-Add-missing-reorder-end-in-LC_COLLATE-of-et_EE-BZ-22.patch ...
+ *   0036-powerpc-Undefine-Linux-ptrace-macros-that-conflict-w.patch ...
+ *   0037-linux-powerpc-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
+ *   0038-BZ-22342-Fix-netgroup-cache-keys.patch ...
+ *   0039-Fix-multiple-definitions-of-__nss_-_database-bug-229.patch ...
+ *   0040-i386-Fix-i386-sigaction-sa_restorer-initialization-B.patch ...
+ *   0041-Update-translations-from-the-Translation-Project.patch ...
+ *   0042-ca_ES-locale-Update-LC_TIME-bug-22848.patch ...
+ *   0043-lt_LT-locale-Update-abbreviated-month-names-bug-2293.patch ...
+ *   0044-Greek-el_CY-el_GR-locales-Introduce-ab_alt_mon-bug-2.patch ...
+ *   0045-cs_CZ-locale-Add-alternative-month-names-bug-22963.patch ...
+ *   0046-NEWS-Add-entries-for-bugs-22848-22932-22937-22963.patch ...
+ *   0047-RISC-V-Do-not-initialize-gp-in-TLS-macros.patch ...
+ *   0048-RISC-V-fmax-fmin-Handle-signalling-NaNs-correctly.patch ...
+ *   0049-Update-ChangeLog-for-BZ-22884-riscv-fmax-fmin.patch ...
+ *   0050-Fix-i386-memmove-issue-bug-22644.patch ...
+ *   0051-Linux-i386-tst-bz21269-triggers-SIGBUS-on-some-kerne.patch ...
+ *   0052-RISC-V-fix-struct-kernel_sigaction-to-match-the-kern.patch ...
+ *   0053-Add-tst-sigaction.c-to-test-BZ-23069.patch ...
+ *   0054-Fix-signed-integer-overflow-in-random_r-bug-17343.patch ...
+ *   0055-Fix-crash-in-resolver-on-memory-allocation-failure-b.patch ...
+ *   0056-getlogin_r-return-early-when-linux-sentinel-value-is.patch ...
+ *   0057-Update-RWF_SUPPORTED-for-Linux-kernel-4.16-BZ-22947.patch ...
+ *   0058-manual-Move-mbstouwcs-to-an-example-C-file.patch ...
+ *   0059-manual-Various-fixes-to-the-mbstouwcs-example-and-mb.patch ...
+ *   0060-resolv-Fully-initialize-struct-mmsghdr-in-send_dg-BZ.patch ...
+ *   0061-Add-PTRACE_SECCOMP_GET_METADATA-from-Linux-4.16-to-s.patch ...
+ *   0062-Fix-blocking-pthread_join.-BZ-23137.patch ...
+ *   0063-Fix-stack-overflow-with-huge-PT_NOTE-segment-BZ-2041.patch ...
+ *   0064-Fix-path-length-overflow-in-realpath-BZ-22786.patch ...
+ *   0065-NEWS-add-entries-for-bugs-17343-20419-22644-22786-22.patch ...
+ *   0066-gd_GB-Fix-typo-in-abbreviated-May-bug-23152.patch ...
+ *   0067-sunrpc-Remove-stray-exports-without-enable-obsolete-.patch ...
+ * Done.
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating scripts/config.sub
+ *   Updating scripts/config.guess
+ * Adjusting to prefix /
+ *   locale-gen ...
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running do_src_configure for ABI x86
+ * Configuring glibc for nptl
+ *             ABI:   x86
+ *          CBUILD:   x86_64-pc-linux-gnu
+ *           CHOST:   x86_64-pc-linux-gnu
+ *         CTARGET:   x86_64-pc-linux-gnu
+ *      CBUILD_OPT:   i686-pc-linux-gnu
+ *     CTARGET_OPT:   i686-pc-linux-gnu
+ *              CC:   x86_64-pc-linux-gnu-gcc -m32
+ *             CXX:   
+ *              LD:   
+ *         ASFLAGS:   
+ *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *        CPPFLAGS:   
+ *        CXXFLAGS:   -O2 -fno-strict-aliasing
+ *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
+ *        MAKEINFO:   /dev/null
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
+ *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running do_src_configure for ABI amd64
+ * Configuring glibc for nptl
+ *             ABI:   amd64
+ *          CBUILD:   x86_64-pc-linux-gnu
+ *           CHOST:   x86_64-pc-linux-gnu
+ *         CTARGET:   x86_64-pc-linux-gnu
+ *      CBUILD_OPT:   x86_64-pc-linux-gnu
+ *     CTARGET_OPT:   x86_64-pc-linux-gnu
+ *              CC:   x86_64-pc-linux-gnu-gcc -m64
+ *             CXX:   
+ *              LD:   
+ *         ASFLAGS:   
+ *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *        CPPFLAGS:   
+ *        CXXFLAGS:   -O2 -fno-strict-aliasing
+ *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
+ *        MAKEINFO:   /dev/null
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
+ *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running do_src_compile for ABI x86
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running do_src_compile for ABI amd64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running glibc_do_src_install for ABI x86
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running glibc_do_src_install for ABI amd64
+ * Final size of build directory: 552612 KiB (539.6 MiB)
+ * Final size of installed tree:   69248 KiB ( 67.6 MiB)
+ * Defaulting /etc/host.conf:multi to on
+ * Generating all locales; edit /etc/locale.gen to save time/space
+
+ * Messages for package sys-apps/baselayout-2.6:
+
+ * Package:    sys-apps/baselayout-2.6
+ * Repository: gentoo
+ * Maintainer: williamh@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux split-usr userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 220 KiB
+ * Final size of installed tree:  168 KiB
+ * You should reboot now to get /run mounted with tmpfs!
+ * Please run env-update then log out and back in to
+ * update your path.
+
+ * Messages for package sys-libs/zlib-1.2.11-r2:
+
+ * Package:    sys-libs/zlib-1.2.11-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying zlib-1.2.11-fix-deflateParams-usage.patch ...
+ * Applying zlib-1.2.11-minizip-drop-crypt-header.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 4676 KiB (4.5 MiB)
+ * Final size of installed tree:   492 KiB
+
+ * Messages for package sys-devel/gettext-0.19.8.1:
+
+ * Package:    sys-devel/gettext-0.19.8.1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying gettext-0.19.7-disable-libintl.patch ...
+ * Applying gettext-0.19.8.1-format-security.patch ...
+ * Removing useless C++ checks ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libgettextpo.la (requested)
+ * Removing unnecessary /usr/lib64/libasprintf.la (requested)
+ * Removing unnecessary /usr/lib64/libgettextsrc.la (requested)
+ * Removing unnecessary /usr/lib64/libgettextlib.la (requested)
+ * Final size of build directory: 128212 KiB (125.2 MiB)
+ * Final size of installed tree:   10364 KiB ( 10.1 MiB)
+ * QA Notice: Missing soname symlink(s):
+ * 
+ * 	usr/lib64/libgnuintl.so.8 -> preloadable_libintl.so
+ * 
+
+ * Messages for package sys-devel/binutils-2.30-r3:
+
+ * Package:    sys-devel/binutils-2.30-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying binutils-2.30 patchset 3
+ * Applying 0001-Gentoo-ld-always-warn-about-textrels-in-files.patch ...
+ * Applying 0002-Gentoo-gold-ld-add-support-for-poisoned-system-direc.patch ...
+ * Applying 0003-Gentoo-ld-enable-new-dtags-by-default-for-linux-gnu-.patch ...
+ * Applying 0004-Gentoo-libiberty-install-PIC-version-of-libiberty.a.patch ...
+ * Applying 0005-Gentoo-opcodes-link-against-libbfd.la-for-rpath-deps.patch ...
+ * Applying 0007-Gentoo-Adapt-the-testsuite-to-our-enhanced-textrel-w.patch ...
+ * Applying 0008-Gentoo-Adapt-the-test-suite-to-our-changed-hash-styl.patch ...
+ * Applying 0009-Gentoo-We-can-t-test-for-textrel-warnings-if-we-regs.patch ...
+ * Applying 0010-Gentoo-Disable-failing-test-ld-x86-64-x86-64.exp-pie.patch ...
+ * Applying 0011-Revert-to-development-on-the-2.30-branch.-Set-the-ve.patch ...
+ * Applying 0013-Gentoo-Disable-another-test-that-checks-for-textrel-.patch ...
+ * Applying 0014-Gentoo-Disable-gold-test-suite-since-it-still-always.patch ...
+ * Applying 0015-Automatic-date-update-in-version.in.patch ...
+ * Applying 0016-Update-Russian-translation-for-the-gas-sub-directory.patch ...
+ * Applying 0017-Automatic-date-update-in-version.in.patch ...
+ * Applying 0018-Add-support-for-DWARF-4-line-number-tables.patch ...
+ * Applying 0019-Automatic-date-update-in-version.in.patch ...
+ * Applying 0020-Import-patch-from-mainline-to-remove-PROVODE-qualifi.patch ...
+ * Applying 0021-Updated-Brazillian-portuguese-and-Russian-translatio.patch ...
+ * Applying 0022-PR22764-LD-AARCH64-Allow-R_AARCH64_ABS16-and-R_AARCH.patch ...
+ * Applying 0023-Automatic-date-update-in-version.in.patch ...
+ * Applying 0024-Revert-PowerPC-PLT-speculative-execution-barriers.patch ...
+ * Applying 0025-Automatic-date-update-in-version.in.patch ...
+ * Applying 0026-Import-patch-from-mainline-to-fix-possible-seg-fault.patch ...
+ * Applying 0027-Fix-GOT-relocation-overflow-on-SPARC.patch ...
+ * Applying 0028-Fix-PR-gas-22738-.dc.a-directive-has-wrong-size-on-S.patch ...
+ * Applying 0029-Updated-Russian-translation-for-the-gas-sub-director.patch ...
+ * Applying 0030-gas-xtensa-fix-trampoline-placement.patch ...
+ * Applying 0031-PR-ld-22832-on-SPARC.patch ...
+ * Applying 0032-Import-patch-from-mainline-to-fix-a-bug-that-would-p.patch ...
+ * Applying 0033-Fix-AArch32-build-attributes-for-Armv8.4-A.patch ...
+ * Applying 0034-Import-patch-from-mainline-to-fix-memory-corruption-.patch ...
+ * Applying 0035-Automatic-date-update-in-version.in.patch ...
+ * Applying 0036-Gentoo-Restore-TEXTREL-warnings-for-non-shared-objec.patch ...
+ * Applying 0037-Gentoo-Properly-ignore-new-textrel-warnings-in-tests.patch ...
+ * Applying 0038-Gentoo-We-can-t-test-for-textrel-warnings-if-we-igno.patch ...
+ * Applying 0039-Updated-Russian-translation-for-the-gas-sub-director.patch ...
+ * Applying 0040-Enable-link-time-garbage-collection-for-the-IA64-tar.patch ...
+ * Applying 0041-IA-64-Fix-linker-error-with-no-keep-memory.patch ...
+ * Applying 0042-GC-Also-check-the-local-debug-definition-section.patch ...
+ * Applying 0043-ARM-Fix-bxns-mask.patch ...
+ * Applying 0044-PR22836-r-s-doesn-t-work-with-g3-using-GCC-7.patch ...
+ * Applying 0045-PR22836-testcases.patch ...
+ * Applying 0046-Set-non_ir_ref_dynamic-if-a-symbol-is-made-dynamic.patch ...
+ * Applying 0047-ld-testsuite-XFAIL-pr20995-2-on-aarch64-elf.patch ...
+ * Applying 0048-Remove-unnecessary-power9-group-terminating-nop.patch ...
+ * Applying 0049-Really-remove-unnecessary-power9-group-terminating-n.patch ...
+ * Applying 0050-PowerPC64-debian-bug-886264-out-of-line-save-restore.patch ...
+ * Applying 0051-x86-64-Add-ENDBR64-to-the-TLSDESC-PLT-entry.patch ...
+ * Applying 0052-gold-testsuite-Fix-bad-regexp-in-split_x86_64.sh.patch ...
+ * Applying 0053-PR-ld-22972-on-SPARC.patch ...
+ * Applying 0054-Fix-case-where-IR-file-provides-symbol-visibility-bu.patch ...
+ * Applying 0055-Automatic-date-update-in-version.in.patch ...
+ * Applying 0056-Import-patch-from-the-mainline-that-fixes-the-ARM-as.patch ...
+ * Applying 0057-i386-Clear-vex-instead-of-vex.evex.patch ...
+ * Applying 0058-Import-patch-from-mainline-sources-to-stop-the-linke.patch ...
+ * Applying 0059-Updated-Spanish-and-Russian-translations-for-the-gas.patch ...
+ * Applying 0060-Updated-Spanish-translations-for-the-gold-and-gprof-.patch ...
+ * Applying 0061-Updated-Spanish-translation-for-gas-sub-directory.patch ...
+ * Applying 0062-x86-Remove-the-unused-_GLOBAL_OFFSET_TABLE_.patch ...
+ * Applying 0063-x86-Keep-the-unused-_GLOBAL_OFFSET_TABLE_-for-Solari.patch ...
+ * Applying 0064-x86-Add-is_solaris-to-elf_x86_target_os.patch ...
+ * Applying 0065-Fix-the-mask-for-the-sqrdml-a-s-h-instructions.patch ...
+ * Applying 0066-PR23123-PowerPC32-ifunc-regression.patch ...
+ * Applying 0067-Automatic-date-update-in-version.in.patch ...
+ * Applying 0068-Prevent-attempts-to-call-strncpy-with-a-zero-length-.patch ...
+ * Applying 0069-PR22769-crash-when-running-32-bit-objdump-on-corrupt.patch ...
+ * Applying 0070-PR22887-null-pointer-dereference-in-aout_32_swap_std.patch ...
+ * Applying 0071-Prevent-illegal-memory-accesses-triggerd-by-intger-o.patch ...
+ * Applying 0072-Catch-integer-overflows-underflows-when-parsing-corr.patch ...
+ * Applying 0073-Fix-potential-integer-overflow-when-reading-corrupt-.patch ...
+ * Applying 0074-PR22741-objcopy-segfault-on-fuzzed-COFF-object.patch ...
+ * Applying 0075-Add-new-Portuguese-translation-for-the-bfd-sub-direc.patch ...
+ * Applying 0076-Fix-uninitialised-memory-acccess-in-COFF-bfd-backend.patch ...
+ * Applying 0077-Fix-disassembly-mask-for-vector-sdot-on-AArch64.patch ...
+ * Applying 0078-PR23199-Invalid-SHT_GROUP-entry-leads-to-group-confu.patch ...
+ * Applying 0079-x86-Don-t-set-eh-local_ref-to-1-for-linker-defined-s.patch ...
+ * Applying 0080-x86-Don-t-set-eh-local_ref-to-1-for-versioned-symbol.patch ...
+ * Applying 0081-Mark-section-in-a-section-group-with-SHF_GROUP.patch ...
+ * Applying 0082-Automatic-date-update-in-version.in.patch ...
+ * Applying 0083-Add-an-option-no-warn-shared-textrel-self-explanator.patch ...
+ * Applying 0084-Revert-Gentoo-Adapt-the-testsuite-to-our-enhanced-te.patch ...
+ * Applying 0085-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
+ * Applying 0086-Revert-Gentoo-Disable-failing-test-ld-x86-64-x86-64..patch ...
+ * Applying 0087-Revert-Gentoo-Disable-another-test-that-checks-for-t.patch ...
+ * Applying 0088-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
+ * Applying 0089-Pass-no-warn-shared-textrel-to-ld-in-its-testsuite.patch ...
+ * Applying 0090-Fix-test-for-precise-textrel-warning-message.patch ...
+ * Applying 0091-Fix-the-PR22983-test-so-that-it-will-work-regardless.patch ...
+ * Applying 0092-x86-64-Add-TLSDESC-fields-to-elf_x86_lazy_plt_layout.patch ...
+ * Applying 0093-Automatic-date-update-in-version.in.patch ...
+ * Applying 9999-Gentoo-We-make-a-release.patch ...
+ * Fixing misc issues in configure files
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating config.sub
+ *   Updating config.guess
+ *  CATEGORY: sys-devel
+ *    CBUILD: x86_64-pc-linux-gnu
+ *     CHOST: x86_64-pc-linux-gnu
+ *   CTARGET: x86_64-pc-linux-gnu
+ *    CFLAGS: -march=sandybridge -O2 -pipe
+ *   LDFLAGS: -Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 461180 KiB (450.3 MiB)
+ * Final size of installed tree:   59528 KiB ( 58.1 MiB)
+
+ * Messages for package sys-devel/gcc-7.3.0-r3:
+
+ * Package:    sys-devel/gcc-7.3.0-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying Gentoo patches ...
+ *   10_all_default-fortify-source.patch ...
+ *   11_all_default-warn-format-security.patch ...
+ *   12_all_default-warn-trampolines.patch ...
+ *   13_all_default-ssp-fix.patch ...
+ *   25_all_alpha-mieee-default.patch ...
+ *   34_all_ia64_note.GNU-stack.patch ...
+ *   50_all_libiberty-asprintf.patch ...
+ *   51_all_libiberty-pic.patch ...
+ *   54_all_nopie-all-flags.patch ...
+ *   55_all_extra-options.patch ...
+ *   90_all_pr55930-dependency-tracking.patch ...
+ *   91_all_bmi-i386-PR-target-81763.patch ...
+ *   92_all_sh-drop-sysroot-suffix.patch ...
+ *   93_all_copy-constructible-fix.patch ...
+ * Done with patching
+ * Updating gcc to use automatic PIE building ...
+ * Updating gcc to use automatic SSP building ...
+ * updating multilib directories to be: ../lib64 ../lib32
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating config.sub
+ *   Updating config.guess
+ * Fixing misc issues in configure files
+ * Applying gcc-configure-texinfo.patch ...
+ * Touching generated files
+ * CFLAGS="-march=sandybridge -O2 -pipe"
+ * CXXFLAGS=""
+ * LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+ * PREFIX:          /usr
+ * BINPATH:         /usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0
+ * LIBPATH:         /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0
+ * DATAPATH:        /usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0
+ * STDCXX_INCDIR:   /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7
+ * Languages:       c,c++
+ * Configuring GCC with: 
+ * 	--host=x86_64-pc-linux-gnu 
+ * 	--build=x86_64-pc-linux-gnu 
+ * 	--prefix=/usr 
+ * 	--bindir=/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0 
+ * 	--includedir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include 
+ * 	--datadir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0 
+ * 	--mandir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/man 
+ * 	--infodir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/info 
+ * 	--with-gxx-include-dir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7 
+ * 	--with-python-dir=/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/python 
+ * 	--enable-languages=c,c++ 
+ * 	--enable-obsolete 
+ * 	--enable-secureplt 
+ * 	--disable-werror 
+ * 	--with-system-zlib 
+ * 	--enable-nls 
+ * 	--without-included-gettext 
+ * 	--enable-checking=release 
+ * 	--with-bugurl=https://bugs.gentoo.org/ 
+ * 	--with-pkgversion=Gentoo Hardened 7.3.0-r3 p1.4 
+ * 	--enable-esp 
+ * 	--enable-libstdcxx-time 
+ * 	--disable-libstdcxx-pch 
+ * 	--enable-shared 
+ * 	--enable-threads=posix 
+ * 	--enable-__cxa_atexit 
+ * 	--enable-clocale=gnu 
+ * 	--enable-multilib 
+ * 	--with-multilib-list=m32,m64 
+ * 	--disable-altivec 
+ * 	--disable-fixed-point 
+ * 	--enable-targets=all 
+ * 	--disable-libgomp 
+ * 	--disable-libmudflap 
+ * 	--disable-libssp 
+ * 	--disable-libcilkrts 
+ * 	--disable-libmpx 
+ * 	--disable-vtable-verify 
+ * 	--disable-libvtv 
+ * 	--disable-libquadmath 
+ * 	--enable-lto 
+ * 	--without-isl 
+ * 	--disable-libsanitizer 
+ * 	--enable-default-pie 
+ * 	--enable-default-ssp
+ * Compiling gcc (bootstrap-lean)...
+ * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1 with setfattr
+ * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1plus with setfattr
+ * Final size of build directory: 1209936 KiB (  1.1 GiB)
+ * Final size of installed tree:   137816 KiB (134.5 MiB)
+ * If you have issues with packages unable to locate libstdc++.la,
+ * then try running 'fix_libtool_files.sh' on the old gcc versions.
+ * You might want to review the GCC upgrade guide when moving between
+ * major versions (like 4.2 to 4.3):
+ * https://wiki.gentoo.org/wiki/Upgrading_GCC
+
+ * Messages for package sys-apps/texinfo-6.5:
+
+ * Package:    sys-apps/texinfo-6.5
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 93668 KiB (91.4 MiB)
+ * Final size of installed tree:   6980 KiB ( 6.8 MiB)
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * Regenerating GNU info directory index...
+ * Processed 89 info files.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+!!! CONFIG_PROTECT is empty
+!!! You have no world file.
+
+Calculating dependencies... done!
+  sys-devel/gcc-7.3.0-r3 pulled in by:
+    @system requires sys-devel/gcc
+    sys-libs/glibc-2.27-r5 requires >=sys-devel/gcc-4.9
+
+>>> No packages selected for removal by prune
+>>> To ignore dependencies, use --nodeps
+-------------------------------------------------------------------------------
+ * Please note that you should now add the '-e' option for emerge system:
+
+ *   # emerge -e system
+
+livecd /usr/portage/scripts #
+
+```
+
+```sh
+livecd /usr/portage/scripts # emerge --emptytree --with-bdeps=y @world
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild   R    ] virtual/libintl-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-lang/python-exec-2.4.6:2::gentoo [2.4.5:2::gentoo] PYTHON_TARGETS="(jython2_7) (pypy) (pypy3) (python2_7) (python3_4) (python3_5) (python3_6) (python3_7%*)" 86 KiB
+[ebuild     U  ] sys-libs/ncurses-6.1-r3:0/6::gentoo [6.1-r2:0/6::gentoo] USE="cxx unicode -ada -debug -doc -gpm -minimal (-profile) -static-libs {-test} -threads -tinfo -trace" ABI_X86="(64) -32 (-x32)" 3287 KiB
+[ebuild   R    ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-arch/bzip2-1.0.6-r9:0/1::gentoo  USE="-static -static-libs" ABI_X86="(64) -32 (-x32)" 764 KiB
+[ebuild     U  ] sys-devel/gnuconfig-20180101::gentoo [20170101::gentoo] 51 KiB
+[ebuild   R    ] sys-apps/gentoo-functions-0.12::gentoo  12 KiB
+[ebuild   R    ] virtual/libiconv-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-misc/c_rehash-1.7-r1::gentoo  5 KiB
+[ebuild   R    ] app-misc/mime-types-9::gentoo  16 KiB
+[ebuild     U  ] app-arch/gzip-1.9::gentoo [1.8::gentoo] USE="-pic -static" 745 KiB
+[ebuild     U  ] sys-apps/debianutils-4.8.6::gentoo [4.8.3::gentoo] USE="installkernel%* -static" 153 KiB
+[ebuild   R    ] app-misc/editor-wrapper-4::gentoo  0 KiB
+[ebuild  N     ] dev-libs/ustr-1.0.4-r8::gentoo  USE="-static-libs -ustr-import" ABI_X86="(64) -32 (-x32)" 229 KiB
+[ebuild   R    ] net-libs/libmnl-1.0.4:0/0.2.0::gentoo  USE="-examples -static-libs" 295 KiB
+[ebuild   R    ] app-text/manpager-1::gentoo  0 KiB
+[ebuild   R    ] app-crypt/openpgp-keys-gentoo-release-20180706::gentoo  USE="{-test}" 0 KiB
+[ebuild     U  ] sys-apps/install-xattr-0.5-r1::gentoo [0.5::gentoo] 16 KiB
+[ebuild   R    ] sys-apps/baselayout-2.6::gentoo  USE="split-usr -build" 0 KiB
+[ebuild   R    ] sys-apps/which-2.21::gentoo  146 KiB
+[ebuild   R    ] app-text/sgml-common-0.6.3-r6::gentoo  126 KiB
+[ebuild   R    ] sys-devel/autoconf-wrapper-13-r1::gentoo  0 KiB
+[ebuild     U  ] sys-devel/automake-wrapper-11::gentoo [10::gentoo] 0 KiB
+[ebuild     U  ] dev-util/gperf-3.1::gentoo [3.0.4::gentoo] 1188 KiB
+[ebuild     U  ] sys-devel/gcc-config-1.9.1::gentoo [1.8-r1::gentoo] 18 KiB
+[ebuild     U  ] sys-libs/timezone-data-2018e::gentoo [2018d::gentoo] USE="nls -leaps_timezone" 572 KiB
+[ebuild     U  ] sys-devel/binutils-config-5.1-r1::gentoo [5-r4::gentoo] 0 KiB
+[ebuild  N     ] sys-apps/semodule-utils-2.8::gentoo  13 KiB
+[ebuild   R    ] app-arch/unzip-6.0_p21-r2::gentoo  USE="bzip2 unicode -natspec" 1362 KiB
+[ebuild     U  ] virtual/os-headers-0-r1::gentoo [0::gentoo] 0 KiB
+[ebuild   R    ] virtual/pam-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/udev-217::gentoo  USE="(-systemd)" 0 KiB
+[ebuild   R    ] sys-fs/udev-init-scripts-32::gentoo  4 KiB
+[ebuild   R    ] virtual/dev-manager-0-r1::gentoo  0 KiB
+[ebuild   R    ] virtual/acl-0-r2::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/libffi-3.0.13-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/man-0-r1::gentoo  0 KiB
+[ebuild   R    ] sys-apps/man-pages-posix-2013a::gentoo  909 KiB
+[ebuild     U  ] sys-apps/man-pages-4.16::gentoo [4.14::gentoo] USE="nls" L10N="-da -de -fr -it -ja -nl -pl -ru -zh-CN" 1597 KiB
+[ebuild   R    ] virtual/shadow-0::gentoo  0 KiB
+[ebuild   R    ] app-eselect/eselect-python-20171204::gentoo  46 KiB
+[ebuild   R    ] virtual/tmpfiles-0::gentoo  0 KiB
+[ebuild   R    ] app-eselect/eselect-pinentry-0.7::gentoo  0 KiB
+[ebuild   R    ] virtual/mta-1::gentoo  0 KiB
+[ebuild   R    ] virtual/logger-0::gentoo  0 KiB
+[ebuild   R    ] virtual/pkgconfig-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] sys-libs/readline-7.0_p5:0/7::gentoo [7.0_p3:0/7::gentoo] USE="-static-libs -utils" ABI_X86="(64) -32 (-x32)" 2851 KiB
+[ebuild     U  ] sys-apps/hwids-20180518::gentoo [20171003::gentoo] USE="net pci udev usb" 3077 KiB
+[ebuild     U  ] dev-libs/libpipeline-1.5.0::gentoo [1.4.2::gentoo] USE="-static-libs {-test}" 810 KiB
+[ebuild   R    ] sys-apps/kbd-2.0.4::gentoo  USE="nls pam {-test}" 1008 KiB
+[ebuild     U  ] app-shells/bash-4.4_p23::gentoo [4.4_p12::gentoo] USE="net nls (readline) -afs -bashlogger -examples -mem-scramble -plugins" 9209 KiB
+[ebuild     U  ] net-misc/netifrc-0.6.0::gentoo [0.5.1::gentoo] 82 KiB
+[ebuild   R    ] app-text/docbook-xml-dtd-4.1.2-r6:4.1.2::gentoo  74 KiB
+[ebuild   R    ] app-text/docbook-xsl-stylesheets-1.79.1-r2::gentoo  USE="-ruby" 21454 KiB
+[ebuild   R    ] virtual/yacc-0::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-File-Temp-0.230.400-r5::gentoo  0 KiB
+[ebuild     U  ] app-admin/perl-cleaner-2.26-r1::gentoo [2.25::gentoo] 8 KiB
+[ebuild     U  ] app-arch/xz-utils-5.2.4-r2::gentoo [5.2.3::gentoo] USE="extra-filters nls threads -static-libs" ABI_X86="(64) -32 (-x32)" 1536 KiB
+[ebuild     U  ] app-portage/elt-patches-20170826.1::gentoo [20170815::gentoo] 28 KiB
+[ebuild     U  ] sys-devel/m4-1.4.18::gentoo [1.4.17::gentoo] USE="-examples" 1180 KiB
+[ebuild   R    ] dev-libs/libltdl-2.4.6::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 951 KiB
+[ebuild   R    ] sys-libs/zlib-1.2.11-r2:0/1::gentoo  USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-libs/gmp-6.1.2-r1:0/10.4::gentoo [6.1.2:0/10.4::gentoo] USE="asm cxx -doc -static-libs (-pgo%)" ABI_X86="(64) -32 (-x32)" 1901 KiB
+[ebuild   R    ] dev-libs/libunistring-0.9.10:0/2::gentoo  USE="-doc -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-libs/libffi-3.2.1-r2::gentoo [3.2.1::gentoo] USE="-debug -pax_kernel -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 919 KiB
+[ebuild   R    ] dev-libs/npth-1.5::gentoo  USE="-static-libs" 0 KiB
+[ebuild     U  ] dev-libs/libpcre-8.42:3::gentoo [8.41-r1:3::gentoo] USE="bzip2 cxx readline recursion-limit (static-libs) (unicode) zlib -jit* -libedit -pcre16 -pcre32" ABI_X86="(64) -32 (-x32)" 1534 KiB
+[ebuild   R    ] sys-apps/file-5.33-r2::gentoo  USE="zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 798 KiB
+[ebuild   R    ] sys-libs/cracklib-2.9.6-r1::gentoo  USE="nls zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 628 KiB
+[ebuild     U  ] dev-libs/mpfr-4.0.1:0/6::gentoo [3.1.6:0/4::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 1380 KiB
+[ebuild     U  ] sys-apps/kmod-25::gentoo [24::gentoo] USE="tools zlib -debug -doc -lzma -python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 533 KiB
+[ebuild     U  ] sys-apps/less-531::gentoo [529::gentoo] USE="pcre unicode" 333 KiB
+[ebuild     U  ] dev-libs/mpc-1.1.0-r1:0/3::gentoo [1.0.3:0/0::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 685 KiB
+[ebuild   R    ] app-admin/metalog-3-r2::gentoo  USE="unicode" 0 KiB
+[ebuild   R    ] virtual/modutils-0::gentoo  0 KiB
+[ebuild   R    ] dev-lang/swig-3.0.12::gentoo  USE="pcre* -ccache -doc" 0 KiB
+[ebuild   R    ] virtual/pager-0::gentoo  0 KiB
+[ebuild     U  ] dev-lang/perl-5.26.2:0/5.26::gentoo [5.24.3-r1:0/5.24::gentoo] USE="-berkdb* -debug -doc -gdbm* -ithreads" 11770 KiB
+[ebuild   R    ] sys-kernel/linux-headers-4.17::gentoo  USE="-headers-only" 0 KiB
+[ebuild     U  ] sys-apps/groff-1.22.3::gentoo [1.22.2::gentoo] USE="-X -examples" L10N="(-ja%)" 4091 KiB
+[ebuild   R    ] sys-devel/autoconf-2.69-r4:2.69::gentoo  USE="-emacs" 1187 KiB
+[ebuild     U  ] virtual/perl-ExtUtils-MakeMaker-7.240.0::gentoo [7.100.200_rc-r4::gentoo] 0 KiB
+[ebuild   R    ] dev-util/gtk-doc-am-1.25-r1::gentoo  658 KiB
+[ebuild     U  ] virtual/perl-Parse-CPAN-Meta-2.150.10::gentoo [1.441.700.100_rc-r4::gentoo] 0 KiB
+[ebuild   R    ] virtual/perl-CPAN-Meta-YAML-0.18.0-r2::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-Test-Harness-3.380.0::gentoo [3.360.100_rc-r3::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-File-Spec-3.670.0::gentoo [3.630.100_rc-r4::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Data-Dumper-2.167.0::gentoo [2.160.0-r1::gentoo] 0 KiB
+[ebuild   R    ] dev-perl/Text-CharWidth-0.40.0-r1::gentoo  9 KiB
+[ebuild   R    ] perl-core/File-Temp-0.230.400-r1::gentoo  59 KiB
+[ebuild     U  ] virtual/perl-version-0.991.700::gentoo [0.991.600-r1::gentoo] 0 KiB
+[ebuild  N     ] virtual/perl-podlators-4.90.0::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-Text-ParseWords-3.300.0-r3::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-Perl-OSType-1.10.0::gentoo [1.9.0-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Module-Metadata-1.0.33::gentoo [1.0.31-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Getopt-Long-2.490.0::gentoo [2.480.0-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-ExtUtils-ParseXS-3.340.0::gentoo [3.310.0-r1::gentoo] 0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-Manifest-1.700.0-r4::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-Install-2.40.0-r3::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-CBuilder-0.280.225-r2::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-JSON-PP-2.274.0.200_rc::gentoo [2.273.0.100_rc-r6::gentoo] 0 KiB
+[ebuild   R    ] sys-libs/libseccomp-2.3.3::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 552 KiB
+[ebuild  N     ] sys-libs/libcap-ng-0.7.9::gentoo  USE="-python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 439 KiB
+[ebuild     U  ] net-firewall/iptables-1.6.2-r2:0/12::gentoo [1.6.1-r3:0/12::gentoo] USE="ipv6 -conntrack -netlink -nftables -pcap -static-libs" 625 KiB
+[ebuild     U  ] dev-perl/Text-Unidecode-1.300.0::gentoo [1.270.0::gentoo] 135 KiB
+[ebuild     U  ] dev-perl/libintl-perl-1.280.0::gentoo [1.240.0-r2::gentoo] 460 KiB
+[ebuild   R    ] dev-perl/Unicode-EastAsianWidth-1.330.0-r1::gentoo  31 KiB
+[ebuild     U  ] dev-perl/TermReadKey-2.370.0::gentoo [2.330.0::gentoo] USE="-examples%" 84 KiB
+[ebuild   R    ] dev-perl/Text-WrapI18N-0.60.0-r1::gentoo  4 KiB
+[ebuild     U  ] virtual/perl-CPAN-Meta-2.150.10::gentoo [2.150.5-r1::gentoo] 0 KiB
+[ebuild     U  ] app-misc/pax-utils-1.2.3-r1::gentoo [1.2.3::gentoo] USE="seccomp -caps -debug -python" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_4% -python3_6%" PYTHON_TARGETS="python2_7%* python3_5%* -python3_4% -python3_6%" 647 KiB
+[ebuild     U  ] dev-perl/Module-Build-0.422.400::gentoo [0.421.600::gentoo] USE="{-test}" 298 KiB
+[ebuild   R    ] sys-apps/sandbox-2.13::gentoo  ABI_X86="(32) (64) (-x32)" 416 KiB
+[ebuild     U  ] dev-perl/SGMLSpm-1.1-r1::gentoo [1.03-r7::gentoo] 112 KiB
+[ebuild     U  ] dev-libs/openssl-1.0.2o-r6::gentoo [1.0.2o-r3::gentoo] USE="asm sslv3 tls-heartbeat zlib -bindist* -gmp -kerberos -rfc3779 -sctp -sslv2 -static-libs {-test} -vanilla" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="(sse2)" 5218 KiB
+[ebuild   R    ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="ruby23*" 0 KiB
+[ebuild     U  ] sys-apps/net-tools-1.60_p20170221182432::gentoo [1.60_p20161110235919::gentoo] USE="arp hostname ipv6 nls (selinux*) -nis -plipconfig -slattach -static" 223 KiB
+[ebuild   R    ] sys-process/procps-3.3.15-r1:0/6::gentoo  USE="kill ncurses nls (selinux*) unicode -elogind -modern-top -static-libs (-systemd) {-test}" 884 KiB
+[ebuild     U  ] sys-apps/busybox-1.29.0::gentoo [1.28.0::gentoo] USE="ipv6 (selinux*) static -debug -livecd -make-symlinks -math -mdev -pam -savedconfig -sep-usr -syslog (-systemd)" 2250 KiB
+[ebuild     U  ] sys-apps/attr-2.4.48-r2::gentoo [2.4.47-r2::gentoo] USE="nls -debug% -static-libs" ABI_X86="(64) -32 (-x32)" 457 KiB
+[ebuild  N     ] sys-libs/libcap-2.25-r1::gentoo  USE="pam -static-libs" ABI_X86="(64) -32 (-x32)" 63 KiB
+[ebuild   R    ] sys-devel/patch-2.7.6-r1::gentoo  USE="xattr -static {-test}" 766 KiB
+[ebuild     U  ] net-misc/iputils-20171016_pre-r1::gentoo [20171016_pre::gentoo] USE="arping filecaps* ipv6 ssl -SECURITY_HAZARD -caps -clockdiff -doc -gcrypt -idn -libressl -nettle -rarpd -rdisc -static -tftpd -tracepath -traceroute (-openssl%*)" 220 KiB
+[ebuild     U  ] dev-python/setuptools-38.6.1::gentoo [36.7.2::gentoo] USE="{-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 722 KiB
+[ebuild   R    ] dev-libs/libgpg-error-1.29::gentoo  USE="nls -common-lisp -static-libs" ABI_X86="(64) -32 (-x32)" 874 KiB
+[ebuild   R    ] dev-libs/libassuan-2.5.1::gentoo  USE="-static-libs" 0 KiB
+[ebuild   R    ] dev-libs/libksba-1.3.5-r1::gentoo  USE="-static-libs" 0 KiB
+[ebuild   R    ] sys-apps/sed-4.5::gentoo  USE="acl nls (selinux*) -forced-sandbox -static" 1245 KiB
+[ebuild     U  ] sys-apps/util-linux-2.32-r3::gentoo [2.30.2-r1::gentoo] USE="cramfs ncurses nls pam readline (selinux*) suid unicode -build -caps -fdformat -kill -python -slang -static-libs (-systemd) {-test} -tty-helpers -udev" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5 -python2_7 -python3_4 -python3_6" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 4444 KiB
+[ebuild     U  ] sys-libs/pam-1.3.0-r2::gentoo [1.2.1-r2::gentoo] USE="cracklib filecaps* nls (pie) (selinux*) -audit -berkdb* -debug -nis {-test} -vim-syntax%" ABI_X86="(64) -32 (-x32)" 1754 KiB
+[ebuild   R    ] sys-auth/pambase-20150213-r1::gentoo  USE="cracklib nullok (selinux*) sha512 -consolekit -debug -elogind -gnome-keyring -minimal -mktemp -pam_krb5 -pam_ssh -passwdqc -securetty (-systemd)" 4 KiB
+[ebuild     U  ] sys-apps/acl-2.2.53::gentoo [2.2.52-r1::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 513 KiB
+[ebuild     U  ] sys-apps/coreutils-8.30::gentoo [8.28-r1::gentoo] USE="acl nls (selinux*) split-usr%* (xattr) -caps -gmp -hostname -kill -multicall -static {-test} -vanilla" 5240 KiB
+[ebuild     U  ] app-admin/eselect-1.4.13::gentoo [1.4.12::gentoo] USE="-doc -emacs -vim-syntax" 174 KiB
+[ebuild   R    ] app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo  0 KiB
+[ebuild   R    ] sys-libs/glibc-2.27-r5:2.2::gentoo  USE="hardened multiarch* (multilib) (selinux) -audit -caps (-compile-locales) -doc -gd -headers-only -nscd (-profile) -suid -systemtap (-vanilla)" 0 KiB
+[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
+[ebuild   R    ] sys-devel/binutils-2.30-r3:2.30::gentoo  USE="cxx nls -doc -multitarget -static-libs {-test}" 0 KiB
+[ebuild     U  ] app-misc/ca-certificates-20180409.3.37::gentoo [20170717.3.36.1::gentoo] USE="-cacert (-insecure_certs%)" 22729 KiB
+[ebuild  N     ] dev-python/ipy-0.83::gentoo  USE="-examples" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 32 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="(ipc) native-extensions* rsync-verify* (selinux) (xattr) -build* -doc -epydoc -gentoo-dev" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+[ebuild   R    ] virtual/package-manager-1::gentoo  0 KiB
+[ebuild   R    ] dev-python/pyblake2-1.1.2::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 124 KiB
+[ebuild     U  ] sys-devel/make-4.2.1-r3::gentoo [4.2.1::gentoo] USE="nls -guile -static" 1375 KiB
+[ebuild   R    ] sys-process/psmisc-23.1-r1::gentoo  USE="ipv6 nls (selinux*) -X" 290 KiB
+[ebuild     U  ] sys-libs/e2fsprogs-libs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 699 KiB
+[ebuild   R    ] dev-libs/popt-1.16-r2::gentoo  USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 687 KiB
+[ebuild   R    ] net-misc/rsync-3.1.3::gentoo  USE="acl iconv ipv6 xattr -examples -static -stunnel" 885 KiB
+[ebuild  N     ] dev-python/decorator-4.2.1::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 33 KiB
+[ebuild  N     ] dev-python/networkx-1.11-r1::gentoo  USE="-doc -examples -scipy {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1285 KiB
+[ebuild  N     ] dev-python/pypax-0.9.2::gentoo  USE="xtpax -ptpax" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 390 KiB
+[ebuild  N     ] sys-apps/elfix-0.9.2::gentoo  USE="xtpax -ptpax" 0 KiB
+[ebuild  N     ] dev-python/enum34-1.1.6::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 -pypy -pypy3" 40 KiB
+[ebuild  N     ] virtual/python-enum34-1::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 0 KiB
+[ebuild  N     ] app-admin/setools-4.1.1::gentoo  USE="-X -debug {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 451 KiB
+[ebuild   R    ] dev-python/bz2file-0.98::gentoo  PYTHON_TARGETS="python2_7 -pypy" 0 KiB
+[ebuild   R    ] dev-libs/libtasn1-4.13:0/6::gentoo  USE="-doc -static-libs -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] net-dns/libidn2-2.0.5::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] app-editors/nano-2.9.8::gentoo [2.8.7::gentoo] USE="magic ncurses nls spell unicode -debug -justify -minimal -slang -static" 2838 KiB
+[ebuild   R    ] virtual/editor-0-r1::gentoo  0 KiB
+[ebuild  NS    ] sys-devel/automake-1.16.1-r1:1.16::gentoo [1.15.1-r2:1.15::gentoo] USE="{-test}" 1499 KiB
+[ebuild     U  ] sys-devel/libtool-2.4.6-r5:2::gentoo [2.4.6-r3:2::gentoo] USE="-vanilla" 0 KiB
+[ebuild   R    ] dev-libs/libxml2-2.9.8:2::gentoo  USE="ipv6 readline -debug -examples -icu -lzma -python -static-libs {-test}" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 5341 KiB
+[ebuild   R    ] dev-libs/expat-2.2.5::gentoo  USE="unicode -examples -static-libs" ABI_X86="(64) -32 (-x32)" 499 KiB
+[ebuild     U  ] sys-libs/gdbm-1.16:0/6::gentoo [1.13-r2:0/1.13::gentoo] USE="berkdb nls readline -static-libs (-exporter%)" ABI_X86="(64) -32 (-x32)" 915 KiB
+[ebuild   R    ] dev-libs/libgcrypt-1.8.3:0/20::gentoo  USE="-doc -o-flag-munging -static-libs" ABI_X86="(64) -32 (-x32)" 2920 KiB
+[ebuild  N     ] sys-process/audit-2.8.3::gentoo  USE="-gssapi -ldap -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1082 KiB
+[ebuild     U  ] net-misc/openssh-7.7_p1-r6::gentoo [7.7_p1-r5::gentoo] USE="pam (pie) (selinux*) ssl -X -X509 -audit -bindist* -debug -hpn -kerberos -ldap -ldns -libedit -libressl -livecd -sctp -skey -static {-test}" 1517 KiB
+[ebuild   R    ] net-misc/curl-7.60.0-r1::gentoo  USE="ipv6 ssl -adns -brotli -http2 -idn -kerberos -ldap -metalink -rtmp -samba -ssh -static-libs {-test} -threads" ABI_X86="(64) -32 (-x32)" CURL_SSL="openssl -axtls -gnutls -libressl -mbedtls -nss (-winssl)" 0 KiB
+[ebuild   R    ] dev-libs/nettle-3.4:0/6.2::gentoo  USE="gmp -doc (-neon) -static-libs {-test}" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="aes*" 0 KiB
+[ebuild   R    ] dev-libs/iniparser-3.1-r1::gentoo  USE="-doc -examples -static-libs" ABI_X86="(64) -32 (-x32)" 39 KiB
+[ebuild     U  ] net-libs/libtirpc-1.0.3:0/3::gentoo [1.0.2-r1:0/3::gentoo] USE="ipv6 -kerberos -static-libs" ABI_X86="(64) -32 (-x32)" 507 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="acl* cxx ncurses* nls openmp* -cvs -doc -emacs -git -java -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-lang/python-2.7.15:2.7::gentoo [2.7.14-r1:2.7::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (wide-unicode) (xml) (-berkdb) -bluetooth% -build -doc -examples -libressl -sqlite -tk -wininst" 12362 KiB
+[ebuild     U  ] dev-lang/python-3.5.5-r1:3.5/3.5m::gentoo [3.5.5:3.5/3.5m::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (xml) -bluetooth% -build -examples -libressl -sqlite {-test} -tk -wininst" 15004 KiB
+[ebuild   R    ] virtual/ssh-0::gentoo  USE="-minimal" 0 KiB
+[ebuild     U  ] app-portage/portage-utils-0.71::gentoo [0.64::gentoo] USE="nls -static" 543 KiB
+[ebuild   R    ] dev-libs/libxslt-1.1.32::gentoo  USE="crypt -debug -examples -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7" 3361 KiB
+[ebuild   R    ] app-text/build-docbook-catalog-1.21::gentoo  5 KiB
+[ebuild   R    ] dev-perl/XML-Parser-2.440.0::gentoo  232 KiB
+[ebuild   R    ] net-libs/libnsl-1.2.0:0/2::gentoo  ABI_X86="(64) -32 (-x32)" 205 KiB
+[ebuild   R    ] net-libs/gnutls-3.5.18:0/30::gentoo  USE="cxx idn nls openssl seccomp tls-heartbeat zlib -dane -doc -examples -guile -openpgp -pkcs11 -sslv2 -sslv3 -static-libs {-test} -test-full -tools -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-arch/tar-1.30::gentoo  USE="acl nls (selinux*) (xattr) -minimal -static" 2792 KiB
+[ebuild   R    ] dev-python/certifi-2018.4.16::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 147 KiB
+[ebuild     U  ] dev-python/pyxattr-0.6.0-r1::gentoo [0.5.5::gentoo] USE="-doc {-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6%" 31 KiB
+[ebuild   R    ] app-crypt/pinentry-1.1.0-r2::gentoo  USE="ncurses -caps -emacs -fltk -gnome-keyring -gtk -qt5 -static" 0 KiB
+[ebuild   R    ] sys-apps/findutils-4.6.0-r1::gentoo  USE="nls (selinux*) -static {-test}" 3692 KiB
+[ebuild     U  ] sys-apps/grep-3.1::gentoo [3.0::gentoo] USE="nls pcre -static" 1339 KiB
+[ebuild     U  ] sys-apps/gawk-4.2.1-r1::gentoo [4.1.4::gentoo] USE="nls readline -forced-sandbox% -mpfr" 2916 KiB
+[ebuild     U  ] sys-apps/diffutils-3.6-r1::gentoo [3.5::gentoo] USE="nls -static" 1366 KiB
+[ebuild   R    ] net-misc/wget-1.19.5::gentoo  USE="ipv6 nls pcre ssl zlib -debug -gnutls -idn -libressl -ntlm -static {-test} -uuid" 4352 KiB
+[ebuild   R    ] sys-devel/flex-2.6.4-r1::gentoo  USE="nls -static {-test}" ABI_X86="(64) -32 (-x32)" 1386 KiB
+[ebuild   R    ] dev-perl/Locale-gettext-1.70.0::gentoo  9 KiB
+[ebuild   R    ] dev-util/intltool-0.51.0-r2::gentoo  159 KiB
+[ebuild   R    ] sys-apps/texinfo-6.5::gentoo  USE="nls -static" 0 KiB
+[ebuild     U  ] app-text/opensp-1.5.2-r6::gentoo [1.5.2-r3::gentoo] USE="nls -doc -static-libs {-test}" 1486 KiB
+[ebuild   R    ] sys-fs/eudev-3.2.5::gentoo  USE="hwdb kmod (selinux*) -introspection -rule-generator -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 1814 KiB
+[ebuild   R    ] mail-mta/nullmailer-2.0-r2::gentoo  USE="ssl {-test}" 0 KiB
+[ebuild     U  ] sys-fs/e2fsprogs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -fuse -static-libs" 7386 KiB
+[ebuild     U  ] sys-devel/bison-3.0.5::gentoo [3.0.4-r1::gentoo] USE="nls -examples -static {-test}" 1915 KiB
+[ebuild     U  ] sys-apps/help2man-1.47.6::gentoo [1.47.4::gentoo] USE="nls" 189 KiB
+[ebuild   R    ] app-text/openjade-1.3.2-r7::gentoo  USE="-static-libs" 874 KiB
+[ebuild  N     ] sys-libs/libsemanage-2.8::gentoo  USE="(python)" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 151 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened (multilib) nls nptl openmp* (pie) (ssp) vtv* (-altivec) -cilk -debug -doc (-fixed-point) -fortran -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc (-pch) -pgo -regression-test (-sanitize) -vanilla" 0 KiB
+[ebuild     U  ] sys-apps/iproute2-4.17.0::gentoo [4.14.1-r2::gentoo] USE="iptables ipv6 (selinux*) -atm -berkdb* -elf% -minimal" 660 KiB
+[ebuild   R    ] app-text/po4a-0.47-r1::gentoo  USE="{-test}" 2334 KiB
+[ebuild  N     ] sys-apps/checkpolicy-2.8::gentoo  USE="-debug" 65 KiB
+[ebuild  N     ] sys-apps/selinux-python-2.8::gentoo  PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2020 KiB
+[ebuild   R    ] sys-apps/shadow-4.6::gentoo  USE="acl cracklib nls pam (selinux*) xattr -audit -skey" 3716 KiB
+[ebuild  N     ] sys-apps/policycoreutils-2.8::gentoo  USE="pam -audit -dbus" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2740 KiB
+[ebuild  N     ] sec-policy/selinux-base-2.20180114-r3::gentoo  USE="open_perms peer_perms ubac unconfined -doc (-systemd)" 1022 KiB
+[ebuild  N     ] sec-policy/selinux-base-policy-2.20180114-r3::gentoo  USE="unconfined (-systemd)" 0 KiB
+[ebuild  N     ] sec-policy/selinux-unconfined-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-openrc-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-shutdown-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/opentmpfiles-0.1.3-r1::gentoo [0.1.3::gentoo] USE="(selinux*)" 6 KiB
+[ebuild  N     ] sec-policy/selinux-mandb-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-dirmngr-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/sysvinit-2.90::gentoo [2.88-r9::gentoo] USE="(selinux*) (-ibm) -static" 111 KiB
+[ebuild     U  ] sys-apps/man-db-2.8.3::gentoo [2.7.6.1-r2::gentoo] USE="manpager nls seccomp%* (selinux*) zlib -berkdb* -gdbm* -static-libs" 1587 KiB
+[ebuild  N     ] sec-policy/selinux-gpg-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/openrc-0.38.1::gentoo [0.34.11::gentoo] USE="ncurses netifrc pam (selinux*) unicode -audit -debug -newnet (-prefix) -static-libs" 236 KiB
+[ebuild   R    ] app-crypt/gnupg-2.2.8::gentoo  USE="bzip2 nls readline (selinux*) smartcard ssl -doc -ldap -tofu -tools -usb -wks-server" 0 KiB
+[ebuild   R    ] app-portage/gemato-13.1::gentoo  USE="blake2 bzip2 gpg -lzma -sha3 {-test} -tools" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 0 KiB
+[ebuild   R    ] virtual/service-manager-0::gentoo  USE="(-prefix)" 0 KiB
+[ebuild     U  ] dev-libs/glib-2.54.3-r6:2::gentoo [2.52.3:2::gentoo] USE="mime (selinux*) xattr -dbus -debug (-fam) -static-libs -systemtap {-test} -utils" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_6%" PYTHON_TARGETS="python2_7 python3_5%* -python3_6%" 9578 KiB
+[ebuild   R    ] dev-util/pkgconfig-0.29.2::gentoo  USE="hardened* -internal-glib" ABI_X86="(64) -32 (-x32)" 1970 KiB
+[ebuild     U  ] x11-misc/shared-mime-info-1.10::gentoo [1.9::gentoo] USE="{-test}" 603 KiB
+
+Total: 228 packages (87 upgrades, 26 new, 1 in new slot, 114 reinstalls), Size of downloads: 245719 KiB
+
+Would you like to merge these packages? [Yes/No] Yrd
+Sorry, response 'Yrd' not understood. [Yes/No] Y
+>>> Verifying ebuild manifests
+>>> Running pre-merge checks for sys-libs/pam-1.3.0-r2
+>>> Running pre-merge checks for sys-libs/glibc-2.27-r5
+ * Checking general environment sanity.
+make -j5 -l4 -s glibc-test 
+ * Checking that IA32 emulation is enabled in the running kernel ...                             [ ok ]
+ * Checking gcc for __thread support ...                                                         [ ok ]
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...                               [ ok ]
+ * Checking linux-headers version (4.17.0 >= 3.2.0) ...                                          [ ok ]
+>>> Running pre-merge checks for net-misc/openssh-7.7_p1-r6
+>>> Running pre-merge checks for sys-fs/eudev-3.2.5
+ * 
+ * As of 2013-01-29, eudev-3.2.5 provides the new interface renaming functionality,
+ * as described in the URL below:
+ * https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames
+ * 
+ * This functionality is enabled BY DEFAULT because eudev has no means of synchronizing
+ * between the default or user-modified choice of sys-fs/udev.  If you wish to disable
+ * this new iface naming, please be sure that /etc/udev/rules.d/80-net-name-slot.rules
+ * exists: touch /etc/udev/rules.d/80-net-name-slot.rules
+ * 
+>>> Running pre-merge checks for sys-devel/gcc-7.3.0-r3
+>>> Running pre-merge checks for sec-policy/selinux-base-policy-2.20180114-r3
+>>> Emerging (1 of 228) virtual/libintl-0-r2::gentoo
+>>> Emerging (2 of 228) dev-lang/python-exec-2.4.6::gentoo
+>>> Emerging (3 of 228) sys-libs/ncurses-6.1-r3::gentoo
+>>> Emerging (4 of 228) sys-libs/libsepol-2.8::gentoo
+>>> Emerging (5 of 228) app-arch/bzip2-1.0.6-r9::gentoo
+>>> Emerging (6 of 228) sys-devel/gnuconfig-20180101::gentoo
+>>> Emerging (7 of 228) sys-apps/gentoo-functions-0.12::gentoo
+>>> Emerging (8 of 228) virtual/libiconv-0-r2::gentoo
+>>> Emerging (9 of 228) app-misc/c_rehash-1.7-r1::gentoo
+>>> Emerging (10 of 228) app-misc/mime-types-9::gentoo
+>>> Emerging (11 of 228) app-arch/gzip-1.9::gentoo
+>>> Emerging (12 of 228) sys-apps/debianutils-4.8.6::gentoo
+>>> Emerging (13 of 228) app-misc/editor-wrapper-4::gentoo
+>>> Emerging (14 of 228) dev-libs/ustr-1.0.4-r8::gentoo
+>>> Emerging (15 of 228) net-libs/libmnl-1.0.4::gentoo
+>>> Emerging (16 of 228) app-text/manpager-1::gentoo
+>>> Emerging (17 of 228) app-crypt/openpgp-keys-gentoo-release-20180706::gentoo
+>>> Emerging (18 of 228) sys-apps/install-xattr-0.5-r1::gentoo
+>>> Emerging (19 of 228) sys-apps/baselayout-2.6::gentoo
+>>> Emerging (20 of 228) sys-apps/which-2.21::gentoo
+>>> Emerging (21 of 228) app-text/sgml-common-0.6.3-r6::gentoo
+>>> Emerging (22 of 228) sys-devel/autoconf-wrapper-13-r1::gentoo
+>>> Installing (21 of 228) app-text/sgml-common-0.6.3-r6::gentoo
+>>> Emerging (23 of 228) sys-devel/automake-wrapper-11::gentoo
+>>> Installing (22 of 228) sys-devel/autoconf-wrapper-13-r1::gentoo
+>>> Emerging (24 of 228) dev-util/gperf-3.1::gentoo
+>>> Installing (23 of 228) sys-devel/automake-wrapper-11::gentoo
+>>> Installing (24 of 228) dev-util/gperf-3.1::gentoo
+>>> Installing (1 of 228) virtual/libintl-0-r2::gentoo
+>>> Installing (6 of 228) sys-devel/gnuconfig-20180101::gentoo
+>>> Installing (5 of 228) app-arch/bzip2-1.0.6-r9::gentoo
+>>> Installing (2 of 228) dev-lang/python-exec-2.4.6::gentoo
+>>> Installing (7 of 228) sys-apps/gentoo-functions-0.12::gentoo
+>>> Installing (4 of 228) sys-libs/libsepol-2.8::gentoo
+>>> Installing (8 of 228) virtual/libiconv-0-r2::gentoo
+>>> Installing (9 of 228) app-misc/c_rehash-1.7-r1::gentoo
+>>> Installing (10 of 228) app-misc/mime-types-9::gentoo
+>>> Installing (13 of 228) app-misc/editor-wrapper-4::gentoo
+>>> Installing (12 of 228) sys-apps/debianutils-4.8.6::gentoo
+>>> Installing (11 of 228) app-arch/gzip-1.9::gentoo
+>>> Installing (14 of 228) dev-libs/ustr-1.0.4-r8::gentoo
+>>> Installing (16 of 228) app-text/manpager-1::gentoo
+>>> Installing (17 of 228) app-crypt/openpgp-keys-gentoo-release-20180706::gentoo
+>>> Installing (15 of 228) net-libs/libmnl-1.0.4::gentoo
+>>> Installing (18 of 228) sys-apps/install-xattr-0.5-r1::gentoo
+>>> Installing (19 of 228) sys-apps/baselayout-2.6::gentoo
+>>> Installing (20 of 228) sys-apps/which-2.21::gentoo
+>>> Installing (3 of 228) sys-libs/ncurses-6.1-r3::gentoo
+>>> Emerging (25 of 228) sys-devel/gcc-config-1.9.1::gentoo
+>>> Emerging (26 of 228) sys-libs/timezone-data-2018e::gentoo
+>>> Emerging (27 of 228) sys-devel/binutils-config-5.1-r1::gentoo
+>>> Emerging (28 of 228) sys-apps/semodule-utils-2.8::gentoo
+>>> Emerging (29 of 228) app-arch/unzip-6.0_p21-r2::gentoo
+>>> Emerging (30 of 228) virtual/libffi-3.0.13-r1::gentoo
+>>> Emerging (31 of 228) app-arch/xz-utils-5.2.4-r2::gentoo
+>>> Installing (29 of 228) app-arch/unzip-6.0_p21-r2::gentoo
+>>> Installing (25 of 228) sys-devel/gcc-config-1.9.1::gentoo
+>>> Installing (27 of 228) sys-devel/binutils-config-5.1-r1::gentoo
+>>> Installing (26 of 228) sys-libs/timezone-data-2018e::gentoo
+>>> Installing (28 of 228) sys-apps/semodule-utils-2.8::gentoo
+>>> Installing (30 of 228) virtual/libffi-3.0.13-r1::gentoo
+>>> Installing (31 of 228) app-arch/xz-utils-5.2.4-r2::gentoo
+>>> Emerging (32 of 228) virtual/os-headers-0-r1::gentoo
+>>> Installing (32 of 228) virtual/os-headers-0-r1::gentoo
+>>> Emerging (33 of 228) virtual/pam-0-r1::gentoo
+>>> Emerging (34 of 228) app-portage/elt-patches-20170826.1::gentoo
+>>> Installing (34 of 228) app-portage/elt-patches-20170826.1::gentoo
+>>> Installing (33 of 228) virtual/pam-0-r1::gentoo
+>>> Emerging (35 of 228) virtual/udev-217::gentoo
+>>> Emerging (36 of 228) sys-devel/m4-1.4.18::gentoo
+>>> Emerging (37 of 228) dev-libs/libltdl-2.4.6::gentoo
+>>> Emerging (38 of 228) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Emerging (39 of 228) dev-libs/libunistring-0.9.10::gentoo
+>>> Emerging (40 of 228) dev-libs/libffi-3.2.1-r2::gentoo
+>>> Emerging (41 of 228) dev-libs/npth-1.5::gentoo
+>>> Installing (37 of 228) dev-libs/libltdl-2.4.6::gentoo
+>>> Installing (36 of 228) sys-devel/m4-1.4.18::gentoo
+>>> Emerging (42 of 228) dev-libs/gmp-6.1.2-r1::gentoo
+>>> Installing (35 of 228) virtual/udev-217::gentoo
+>>> Installing (38 of 228) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Installing (40 of 228) dev-libs/libffi-3.2.1-r2::gentoo
+>>> Installing (41 of 228) dev-libs/npth-1.5::gentoo
+>>> Installing (42 of 228) dev-libs/gmp-6.1.2-r1::gentoo
+>>> Installing (39 of 228) dev-libs/libunistring-0.9.10::gentoo
+>>> Emerging (43 of 228) sys-fs/udev-init-scripts-32::gentoo
+>>> Installing (43 of 228) sys-fs/udev-init-scripts-32::gentoo
+>>> Emerging (44 of 228) virtual/dev-manager-0-r1::gentoo
+>>> Installing (44 of 228) virtual/dev-manager-0-r1::gentoo
+>>> Emerging (45 of 228) virtual/acl-0-r2::gentoo
+>>> Installing (45 of 228) virtual/acl-0-r2::gentoo
+>>> Emerging (46 of 228) virtual/man-0-r1::gentoo
+>>> Installing (46 of 228) virtual/man-0-r1::gentoo
+>>> Emerging (47 of 228) sys-apps/man-pages-posix-2013a::gentoo
+>>> Emerging (48 of 228) virtual/shadow-0::gentoo
+>>> Emerging (49 of 228) sys-apps/file-5.33-r2::gentoo
+>>> Emerging (50 of 228) sys-libs/cracklib-2.9.6-r1::gentoo
+>>> Emerging (51 of 228) dev-libs/mpfr-4.0.1::gentoo
+>>> Installing (48 of 228) virtual/shadow-0::gentoo
+>>> Installing (47 of 228) sys-apps/man-pages-posix-2013a::gentoo
+>>> Installing (50 of 228) sys-libs/cracklib-2.9.6-r1::gentoo
+>>> Installing (49 of 228) sys-apps/file-5.33-r2::gentoo
+>>> Installing (51 of 228) dev-libs/mpfr-4.0.1::gentoo
+>>> Emerging (52 of 228) sys-apps/man-pages-4.16::gentoo
+>>> Emerging (53 of 228) app-eselect/eselect-python-20171204::gentoo
+>>> Emerging (54 of 228) dev-libs/mpc-1.1.0-r1::gentoo
+>>> Installing (52 of 228) sys-apps/man-pages-4.16::gentoo
+>>> Installing (53 of 228) app-eselect/eselect-python-20171204::gentoo
+>>> Installing (54 of 228) dev-libs/mpc-1.1.0-r1::gentoo
+>>> Emerging (55 of 228) virtual/tmpfiles-0::gentoo
+>>> Installing (55 of 228) virtual/tmpfiles-0::gentoo
+>>> Emerging (56 of 228) app-eselect/eselect-pinentry-0.7::gentoo
+>>> Installing (56 of 228) app-eselect/eselect-pinentry-0.7::gentoo
+>>> Emerging (57 of 228) virtual/mta-1::gentoo
+>>> Installing (57 of 228) virtual/mta-1::gentoo
+>>> Emerging (58 of 228) virtual/logger-0::gentoo
+>>> Installing (58 of 228) virtual/logger-0::gentoo
+>>> Emerging (59 of 228) virtual/pkgconfig-0-r1::gentoo
+>>> Installing (59 of 228) virtual/pkgconfig-0-r1::gentoo
+>>> Emerging (60 of 228) sys-libs/readline-7.0_p5::gentoo
+>>> Installing (60 of 228) sys-libs/readline-7.0_p5::gentoo
+>>> Emerging (61 of 228) sys-apps/hwids-20180518::gentoo
+>>> Installing (61 of 228) sys-apps/hwids-20180518::gentoo
+>>> Emerging (62 of 228) dev-libs/libpipeline-1.5.0::gentoo
+>>> Emerging (63 of 228) sys-apps/kbd-2.0.4::gentoo
+>>> Emerging (64 of 228) app-shells/bash-4.4_p23::gentoo
+>>> Installing (63 of 228) sys-apps/kbd-2.0.4::gentoo
+>>> Installing (62 of 228) dev-libs/libpipeline-1.5.0::gentoo
+>>> Installing (64 of 228) app-shells/bash-4.4_p23::gentoo
+>>> Emerging (65 of 228) net-misc/netifrc-0.6.0::gentoo
+>>> Emerging (66 of 228) app-text/docbook-xml-dtd-4.1.2-r6::gentoo
+>>> Installing (66 of 228) app-text/docbook-xml-dtd-4.1.2-r6::gentoo
+>>> Installing (65 of 228) net-misc/netifrc-0.6.0::gentoo
+>>> Emerging (67 of 228) app-text/docbook-xsl-stylesheets-1.79.1-r2::gentoo
+>>> Installing (67 of 228) app-text/docbook-xsl-stylesheets-1.79.1-r2::gentoo
+>>> Emerging (68 of 228) virtual/yacc-0::gentoo
+>>> Installing (68 of 228) virtual/yacc-0::gentoo
+>>> Emerging (69 of 228) virtual/perl-File-Temp-0.230.400-r5::gentoo
+>>> Installing (69 of 228) virtual/perl-File-Temp-0.230.400-r5::gentoo
+>>> Emerging (70 of 228) app-admin/perl-cleaner-2.26-r1::gentoo
+>>> Installing (70 of 228) app-admin/perl-cleaner-2.26-r1::gentoo
+>>> Emerging (71 of 228) dev-libs/libpcre-8.42::gentoo
+>>> Installing (71 of 228) dev-libs/libpcre-8.42::gentoo
+>>> Emerging (72 of 228) sys-apps/kmod-25::gentoo
+>>> Installing (72 of 228) sys-apps/kmod-25::gentoo
+>>> Emerging (73 of 228) sys-apps/less-531::gentoo
+>>> Emerging (74 of 228) app-admin/metalog-3-r2::gentoo
+>>> Installing (73 of 228) sys-apps/less-531::gentoo
+>>> Installing (74 of 228) app-admin/metalog-3-r2::gentoo
+>>> Emerging (75 of 228) virtual/modutils-0::gentoo
+>>> Emerging (76 of 228) dev-lang/swig-3.0.12::gentoo
+>>> Installing (76 of 228) dev-lang/swig-3.0.12::gentoo
+>>> Installing (75 of 228) virtual/modutils-0::gentoo
+>>> Emerging (77 of 228) virtual/pager-0::gentoo
+>>> Emerging (78 of 228) dev-lang/perl-5.26.2::gentoo
+>>> Installing (78 of 228) dev-lang/perl-5.26.2::gentoo
+>>> Installing (77 of 228) virtual/pager-0::gentoo
+>>> Emerging (79 of 228) sys-kernel/linux-headers-4.17::gentoo
+>>> Installing (79 of 228) sys-kernel/linux-headers-4.17::gentoo
+>>> Emerging (80 of 228) sys-apps/groff-1.22.3::gentoo
+>>> Installing (80 of 228) sys-apps/groff-1.22.3::gentoo
+>>> Emerging (81 of 228) sys-devel/autoconf-2.69-r4::gentoo
+>>> Installing (81 of 228) sys-devel/autoconf-2.69-r4::gentoo
+>>> Emerging (82 of 228) virtual/perl-ExtUtils-MakeMaker-7.240.0::gentoo
+>>> Installing (82 of 228) virtual/perl-ExtUtils-MakeMaker-7.240.0::gentoo
+>>> Emerging (83 of 228) dev-util/gtk-doc-am-1.25-r1::gentoo
+>>> Installing (83 of 228) dev-util/gtk-doc-am-1.25-r1::gentoo
+>>> Emerging (84 of 228) virtual/perl-Parse-CPAN-Meta-2.150.10::gentoo
+>>> Emerging (85 of 228) virtual/perl-CPAN-Meta-YAML-0.18.0-r2::gentoo
+>>> Installing (84 of 228) virtual/perl-Parse-CPAN-Meta-2.150.10::gentoo
+>>> Emerging (86 of 228) virtual/perl-Test-Harness-3.380.0::gentoo
+>>> Installing (85 of 228) virtual/perl-CPAN-Meta-YAML-0.18.0-r2::gentoo
+>>> Installing (86 of 228) virtual/perl-Test-Harness-3.380.0::gentoo
+>>> Emerging (87 of 228) virtual/perl-File-Spec-3.670.0::gentoo
+>>> Emerging (88 of 228) virtual/perl-Data-Dumper-2.167.0::gentoo
+>>> Installing (87 of 228) virtual/perl-File-Spec-3.670.0::gentoo
+>>> Installing (88 of 228) virtual/perl-Data-Dumper-2.167.0::gentoo
+>>> Emerging (89 of 228) dev-perl/Text-CharWidth-0.40.0-r1::gentoo
+>>> Emerging (90 of 228) perl-core/File-Temp-0.230.400-r1::gentoo
+>>> Installing (89 of 228) dev-perl/Text-CharWidth-0.40.0-r1::gentoo
+>>> Installing (90 of 228) perl-core/File-Temp-0.230.400-r1::gentoo
+>>> Emerging (91 of 228) virtual/perl-version-0.991.700::gentoo
+>>> Emerging (92 of 228) virtual/perl-podlators-4.90.0::gentoo
+>>> Installing (91 of 228) virtual/perl-version-0.991.700::gentoo
+>>> Emerging (93 of 228) virtual/perl-Text-ParseWords-3.300.0-r3::gentoo
+>>> Installing (92 of 228) virtual/perl-podlators-4.90.0::gentoo
+>>> Emerging (94 of 228) virtual/perl-Perl-OSType-1.10.0::gentoo
+>>> Installing (93 of 228) virtual/perl-Text-ParseWords-3.300.0-r3::gentoo
+>>> Emerging (95 of 228) virtual/perl-Module-Metadata-1.0.33::gentoo
+>>> Emerging (96 of 228) virtual/perl-Getopt-Long-2.490.0::gentoo
+>>> Installing (94 of 228) virtual/perl-Perl-OSType-1.10.0::gentoo
+>>> Emerging (97 of 228) virtual/perl-ExtUtils-ParseXS-3.340.0::gentoo
+>>> Installing (95 of 228) virtual/perl-Module-Metadata-1.0.33::gentoo
+>>> Emerging (98 of 228) virtual/perl-ExtUtils-Manifest-1.700.0-r4::gentoo
+>>> Emerging (99 of 228) virtual/perl-ExtUtils-Install-2.40.0-r3::gentoo
+>>> Installing (96 of 228) virtual/perl-Getopt-Long-2.490.0::gentoo
+>>> Emerging (100 of 228) virtual/perl-ExtUtils-CBuilder-0.280.225-r2::gentoo
+>>> Installing (97 of 228) virtual/perl-ExtUtils-ParseXS-3.340.0::gentoo
+>>> Emerging (101 of 228) virtual/perl-JSON-PP-2.274.0.200_rc::gentoo
+>>> Installing (98 of 228) virtual/perl-ExtUtils-Manifest-1.700.0-r4::gentoo
+>>> Emerging (102 of 228) sys-libs/libseccomp-2.3.3::gentoo
+>>> Installing (99 of 228) virtual/perl-ExtUtils-Install-2.40.0-r3::gentoo
+>>> Installing (100 of 228) virtual/perl-ExtUtils-CBuilder-0.280.225-r2::gentoo
+>>> Installing (101 of 228) virtual/perl-JSON-PP-2.274.0.200_rc::gentoo
+>>> Installing (102 of 228) sys-libs/libseccomp-2.3.3::gentoo
+>>> Emerging (103 of 228) sys-libs/libcap-ng-0.7.9::gentoo
+>>> Installing (103 of 228) sys-libs/libcap-ng-0.7.9::gentoo
+>>> Emerging (104 of 228) net-firewall/iptables-1.6.2-r2::gentoo
+>>> Emerging (105 of 228) dev-perl/Text-Unidecode-1.300.0::gentoo
+>>> Emerging (106 of 228) dev-perl/libintl-perl-1.280.0::gentoo
+>>> Emerging (107 of 228) dev-perl/Unicode-EastAsianWidth-1.330.0-r1::gentoo
+>>> Emerging (108 of 228) dev-perl/TermReadKey-2.370.0::gentoo
+>>> Installing (105 of 228) dev-perl/Text-Unidecode-1.300.0::gentoo
+>>> Installing (107 of 228) dev-perl/Unicode-EastAsianWidth-1.330.0-r1::gentoo
+>>> Installing (108 of 228) dev-perl/TermReadKey-2.370.0::gentoo
+>>> Installing (106 of 228) dev-perl/libintl-perl-1.280.0::gentoo
+>>> Emerging (109 of 228) dev-perl/Text-WrapI18N-0.60.0-r1::gentoo
+>>> Installing (109 of 228) dev-perl/Text-WrapI18N-0.60.0-r1::gentoo
+>>> Emerging (110 of 228) virtual/perl-CPAN-Meta-2.150.10::gentoo
+>>> Emerging (111 of 228) app-misc/pax-utils-1.2.3-r1::gentoo
+>>> Installing (110 of 228) virtual/perl-CPAN-Meta-2.150.10::gentoo
+>>> Installing (104 of 228) net-firewall/iptables-1.6.2-r2::gentoo
+>>> Installing (111 of 228) app-misc/pax-utils-1.2.3-r1::gentoo
+>>> Emerging (112 of 228) dev-perl/Module-Build-0.422.400::gentoo
+>>> Emerging (113 of 228) sys-apps/sandbox-2.13::gentoo
+>>> Installing (112 of 228) dev-perl/Module-Build-0.422.400::gentoo
+>>> Installing (113 of 228) sys-apps/sandbox-2.13::gentoo
+>>> Emerging (114 of 228) dev-perl/SGMLSpm-1.1-r1::gentoo
+>>> Emerging (115 of 228) dev-libs/openssl-1.0.2o-r6::gentoo
+>>> Installing (114 of 228) dev-perl/SGMLSpm-1.1-r1::gentoo
+>>> Installing (115 of 228) dev-libs/openssl-1.0.2o-r6::gentoo
+>>> Emerging (116 of 228) sys-libs/libselinux-2.8::gentoo
+>>> Installing (116 of 228) sys-libs/libselinux-2.8::gentoo
+>>> Emerging (117 of 228) sys-apps/net-tools-1.60_p20170221182432::gentoo
+>>> Emerging (118 of 228) sys-process/procps-3.3.15-r1::gentoo
+>>> Emerging (119 of 228) sys-apps/busybox-1.29.0::gentoo
+>>> Emerging (120 of 228) sys-apps/attr-2.4.48-r2::gentoo
+>>> Installing (117 of 228) sys-apps/net-tools-1.60_p20170221182432::gentoo
+>>> Installing (120 of 228) sys-apps/attr-2.4.48-r2::gentoo
+>>> Installing (118 of 228) sys-process/procps-3.3.15-r1::gentoo
+>>> Installing (119 of 228) sys-apps/busybox-1.29.0::gentoo
+>>> Emerging (121 of 228) sys-libs/libcap-2.25-r1::gentoo
+>>> Installing (121 of 228) sys-libs/libcap-2.25-r1::gentoo
+>>> Emerging (122 of 228) sys-devel/patch-2.7.6-r1::gentoo
+>>> Installing (122 of 228) sys-devel/patch-2.7.6-r1::gentoo
+>>> Emerging (123 of 228) net-misc/iputils-20171016_pre-r1::gentoo
+>>> Emerging (124 of 228) dev-python/setuptools-38.6.1::gentoo
+>>> Installing (123 of 228) net-misc/iputils-20171016_pre-r1::gentoo
+>>> Installing (124 of 228) dev-python/setuptools-38.6.1::gentoo
+>>> Emerging (125 of 228) dev-libs/libgpg-error-1.29::gentoo
+>>> Installing (125 of 228) dev-libs/libgpg-error-1.29::gentoo
+>>> Emerging (126 of 228) dev-libs/libassuan-2.5.1::gentoo
+>>> Installing (126 of 228) dev-libs/libassuan-2.5.1::gentoo
+>>> Emerging (127 of 228) dev-libs/libksba-1.3.5-r1::gentoo
+>>> Installing (127 of 228) dev-libs/libksba-1.3.5-r1::gentoo
+>>> Emerging (128 of 228) sys-apps/sed-4.5::gentoo
+>>> Installing (128 of 228) sys-apps/sed-4.5::gentoo
+>>> Emerging (129 of 228) sys-apps/util-linux-2.32-r3::gentoo
+>>> Installing (129 of 228) sys-apps/util-linux-2.32-r3::gentoo
+>>> Emerging (130 of 228) sys-libs/pam-1.3.0-r2::gentoo
+>>> Installing (130 of 228) sys-libs/pam-1.3.0-r2::gentoo
+>>> Emerging (131 of 228) sys-auth/pambase-20150213-r1::gentoo
+>>> Installing (131 of 228) sys-auth/pambase-20150213-r1::gentoo
+>>> Emerging (132 of 228) sys-apps/acl-2.2.53::gentoo
+>>> Installing (132 of 228) sys-apps/acl-2.2.53::gentoo
+>>> Emerging (133 of 228) sys-apps/coreutils-8.30::gentoo
+>>> Installing (133 of 228) sys-apps/coreutils-8.30::gentoo
+>>> Emerging (134 of 228) app-admin/eselect-1.4.13::gentoo
+>>> Installing (134 of 228) app-admin/eselect-1.4.13::gentoo
+>>> Emerging (135 of 228) app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo
+>>> Installing (135 of 228) app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo
+>>> Emerging (136 of 228) sys-libs/glibc-2.27-r5::gentoo
+>>> Emerging (137 of 228) sys-devel/binutils-2.30-r3::gentoo
+>>> Emerging (138 of 228) app-misc/ca-certificates-20180409.3.37::gentoo
+>>> Installing (138 of 228) app-misc/ca-certificates-20180409.3.37::gentoo
+>>> Installing (137 of 228) sys-devel/binutils-2.30-r3::gentoo
+>>> Installing (136 of 228) sys-libs/glibc-2.27-r5::gentoo
+>>> Emerging (139 of 228) virtual/libc-1::gentoo
+>>> Emerging (140 of 228) dev-python/ipy-0.83::gentoo
+>>> Installing (139 of 228) virtual/libc-1::gentoo
+>>> Installing (140 of 228) dev-python/ipy-0.83::gentoo
+>>> Emerging (141 of 228) sys-apps/portage-2.3.41::gentoo
+>>> Installing (141 of 228) sys-apps/portage-2.3.41::gentoo
+>>> Emerging (142 of 228) virtual/package-manager-1::gentoo
+>>> Emerging (143 of 228) dev-python/pyblake2-1.1.2::gentoo
+>>> Installing (142 of 228) virtual/package-manager-1::gentoo
+>>> Installing (143 of 228) dev-python/pyblake2-1.1.2::gentoo
+>>> Emerging (144 of 228) sys-devel/make-4.2.1-r3::gentoo
+>>> Installing (144 of 228) sys-devel/make-4.2.1-r3::gentoo
+>>> Emerging (145 of 228) sys-process/psmisc-23.1-r1::gentoo
+>>> Emerging (146 of 228) sys-libs/e2fsprogs-libs-1.44.2::gentoo
+>>> Emerging (147 of 228) dev-libs/popt-1.16-r2::gentoo
+>>> Installing (145 of 228) sys-process/psmisc-23.1-r1::gentoo
+>>> Installing (147 of 228) dev-libs/popt-1.16-r2::gentoo
+>>> Installing (146 of 228) sys-libs/e2fsprogs-libs-1.44.2::gentoo
+>>> Emerging (148 of 228) net-misc/rsync-3.1.3::gentoo
+>>> Installing (148 of 228) net-misc/rsync-3.1.3::gentoo
+>>> Emerging (149 of 228) dev-python/decorator-4.2.1::gentoo
+>>> Installing (149 of 228) dev-python/decorator-4.2.1::gentoo
+>>> Emerging (150 of 228) dev-python/networkx-1.11-r1::gentoo
+>>> Installing (150 of 228) dev-python/networkx-1.11-r1::gentoo
+>>> Emerging (151 of 228) dev-python/pypax-0.9.2::gentoo
+>>> Emerging (152 of 228) dev-python/enum34-1.1.6::gentoo
+>>> Installing (151 of 228) dev-python/pypax-0.9.2::gentoo
+>>> Installing (152 of 228) dev-python/enum34-1.1.6::gentoo
+>>> Emerging (153 of 228) sys-apps/elfix-0.9.2::gentoo
+>>> Emerging (154 of 228) virtual/python-enum34-1::gentoo
+>>> Installing (154 of 228) virtual/python-enum34-1::gentoo
+>>> Installing (153 of 228) sys-apps/elfix-0.9.2::gentoo
+>>> Emerging (155 of 228) app-admin/setools-4.1.1::gentoo
+>>> Installing (155 of 228) app-admin/setools-4.1.1::gentoo
+>>> Emerging (156 of 228) dev-python/bz2file-0.98::gentoo
+>>> Installing (156 of 228) dev-python/bz2file-0.98::gentoo
+>>> Emerging (157 of 228) dev-libs/libtasn1-4.13::gentoo
+>>> Installing (157 of 228) dev-libs/libtasn1-4.13::gentoo
+>>> Emerging (158 of 228) net-dns/libidn2-2.0.5::gentoo
+>>> Installing (158 of 228) net-dns/libidn2-2.0.5::gentoo
+>>> Emerging (159 of 228) app-editors/nano-2.9.8::gentoo
+>>> Emerging (160 of 228) sys-devel/automake-1.16.1-r1::gentoo
+>>> Installing (160 of 228) sys-devel/automake-1.16.1-r1::gentoo
+>>> Emerging (161 of 228) sys-devel/libtool-2.4.6-r5::gentoo
+>>> Installing (161 of 228) sys-devel/libtool-2.4.6-r5::gentoo
+>>> Installing (159 of 228) app-editors/nano-2.9.8::gentoo
+>>> Emerging (162 of 228) virtual/editor-0-r1::gentoo
+>>> Emerging (163 of 228) dev-libs/libxml2-2.9.8::gentoo
+>>> Installing (162 of 228) virtual/editor-0-r1::gentoo
+>>> Installing (163 of 228) dev-libs/libxml2-2.9.8::gentoo
+>>> Emerging (164 of 228) dev-libs/expat-2.2.5::gentoo
+>>> Installing (164 of 228) dev-libs/expat-2.2.5::gentoo
+>>> Emerging (165 of 228) sys-libs/gdbm-1.16::gentoo
+>>> Installing (165 of 228) sys-libs/gdbm-1.16::gentoo
+>>> Emerging (166 of 228) dev-libs/libgcrypt-1.8.3::gentoo
+>>> Installing (166 of 228) dev-libs/libgcrypt-1.8.3::gentoo
+>>> Emerging (167 of 228) sys-process/audit-2.8.3::gentoo
+>>> Installing (167 of 228) sys-process/audit-2.8.3::gentoo
+>>> Emerging (168 of 228) net-misc/openssh-7.7_p1-r6::gentoo
+>>> Emerging (169 of 228) net-misc/curl-7.60.0-r1::gentoo
+>>> Installing (168 of 228) net-misc/openssh-7.7_p1-r6::gentoo
+>>> Installing (169 of 228) net-misc/curl-7.60.0-r1::gentoo
+>>> Emerging (170 of 228) dev-libs/nettle-3.4::gentoo
+>>> Installing (170 of 228) dev-libs/nettle-3.4::gentoo
+>>> Emerging (171 of 228) dev-libs/iniparser-3.1-r1::gentoo
+>>> Installing (171 of 228) dev-libs/iniparser-3.1-r1::gentoo
+>>> Emerging (172 of 228) net-libs/libtirpc-1.0.3::gentoo
+>>> Emerging (173 of 228) sys-devel/gettext-0.19.8.1::gentoo
+>>> Installing (172 of 228) net-libs/libtirpc-1.0.3::gentoo
+>>> Installing (173 of 228) sys-devel/gettext-0.19.8.1::gentoo
+>>> Emerging (174 of 228) dev-lang/python-2.7.15::gentoo
+>>> Installing (174 of 228) dev-lang/python-2.7.15::gentoo
+>>> Emerging (175 of 228) dev-lang/python-3.5.5-r1::gentoo
+>>> Installing (175 of 228) dev-lang/python-3.5.5-r1::gentoo
+>>> Emerging (176 of 228) virtual/ssh-0::gentoo
+>>> Emerging (177 of 228) app-portage/portage-utils-0.71::gentoo
+>>> Installing (177 of 228) app-portage/portage-utils-0.71::gentoo
+>>> Installing (176 of 228) virtual/ssh-0::gentoo
+>>> Emerging (178 of 228) dev-libs/libxslt-1.1.32::gentoo
+>>> Installing (178 of 228) dev-libs/libxslt-1.1.32::gentoo
+>>> Emerging (179 of 228) app-text/build-docbook-catalog-1.21::gentoo
+>>> Installing (179 of 228) app-text/build-docbook-catalog-1.21::gentoo
+>>> Emerging (180 of 228) dev-perl/XML-Parser-2.440.0::gentoo
+>>> Installing (180 of 228) dev-perl/XML-Parser-2.440.0::gentoo
+>>> Emerging (181 of 228) net-libs/libnsl-1.2.0::gentoo
+>>> Emerging (182 of 228) net-libs/gnutls-3.5.18::gentoo
+>>> Installing (181 of 228) net-libs/libnsl-1.2.0::gentoo
+>>> Installing (182 of 228) net-libs/gnutls-3.5.18::gentoo
+>>> Emerging (183 of 228) app-arch/tar-1.30::gentoo
+>>> Installing (183 of 228) app-arch/tar-1.30::gentoo
+>>> Emerging (184 of 228) dev-python/certifi-2018.4.16::gentoo
+>>> Installing (184 of 228) dev-python/certifi-2018.4.16::gentoo
+>>> Emerging (185 of 228) dev-python/pyxattr-0.6.0-r1::gentoo
+>>> Installing (185 of 228) dev-python/pyxattr-0.6.0-r1::gentoo
+>>> Emerging (186 of 228) app-crypt/pinentry-1.1.0-r2::gentoo
+>>> Installing (186 of 228) app-crypt/pinentry-1.1.0-r2::gentoo
+>>> Emerging (187 of 228) sys-apps/findutils-4.6.0-r1::gentoo
+>>> Emerging (188 of 228) sys-apps/grep-3.1::gentoo
+>>> Emerging (189 of 228) sys-apps/gawk-4.2.1-r1::gentoo
+>>> Emerging (190 of 228) sys-apps/diffutils-3.6-r1::gentoo
+>>> Emerging (191 of 228) net-misc/wget-1.19.5::gentoo
+>>> Emerging (192 of 228) sys-devel/flex-2.6.4-r1::gentoo
+>>> Installing (192 of 228) sys-devel/flex-2.6.4-r1::gentoo
+>>> Installing (188 of 228) sys-apps/grep-3.1::gentoo
+>>> Installing (189 of 228) sys-apps/gawk-4.2.1-r1::gentoo
+>>> Installing (190 of 228) sys-apps/diffutils-3.6-r1::gentoo
+>>> Installing (191 of 228) net-misc/wget-1.19.5::gentoo
+>>> Installing (187 of 228) sys-apps/findutils-4.6.0-r1::gentoo
+>>> Emerging (193 of 228) dev-perl/Locale-gettext-1.70.0::gentoo
+>>> Installing (193 of 228) dev-perl/Locale-gettext-1.70.0::gentoo
+>>> Emerging (194 of 228) dev-util/intltool-0.51.0-r2::gentoo
+>>> Installing (194 of 228) dev-util/intltool-0.51.0-r2::gentoo
+>>> Emerging (195 of 228) sys-apps/texinfo-6.5::gentoo
+>>> Emerging (196 of 228) app-text/opensp-1.5.2-r6::gentoo
+>>> Emerging (197 of 228) sys-fs/eudev-3.2.5::gentoo
+>>> Installing (196 of 228) app-text/opensp-1.5.2-r6::gentoo
+>>> Installing (195 of 228) sys-apps/texinfo-6.5::gentoo
+>>> Installing (197 of 228) sys-fs/eudev-3.2.5::gentoo
+>>> Emerging (198 of 228) mail-mta/nullmailer-2.0-r2::gentoo
+>>> Installing (198 of 228) mail-mta/nullmailer-2.0-r2::gentoo
+>>> Emerging (199 of 228) sys-fs/e2fsprogs-1.44.2::gentoo
+>>> Emerging (200 of 228) sys-devel/bison-3.0.5::gentoo
+>>> Installing (200 of 228) sys-devel/bison-3.0.5::gentoo
+>>> Installing (199 of 228) sys-fs/e2fsprogs-1.44.2::gentoo
+>>> Emerging (201 of 228) sys-apps/help2man-1.47.6::gentoo
+>>> Installing (201 of 228) sys-apps/help2man-1.47.6::gentoo
+>>> Emerging (202 of 228) app-text/openjade-1.3.2-r7::gentoo
+>>> Emerging (203 of 228) sys-libs/libsemanage-2.8::gentoo
+>>> Installing (202 of 228) app-text/openjade-1.3.2-r7::gentoo
+>>> Installing (203 of 228) sys-libs/libsemanage-2.8::gentoo
+>>> Emerging (204 of 228) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Emerging (205 of 228) app-text/po4a-0.47-r1::gentoo
+>>> Emerging (206 of 228) sys-apps/checkpolicy-2.8::gentoo
+>>> Installing (205 of 228) app-text/po4a-0.47-r1::gentoo
+>>> Installing (206 of 228) sys-apps/checkpolicy-2.8::gentoo
+>>> Installing (204 of 228) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Emerging (207 of 228) sys-apps/iproute2-4.17.0::gentoo
+>>> Emerging (208 of 228) sys-apps/selinux-python-2.8::gentoo
+>>> Installing (208 of 228) sys-apps/selinux-python-2.8::gentoo
+>>> Installing (207 of 228) sys-apps/iproute2-4.17.0::gentoo
+>>> Emerging (209 of 228) sys-apps/shadow-4.6::gentoo
+>>> Installing (209 of 228) sys-apps/shadow-4.6::gentoo
+>>> Emerging (210 of 228) sys-apps/policycoreutils-2.8::gentoo
+>>> Installing (210 of 228) sys-apps/policycoreutils-2.8::gentoo
+>>> Emerging (211 of 228) sec-policy/selinux-base-2.20180114-r3::gentoo
+>>> Installing (211 of 228) sec-policy/selinux-base-2.20180114-r3::gentoo
+>>> Emerging (212 of 228) sec-policy/selinux-base-policy-2.20180114-r3::gentoo
+>>> Installing (212 of 228) sec-policy/selinux-base-policy-2.20180114-r3::gentoo
+>>> Emerging (213 of 228) sec-policy/selinux-unconfined-2.20180114-r3::gentoo
+>>> Installing (213 of 228) sec-policy/selinux-unconfined-2.20180114-r3::gentoo
+>>> Emerging (214 of 228) sec-policy/selinux-openrc-2.20180114-r3::gentoo
+>>> Emerging (215 of 228) sec-policy/selinux-shutdown-2.20180114-r3::gentoo
+>>> Emerging (216 of 228) sys-apps/opentmpfiles-0.1.3-r1::gentoo
+>>> Emerging (217 of 228) sec-policy/selinux-mandb-2.20180114-r3::gentoo
+>>> Emerging (218 of 228) sec-policy/selinux-dirmngr-2.20180114-r3::gentoo
+>>> Installing (214 of 228) sec-policy/selinux-openrc-2.20180114-r3::gentoo
+>>> Installing (215 of 228) sec-policy/selinux-shutdown-2.20180114-r3::gentoo
+>>> Installing (216 of 228) sys-apps/opentmpfiles-0.1.3-r1::gentoo
+>>> Installing (217 of 228) sec-policy/selinux-mandb-2.20180114-r3::gentoo
+>>> Installing (218 of 228) sec-policy/selinux-dirmngr-2.20180114-r3::gentoo
+>>> Emerging (219 of 228) sys-apps/sysvinit-2.90::gentoo
+>>> Emerging (220 of 228) sys-apps/man-db-2.8.3::gentoo
+>>> Emerging (221 of 228) sec-policy/selinux-gpg-2.20180114-r3::gentoo
+>>> Installing (219 of 228) sys-apps/sysvinit-2.90::gentoo
+>>> Installing (221 of 228) sec-policy/selinux-gpg-2.20180114-r3::gentoo
+>>> Installing (220 of 228) sys-apps/man-db-2.8.3::gentoo
+>>> Emerging (222 of 228) sys-apps/openrc-0.38.1::gentoo
+>>> Emerging (223 of 228) app-crypt/gnupg-2.2.8::gentoo
+>>> Installing (222 of 228) sys-apps/openrc-0.38.1::gentoo
+>>> Installing (223 of 228) app-crypt/gnupg-2.2.8::gentoo
+>>> Emerging (224 of 228) app-portage/gemato-13.1::gentoo
+>>> Installing (224 of 228) app-portage/gemato-13.1::gentoo
+>>> Emerging (225 of 228) virtual/service-manager-0::gentoo
+>>> Installing (225 of 228) virtual/service-manager-0::gentoo
+>>> Emerging (226 of 228) dev-libs/glib-2.54.3-r6::gentoo
+>>> Installing (226 of 228) dev-libs/glib-2.54.3-r6::gentoo
+>>> Emerging (227 of 228) dev-util/pkgconfig-0.29.2::gentoo
+>>> Installing (227 of 228) dev-util/pkgconfig-0.29.2::gentoo
+>>> Emerging (228 of 228) x11-misc/shared-mime-info-1.10::gentoo
+>>> Installing (228 of 228) x11-misc/shared-mime-info-1.10::gentoo
+>>> Jobs: 228 of 228 complete                       Load avg: 1.90, 2.41, 2.87
+
+ * Messages for package sys-libs/pam-1.3.0-r2:
+
+ * Package:    sys-libs/pam-1.3.0-r2
+ * Repository: gentoo
+ * Maintainer: pam-bugs@gentoo.org
+ * USE:        abi_x86_64 amd64 cracklib elibc_glibc filecaps kernel_linux nls pie selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package sys-libs/glibc-2.27-r5:
+
+ * Package:    sys-libs/glibc-2.27-r5
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multiarch multilib selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Checking general environment sanity.
+ * Checking that IA32 emulation is enabled in the running kernel ...
+ * Checking gcc for __thread support ...
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
+ * Checking linux-headers version (4.17.0 >= 3.2.0) ...
+
+ * Messages for package net-misc/openssh-7.7_p1-r6:
+
+ * Package:    net-misc/openssh-7.7_p1-r6
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org robbat2@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pam pie selinux ssl userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package sys-fs/eudev-3.2.5:
+
+ * Package:    sys-fs/eudev-3.2.5
+ * Repository: gentoo
+ * Maintainer: eudev@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hwdb kernel_linux kmod selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * 
+ * As of 2013-01-29, eudev-3.2.5 provides the new interface renaming functionality,
+ * as described in the URL below:
+ * https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames
+ * 
+ * This functionality is enabled BY DEFAULT because eudev has no means of synchronizing
+ * between the default or user-modified choice of sys-fs/udev.  If you wish to disable
+ * this new iface naming, please be sure that /etc/udev/rules.d/80-net-name-slot.rules
+ * exists: touch /etc/udev/rules.d/80-net-name-slot.rules
+ * 
+
+ * Messages for package sys-devel/gcc-7.3.0-r3:
+
+ * Package:    sys-devel/gcc-7.3.0-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl openmp pie ssp userland_GNU vtv
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package sec-policy/selinux-base-policy-2.20180114-r3:
+
+ * Package:    sec-policy/selinux-base-policy-2.20180114-r3
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux unconfined userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package app-text/sgml-common-0.6.3-r6:
+
+ * Removing Catalogs...
+
+ * Messages for package app-text/sgml-common-0.6.3-r6:
+
+ * Package:    app-text/sgml-common-0.6.3-r6
+ * Repository: gentoo
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying sgml-common-0.6.3-prefix.patch ...
+ * Adjusting to prefix /
+ *   install-catalog.in ...
+ *   sgmlwhich ...
+ *   sgml.conf ...
+ * Final size of build directory: 900 KiB
+ * Final size of installed tree:  368 KiB
+ * Installing Catalogs...
+ * Fixing /etc/sgml/catalog
+
+ * Messages for package sys-devel/autoconf-wrapper-13-r1:
+
+ * Package:    sys-devel/autoconf-wrapper-13-r1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory:  4 KiB
+ * Final size of installed tree:  28 KiB
+
+ * Messages for package sys-devel/automake-wrapper-11:
+
+ * Package:    sys-devel/automake-wrapper-11
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 12 KiB
+ * Final size of installed tree:  28 KiB
+
+ * Messages for package dev-util/gperf-3.1:
+
+ * Package:    dev-util/gperf-3.1
+ * Repository: gentoo
+ * Maintainer: blueness@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4324 KiB (4.2 MiB)
+ * Final size of installed tree:   592 KiB
+
+ * Messages for package virtual/libintl-0-r2:
+
+ * Package:    virtual/libintl-0-r2
+ * Repository: gentoo
+ * Maintainer: alt@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-devel/gnuconfig-20180101:
+
+ * Package:    sys-devel/gnuconfig-20180101
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 0002-Add-x32-support-to-config.guess.patch ...
+ * Applying 0002-add-ps2-targets-to-config.sub.patch ...
+ * Final size of build directory: 256 KiB
+ * Final size of installed tree:  208 KiB
+
+ * Messages for package app-arch/bzip2-1.0.6-r9:
+
+ * Package:    app-arch/bzip2-1.0.6-r9
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying bzip2-1.0.4-makefile-CFLAGS.patch ...
+ * Applying bzip2-1.0.6-saneso.patch ...
+ * Applying bzip2-1.0.4-man-links.patch ...
+ * Applying bzip2-1.0.6-progress.patch ...
+ * Applying bzip2-1.0.3-no-test.patch ...
+ * Applying bzip2-1.0.4-POSIX-shell.patch ...
+ * Applying bzip2-1.0.6-mingw.patch ...
+ * Applying bzip2-1.0.6-out-of-tree-build.patch ...
+ * Applying bzip2-1.0.6-CVE-2016-3189.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 3024 KiB (2.9 MiB)
+ * Final size of installed tree:   660 KiB
+
+ * Messages for package dev-lang/python-exec-2.4.6:
+
+ * Package:    dev-lang/python-exec-2.4.6
+ * Repository: gentoo
+ * Maintainer: python@gentoo.org
+ * Upstream:   mgorny@gentoo.org https://github.com/mgorny/python-exec/issues/
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_targets_jython2_7 python_targets_pypy python_targets_pypy3 python_targets_python2_7 python_targets_python3_4 python_targets_python3_5 python_targets_python3_6 python_targets_python3_7 userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 704 KiB
+ * Final size of installed tree:   76 KiB
+
+ * Messages for package sys-apps/gentoo-functions-0.12:
+
+ * Package:    sys-apps/gentoo-functions-0.12
+ * Repository: gentoo
+ * Maintainer: williamh@gentoo.org blueness@gentoo.org,base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 72 KiB
+ * Final size of installed tree:  60 KiB
+
+ * Messages for package sys-libs/libsepol-2.8:
+
+ * Package:    sys-libs/libsepol-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * Skipping make test/check due to ebuild restriction.
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 14568 KiB (14.2 MiB)
+ * Final size of installed tree:   2852 KiB ( 2.7 MiB)
+
+ * Messages for package virtual/libiconv-0-r2:
+
+ * Package:    virtual/libiconv-0-r2
+ * Repository: gentoo
+ * Maintainer: alt@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-misc/c_rehash-1.7-r1:
+
+ * Package:    app-misc/c_rehash-1.7-r1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 12 KiB
+ * Final size of installed tree:  20 KiB
+
+ * Messages for package app-misc/mime-types-9:
+
+ * Package:    app-misc/mime-types-9
+ * Repository: gentoo
+ * Maintainer: djc@gentoo.org net-mail@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 72 KiB
+ * Final size of installed tree:  72 KiB
+
+ * Messages for package app-misc/editor-wrapper-4:
+
+ * Package:    app-misc/editor-wrapper-4
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org emacs@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pie selinux ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 12 KiB
+ * Final size of installed tree:  20 KiB
+
+ * Messages for package sys-apps/debianutils-4.8.6:
+
+ * Package:    sys-apps/debianutils-4.8.6
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc installkernel kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying debianutils-3.4.2-no-bs-namespace.patch ...
+ * Final size of build directory: 1740 KiB (1.6 MiB)
+ * Final size of installed tree:   192 KiB
+
+ * Messages for package app-arch/gzip-1.9:
+
+ * Package:    app-arch/gzip-1.9
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying gzip-1.3.8-install-symlinks.patch ...
+ * Final size of build directory: 7952 KiB (7.7 MiB)
+ * Final size of installed tree:   496 KiB
+
+ * Messages for package dev-libs/ustr-1.0.4-r8:
+
+ * Package:    dev-libs/ustr-1.0.4-r8
+ * Repository: gentoo
+ * Maintainer: yamakuzure@gmx.net proxy-maint@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying ustr-1.0.4-gcc_5-check.patch ...
+ * Applying ustr-1.0.4-build-libs.patch ...
+ * Will copy sources from /var/tmp/portage/dev-libs/ustr-1.0.4-r8/work/ustr-1.0.4
+ * abi_x86_64.amd64: copying to /var/tmp/portage/dev-libs/ustr-1.0.4-r8/work/ustr-1.0.4-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 5724 KiB (5.5 MiB)
+ * Final size of installed tree:  1344 KiB (1.3 MiB)
+
+ * Messages for package app-text/manpager-1:
+
+ * Package:    app-text/manpager-1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 16 KiB
+ * Final size of installed tree:  36 KiB
+
+ * Messages for package app-crypt/openpgp-keys-gentoo-release-20180706:
+
+ * Package:    app-crypt/openpgp-keys-gentoo-release-20180706
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 52 KiB
+ * Final size of installed tree:  64 KiB
+
+ * Messages for package net-libs/libmnl-1.0.4:
+
+ * Package:    net-libs/libmnl-1.0.4
+ * Repository: gentoo
+ * Maintainer: netmon@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libmnl.la (no static archive)
+ * Final size of build directory: 2544 KiB (2.4 MiB)
+ * Final size of installed tree:    92 KiB
+
+ * Messages for package sys-apps/install-xattr-0.5-r1:
+
+ * Package:    sys-apps/install-xattr-0.5-r1
+ * Repository: gentoo
+ * Maintainer: blueness@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 88 KiB
+ * Final size of installed tree:  28 KiB
+
+ * Messages for package sys-apps/baselayout-2.6:
+
+ * Package:    sys-apps/baselayout-2.6
+ * Repository: gentoo
+ * Maintainer: williamh@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux split-usr userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 220 KiB
+ * Final size of installed tree:  168 KiB
+ * You should reboot now to get /run mounted with tmpfs!
+
+ * Messages for package sys-apps/which-2.21:
+
+ * Package:    sys-apps/which-2.21
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 904 KiB
+ * Final size of installed tree:  112 KiB
+
+ * Messages for package sys-libs/ncurses-6.1-r3:
+
+ * Package:    sys-libs/ncurses-6.1-r3
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux unicode userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying ncurses-6.0-gfbsd.patch ...
+ * Applying ncurses-5.7-nongnu.patch ...
+ * Applying ncurses-6.0-rxvt-unicode-9.15.patch ...
+ * Applying ncurses-6.0-pkg-config.patch ...
+ * Applying ncurses-5.9-gcc-5.patch ...
+ * Applying ncurses-6.0-ticlib.patch ...
+ * Applying ncurses-6.0-cppflags-cross.patch ...
+ * Applying ncurses-6.1-st07_terminfo_typo.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Installing basic terminfo files in /etc...
+ * Final size of build directory: 36408 KiB (35.5 MiB)
+ * Final size of installed tree:  12032 KiB (11.7 MiB)
+
+ * Messages for package app-arch/unzip-6.0_p21-r2:
+
+ * Package:    app-arch/unzip-6.0_p21-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 bzip2 elibc_glibc kernel_linux unicode userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 01-manpages-in-section-1-not-in-section-1l.patch ...
+ * Applying 03-include-unistd-for-kfreebsd.patch ...
+ * Applying 04-handle-pkware-verification-bit.patch ...
+ * Applying 05-fix-uid-gid-handling.patch ...
+ * Applying 06-initialize-the-symlink-flag.patch ...
+ * Applying 07-increase-size-of-cfactorstr.patch ...
+ * Applying 08-allow-greater-hostver-values.patch ...
+ * Applying 09-cve-2014-8139-crc-overflow.patch ...
+ * Applying 10-cve-2014-8140-test-compr-eb.patch ...
+ * Applying 11-cve-2014-8141-getzip64data.patch ...
+ * Applying 12-cve-2014-9636-test-compr-eb.patch ...
+ * Applying 13-remove-build-date.patch ...
+ * Applying 14-cve-2015-7696.patch ...
+ * Applying 15-cve-2015-7697.patch ...
+ * Applying 16-fix-integer-underflow-csiz-decrypted.patch ...
+ * Applying 17-restore-unix-timestamps-accurately.patch ...
+ * Applying 18-cve-2014-9913-unzip-buffer-overflow.patch ...
+ * Applying 19-cve-2016-9844-zipinfo-buffer-overflow.patch ...
+ * Applying unzip-6.0-no-exec-stack.patch ...
+ * Applying unzip-6.0-format-security.patch ...
+ * Final size of build directory: 8276 KiB (8.0 MiB)
+ * Final size of installed tree:   568 KiB
+
+ * Messages for package sys-devel/gcc-config-1.9.1:
+
+ * Package:    sys-devel/gcc-config-1.9.1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 668 KiB
+ * Final size of installed tree:   88 KiB
+
+ * Messages for package sys-devel/binutils-config-5.1-r1:
+
+ * Package:    sys-devel/binutils-config-5.1-r1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory:  4 KiB
+ * Final size of installed tree:  56 KiB
+
+ * Messages for package sys-libs/timezone-data-2018e:
+
+ * Package:    sys-libs/timezone-data-2018e
+ * Repository: gentoo
+ * Maintainer: djc@gentoo.org toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4092 KiB (3.9 MiB)
+ * Final size of installed tree:  2188 KiB (2.1 MiB)
+ * Updating /etc/localtime with /usr/share/zoneinfo/Europe/Madrid
+
+ * Messages for package sys-apps/semodule-utils-2.8:
+
+ * Package:    sys-apps/semodule-utils-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 200 KiB
+ * Final size of installed tree:  108 KiB
+
+ * Messages for package virtual/libffi-3.0.13-r1:
+
+ * Package:    virtual/libffi-3.0.13-r1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-arch/xz-utils-5.2.4-r2:
+
+ * Package:    app-arch/xz-utils-5.2.4-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc extra-filters kernel_linux nls threads userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 9060 KiB (8.8 MiB)
+ * Final size of installed tree:  1112 KiB (1.0 MiB)
+
+ * Messages for package virtual/os-headers-0-r1:
+
+ * Package:    virtual/os-headers-0-r1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org bsd@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-portage/elt-patches-20170826.1:
+
+ * Package:    app-portage/elt-patches-20170826.1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 676 KiB
+ * Final size of installed tree:  664 KiB
+
+ * Messages for package virtual/pam-0-r1:
+
+ * Package:    virtual/pam-0-r1
+ * Repository: gentoo
+ * Maintainer: pam-bugs@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package dev-libs/libltdl-2.4.6:
+
+ * Package:    dev-libs/libltdl-2.4.6
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pie selinux ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * Skipping make test/check due to ebuild restriction.
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 9708 KiB (9.4 MiB)
+ * Final size of installed tree:   116 KiB
+
+ * Messages for package sys-devel/m4-1.4.18:
+
+ * Package:    sys-devel/m4-1.4.18
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying m4-1.4.18-darwin17-printf-n.patch ...
+ * Final size of build directory: 14908 KiB (14.5 MiB)
+ * Final size of installed tree:    652 KiB
+
+ * Messages for package virtual/udev-217:
+
+ * Package:    virtual/udev-217
+ * Repository: gentoo
+ * Maintainer: udev-bugs@gentoo.org eudev@gentoo.org,systemd@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-libs/zlib-1.2.11-r2:
+
+ * Package:    sys-libs/zlib-1.2.11-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying zlib-1.2.11-fix-deflateParams-usage.patch ...
+ * Applying zlib-1.2.11-minizip-drop-crypt-header.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 4732 KiB (4.6 MiB)
+ * Final size of installed tree:   496 KiB
+
+ * Messages for package dev-libs/libffi-3.2.1-r2:
+
+ * Package:    dev-libs/libffi-3.2.1-r2
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying libffi-3.2.1-o-tmpfile-eacces.patch ...
+ * Applying libffi-3.2.1-complex_alpha.patch ...
+ * Applying libffi-3.1-darwin-x32.patch ...
+ * Applying libffi-3.2.1-complex-ia64.patch ...
+ * Applying libffi-3.2.1-include-path.patch ...
+ * Applying libffi-3.2.1-include-path-autogen.patch ...
+ * Applying libffi-3.2.1-ia64-small-struct.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libffi.la (no static archive)
+ * Final size of build directory: 5832 KiB (5.6 MiB)
+ * Final size of installed tree:   604 KiB
+
+ * Messages for package dev-libs/npth-1.5:
+
+ * Package:    dev-libs/npth-1.5
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libnpth.la (no static archive)
+ * Final size of build directory: 2400 KiB (2.3 MiB)
+ * Final size of installed tree:   124 KiB
+
+ * Messages for package dev-libs/gmp-6.1.2-r1:
+
+ * Package:    dev-libs/gmp-6.1.2-r1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 asm cxx elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying gmp-6.1.0-noexecstack-detect.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 29040 KiB (28.3 MiB)
+ * Final size of installed tree:   3976 KiB ( 3.8 MiB)
+
+ * Messages for package dev-libs/libunistring-0.9.10:
+
+ * Package:    dev-libs/libunistring-0.9.10
+ * Repository: gentoo
+ * Maintainer: scheme@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying libunistring-nodocs.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libunistring.la (no static archive)
+ * Final size of build directory: 38848 KiB (37.9 MiB)
+ * Final size of installed tree:   1928 KiB ( 1.8 MiB)
+
+ * Messages for package sys-fs/udev-init-scripts-32:
+
+ * Package:    sys-fs/udev-init-scripts-32
+ * Repository: gentoo
+ * Maintainer: udev-bugs@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 48 KiB
+ * Final size of installed tree:  60 KiB
+
+ * Messages for package virtual/dev-manager-0-r1:
+
+ * Package:    virtual/dev-manager-0-r1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org bsd@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/acl-0-r2:
+
+ * Package:    virtual/acl-0-r2
+ * Repository: gentoo
+ * Maintainer: bsd@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/man-0-r1:
+
+ * Package:    virtual/man-0-r1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/shadow-0:
+
+ * Package:    virtual/shadow-0
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-apps/man-pages-posix-2013a:
+
+ * Package:    sys-apps/man-pages-posix-2013a
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 9392 KiB (9.1 MiB)
+ * Final size of installed tree:  9392 KiB (9.1 MiB)
+
+ * Messages for package sys-libs/cracklib-2.9.6-r1:
+
+ * Package:    sys-libs/cracklib-2.9.6-r1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls python_targets_python2_7 python_targets_python3_5 userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying cracklib-2.9.6-CVE-2016-6318.patch ...
+ * Applying cracklib-2.9.6-fix-long-word-bufferoverflow.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libcrack.la (no static archive)
+ * Final size of build directory: 3732 KiB (3.6 MiB)
+ * Final size of installed tree:  1096 KiB (1.0 MiB)
+ * Regenerating cracklib dictionary ...
+
+ * Messages for package sys-apps/file-5.33-r2:
+
+ * Package:    sys-apps/file-5.33-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * Upstream:   http://bugs.gw.com/
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_targets_python2_7 python_targets_python3_5 userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying file-5.33-CVE-2018-10360.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libmagic.la (no static archive)
+ * Final size of build directory: 10460 KiB (10.2 MiB)
+ * Final size of installed tree:   7220 KiB ( 7.0 MiB)
+
+ * Messages for package dev-libs/mpfr-4.0.1:
+
+ * Package:    dev-libs/mpfr-4.0.1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 15344 KiB (14.9 MiB)
+ * Final size of installed tree:   1032 KiB ( 1.0 MiB)
+
+ * Messages for package sys-apps/man-pages-4.16:
+
+ * Package:    sys-apps/man-pages-4.16
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 16432 KiB (16.0 MiB)
+ * Final size of installed tree:  16292 KiB (15.9 MiB)
+
+ * Messages for package app-eselect/eselect-python-20171204:
+
+ * Package:    app-eselect/eselect-python-20171204
+ * Repository: gentoo
+ * Maintainer: python@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 272 KiB
+ * Final size of installed tree:   32 KiB
+
+ * Messages for package dev-libs/mpc-1.1.0-r1:
+
+ * Package:    dev-libs/mpc-1.1.0-r1
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 5508 KiB (5.3 MiB)
+ * Final size of installed tree:   276 KiB
+
+ * Messages for package virtual/tmpfiles-0:
+
+ * Package:    virtual/tmpfiles-0
+ * Repository: gentoo
+ * Maintainer: williamh@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-eselect/eselect-pinentry-0.7:
+
+ * Package:    app-eselect/eselect-pinentry-0.7
+ * Repository: gentoo
+ * Maintainer: crypto@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory:  4 KiB
+ * Final size of installed tree:  24 KiB
+
+ * Messages for package virtual/mta-1:
+
+ * Package:    virtual/mta-1
+ * Repository: gentoo
+ * Maintainer: net-mail@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/logger-0:
+
+ * Package:    virtual/logger-0
+ * Repository: gentoo
+ * Maintainer: ultrabug@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/pkgconfig-0-r1:
+
+ * Package:    virtual/pkgconfig-0-r1
+ * Repository: gentoo
+ * Maintainer: freedesktop-bugs@gentoo.org embedded@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-libs/readline-7.0_p5:
+
+ * Package:    sys-libs/readline-7.0_p5
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying readline70-001 ...
+ * Applying readline70-002 ...
+ * Applying readline70-003 ...
+ * Applying readline70-004 ...
+ * Applying readline70-005 ...
+ * Applying readline-5.0-no_rpath.patch ...
+ * Applying readline-6.2-rlfe-tgoto.patch ...
+ * Applying readline-7.0-headers.patch ...
+ * Applying readline-7.0-missing-echo-proto.patch ...
+ * Applying readline-7.0-mingw.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 8576 KiB (8.3 MiB)
+ * Final size of installed tree:  3424 KiB (3.3 MiB)
+
+ * Messages for package sys-apps/hwids-20180518:
+
+ * Package:    sys-apps/hwids-20180518
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org floppym@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux net pci udev usb userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 15324 KiB (14.9 MiB)
+ * Final size of installed tree:  14528 KiB (14.1 MiB)
+
+ * Messages for package sys-apps/kbd-2.0.4:
+
+ * Package:    sys-apps/kbd-2.0.4
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls pam userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 18804 KiB (18.3 MiB)
+ * Final size of installed tree:   5136 KiB ( 5.0 MiB)
+
+ * Messages for package dev-libs/libpipeline-1.5.0:
+
+ * Package:    dev-libs/libpipeline-1.5.0
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying libpipeline-1.4.1-gnulib-cygwin-sys_select.patch ...
+ * Applying libpipeline-1.4.1-gnulib-darwin-program_name.patch ...
+ * Removing unnecessary /usr/lib64/libpipeline.la (no static archive)
+ * Final size of build directory: 6276 KiB (6.1 MiB)
+ * Final size of installed tree:   188 KiB
+
+ * Messages for package app-shells/bash-4.4_p23:
+
+ * Package:    app-shells/bash-4.4_p23
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux net nls readline userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying bash44-001 ...
+ * Applying bash44-002 ...
+ * Applying bash44-003 ...
+ * Applying bash44-004 ...
+ * Applying bash44-005 ...
+ * Applying bash44-006 ...
+ * Applying bash44-007 ...
+ * Applying bash44-008 ...
+ * Applying bash44-009 ...
+ * Applying bash44-010 ...
+ * Applying bash44-011 ...
+ * Applying bash44-012 ...
+ * Applying bash44-013 ...
+ * Applying bash44-014 ...
+ * Applying bash44-015 ...
+ * Applying bash44-016 ...
+ * Applying bash44-017 ...
+ * Applying bash44-018 ...
+ * Applying bash44-019 ...
+ * Applying bash44-020 ...
+ * Applying bash44-021 ...
+ * Applying bash44-022 ...
+ * Applying bash44-023 ...
+ * Applying bash-4.4-jobs_overflow.patch ...
+ * Final size of build directory: 35920 KiB (35.0 MiB)
+ * Final size of installed tree:   8476 KiB ( 8.2 MiB)
+
+ * Messages for package app-text/docbook-xml-dtd-4.1.2-r6:
+
+ * Now removing /etc/sgml/sgml-docbook.cat from /etc/sgml/xml-docbook-4.1.2.cat and /etc/sgml/catalog
+ * Now removing /usr/share/sgml/docbook/xml-dtd-4.1.2/docbook.cat from /etc/sgml/xml-docbook-4.1.2.cat and /etc/sgml/catalog
+
+ * Messages for package app-text/docbook-xml-dtd-4.1.2-r6:
+
+ * Package:    app-text/docbook-xml-dtd-4.1.2-r6
+ * Repository: gentoo
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pie selinux ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 440 KiB
+ * Final size of installed tree:  476 KiB
+ * Now adding /etc/sgml/sgml-docbook.cat to /etc/sgml/xml-docbook-4.1.2.cat and /etc/sgml/catalog
+ * Now adding /usr/share/sgml/docbook/xml-dtd-4.1.2/docbook.cat to /etc/sgml/xml-docbook-4.1.2.cat and /etc/sgml/catalog
+
+ * Messages for package net-misc/netifrc-0.6.0:
+
+ * Package:    net-misc/netifrc-0.6.0
+ * Repository: gentoo
+ * Maintainer: netifrc@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 772 KiB
+ * Final size of installed tree:  448 KiB
+
+ * Messages for package app-text/docbook-xsl-stylesheets-1.79.1-r2:
+
+ * Package:    app-text/docbook-xsl-stylesheets-1.79.1-r2
+ * Repository: gentoo
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying nonrecursive-string-subst.patch ...
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 27588 KiB (26.9 MiB)
+ * Final size of installed tree:  25768 KiB (25.1 MiB)
+
+ * Messages for package virtual/yacc-0:
+
+ * Package:    virtual/yacc-0
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-File-Temp-0.230.400-r5:
+
+ * Package:    virtual/perl-File-Temp-0.230.400-r5
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package app-admin/perl-cleaner-2.26-r1:
+
+ * Package:    app-admin/perl-cleaner-2.26-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Adjusting to prefix /
+ *   perl-cleaner ...
+ * Final size of build directory: 36 KiB
+ * Final size of installed tree:  52 KiB
+
+ * Messages for package dev-libs/libpcre-8.42:
+
+ * Package:    dev-libs/libpcre-8.42
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 bzip2 cxx elibc_glibc kernel_linux readline recursion-limit static-libs unicode userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying libpcre-8.41-fix-stack-size-detection.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 14384 KiB (14.0 MiB)
+ * Final size of installed tree:   3784 KiB ( 3.6 MiB)
+
+ * Messages for package sys-apps/kmod-25:
+
+ * Package:    sys-apps/kmod-25
+ * Repository: gentoo
+ * Maintainer: udev-bugs@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_targets_python2_7 python_targets_python3_5 tools userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Removing unnecessary /usr/lib64/libkmod.la (no static archive)
+ * Final size of build directory: 8348 KiB (8.1 MiB)
+ * Final size of installed tree:   492 KiB
+
+ * Messages for package sys-apps/less-531:
+
+ * Package:    sys-apps/less-531
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pcre unicode userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 2276 KiB (2.2 MiB)
+ * Final size of installed tree:   440 KiB
+
+ * Messages for package app-admin/metalog-3-r2:
+
+ * Package:    app-admin/metalog-3-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux unicode userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying metalog-0.9-metalog-conf.patch ...
+ * Final size of build directory: 5096 KiB (4.9 MiB)
+ * Final size of installed tree:   184 KiB
+
+ * Messages for package dev-lang/swig-3.0.12:
+
+ * Package:    dev-lang/swig-3.0.12
+ * Repository: gentoo
+ * Maintainer: radhermit@gentoo.org scheme@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pcre userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 52880 KiB (51.6 MiB)
+ * Final size of installed tree:   8296 KiB ( 8.1 MiB)
+
+ * Messages for package virtual/modutils-0:
+
+ * Package:    virtual/modutils-0
+ * Repository: gentoo
+ * Maintainer: udev-bugs@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package dev-lang/perl-5.24.3-r1:
+
+ * Linking //usr/bin/ptar-2.240.0-perl-5.26.2 to //usr/bin/ptar (relative)
+ * Linking //usr/share/man/man1/ptar-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptar.1.bz2 (relative)
+ * Linking //usr/bin/ptardiff-2.240.0-perl-5.26.2 to //usr/bin/ptardiff (relative)
+ * Linking //usr/share/man/man1/ptardiff-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptardiff.1.bz2 (relative)
+ * Linking //usr/bin/ptargrep-2.240.0-perl-5.26.2 to //usr/bin/ptargrep (relative)
+ * Linking //usr/share/man/man1/ptargrep-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptargrep.1.bz2 (relative)
+ * Linking //usr/bin/cpan-2.180.0-perl-5.26.2 to //usr/bin/cpan (relative)
+ * Linking //usr/share/man/man1/cpan-2.180.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/cpan.1.bz2 (relative)
+ * Linking //usr/bin/shasum-5.960.0-perl-5.26.2 to //usr/bin/shasum (relative)
+ * Linking //usr/share/man/man1/shasum-5.960.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/shasum.1.bz2 (relative)
+ * Linking //usr/bin/enc2xs-2.880.0-perl-5.26.2 to //usr/bin/enc2xs (relative)
+ * Linking //usr/share/man/man1/enc2xs-2.880.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/enc2xs.1.bz2 (relative)
+ * Linking //usr/bin/piconv-2.880.0-perl-5.26.2 to //usr/bin/piconv (relative)
+ * Linking //usr/share/man/man1/piconv-2.880.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/piconv.1.bz2 (relative)
+ * Linking //usr/bin/instmodsh-7.240.0-perl-5.26.2 to //usr/bin/instmodsh (relative)
+ * Linking //usr/share/man/man1/instmodsh-7.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/instmodsh.1.bz2 (relative)
+ * Linking //usr/bin/xsubpp-3.340.0-perl-5.26.2 to //usr/bin/xsubpp (relative)
+ * Linking //usr/share/man/man1/xsubpp-3.340.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/xsubpp.1.bz2 (relative)
+ * Linking //usr/bin/zipdetails-2.74.0-perl-5.26.2 to //usr/bin/zipdetails (relative)
+ * Linking //usr/share/man/man1/zipdetails-2.74.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/zipdetails.1.bz2 (relative)
+ * Linking //usr/bin/json_pp-2.274.0.200_rc-perl-5.26.2 to //usr/bin/json_pp (relative)
+ * Linking //usr/share/man/man1/json_pp-2.274.0.200_rc-perl-5.26.2.1.bz2 to //usr/share/man/man1/json_pp.1.bz2 (relative)
+ * Linking //usr/bin/corelist-5.201.804.142.600_rc-perl-5.26.2 to //usr/bin/corelist (relative)
+ * Linking //usr/share/man/man1/corelist-5.201.804.142.600_rc-perl-5.26.2.1.bz2 to //usr/share/man/man1/corelist.1.bz2 (relative)
+ * Linking //usr/bin/pod2usage-1.630.0-perl-5.26.2 to //usr/bin/pod2usage (relative)
+ * Linking //usr/share/man/man1/pod2usage-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2usage.1.bz2 (relative)
+ * Linking //usr/bin/podchecker-1.630.0-perl-5.26.2 to //usr/bin/podchecker (relative)
+ * Linking //usr/share/man/man1/podchecker-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/podchecker.1.bz2 (relative)
+ * Linking //usr/bin/podselect-1.630.0-perl-5.26.2 to //usr/bin/podselect (relative)
+ * Linking //usr/share/man/man1/podselect-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/podselect.1.bz2 (relative)
+ * Linking //usr/bin/perldoc-3.280.0-perl-5.26.2 to //usr/bin/perldoc (relative)
+ * Linking //usr/share/man/man1/perldoc-3.280.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/perldoc.1.bz2 (relative)
+ * Linking //usr/bin/prove-3.380.0-perl-5.26.2 to //usr/bin/prove (relative)
+ * Linking //usr/share/man/man1/prove-3.380.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/prove.1.bz2 (relative)
+ * Linking //usr/bin/pod2man-4.90.0-perl-5.26.2 to //usr/bin/pod2man (relative)
+ * Linking //usr/share/man/man1/pod2man-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2man.1.bz2 (relative)
+ * Linking //usr/bin/pod2text-4.90.0-perl-5.26.2 to //usr/bin/pod2text (relative)
+ * Linking //usr/share/man/man1/pod2text-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2text.1.bz2 (relative)
+ * Linking //usr/share/man/man1/perlpodstyle-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/perlpodstyle.1.bz2 (relative)
+
+ * Messages for package dev-lang/perl-5.26.2:
+
+ * Package:    dev-lang/perl-5.26.2
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying patches from perl-5.26.2-patches-1 ...
+ *   gentoo/hints_hpux.diff ...
+ *   gentoo/aix_soname.diff ...
+ *   gentoo/EUMM-RUNPATH.diff ...
+ *   gentoo/config_over.diff ...
+ *   gentoo/opensolaris_headers.diff ...
+ *   gentoo/patchlevel.diff ...
+ *   gentoo/cleanup-paths.diff ...
+ *   gentoo/enc2xs.diff ...
+ *   gentoo/darwin-cc-ld.diff ...
+ *   gentoo/cpan_definstalldirs.diff ...
+ *   gentoo/interix.diff ...
+ *   gentoo/create_libperl_soname.diff ...
+ *   gentoo/mod_paths.diff ...
+ *   gentoo/EUMM_perllocalpod.diff ...
+ *   gentoo/drop_fstack_protector.diff ...
+ *   gentoo/usr_local.diff ...
+ *   gentoo/D-SHA-CFLAGS.diff ...
+ *   gentoo/io_socket_ip_tests.diff ...
+ *   gentoo/tests.diff ...
+ *   gentoo/no-nsl.patch ...
+ *   debian/cpan-missing-site-dirs.diff ...
+ *   debian/makemaker-pasthru.diff ...
+ *   fixes/memoize_storable_nstore.diff ...
+ *   fixes/podman-pipe.diff ...
+ *   fixes/respect_umask.diff ...
+ *   fixes/net_smtp_docs.diff ...
+ *   fixes/document_makemaker_ccflags.diff ...
+ *   fixes/parallel-manisort.patch ...
+ * This version of perl may partially support modules previously
+ * installed in any of the following paths:
+ *  /usr/lib64/perl5/vendor_perl/5.24.3
+ *  /usr/lib64/perl5/5.24.3
+ * This is a temporary measure and you should aim to cleanup these paths
+ * via world updates and perl-cleaner
+ * Removing /var/tmp/portage/dev-lang/perl-5.26.2/image/ from /var/tmp/portage/dev-lang/perl-5.26.2/image/usr/lib64/perl5/5.26.2/x86_64-linux/Config.pm...
+ * Removing /var/tmp/portage/dev-lang/perl-5.26.2/image/ from /var/tmp/portage/dev-lang/perl-5.26.2/image/usr/lib64/perl5/5.26.2/x86_64-linux/Encode/Config.pm...
+ * Removing /var/tmp/portage/dev-lang/perl-5.26.2/image/ from /var/tmp/portage/dev-lang/perl-5.26.2/image/usr/lib64/perl5/5.26.2/Net/Config.pm...
+ * Removing /var/tmp/portage/dev-lang/perl-5.26.2/image/ from /var/tmp/portage/dev-lang/perl-5.26.2/image/usr/lib64/perl5/5.26.2/ExtUtils/MakeMaker/Config.pm...
+ * Final size of build directory: 191436 KiB (186.9 MiB)
+ * Final size of installed tree:   63108 KiB ( 61.6 MiB)
+ * UPDATE THE PERL MODULES:
+ * After updating dev-lang/perl the installed Perl modules
+ * have to be re-installed. In most cases, this is done automatically
+ * by the package manager, but subsequent steps are still recommended
+ * to ensure system consistency.
+ * 
+ * You should start with a depclean to remove any unused perl dependencies
+ * that may confuse portage in future. Regular depcleans are also encouraged
+ * as part of your regular update cycle, as that will keep perl upgrades working.
+ * Recommended: emerge --depclean -va
+ * 
+ * You should then call perl-cleaner to clean up any old files and trigger any
+ * remaining rebuilds portage may have missed.
+ * Use: perl-cleaner --all
+ * Linking //usr/bin/ptar-2.240.0-perl-5.26.2 to //usr/bin/ptar (relative)
+ * Linking //usr/share/man/man1/ptar-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptar.1.bz2 (relative)
+ * Linking //usr/bin/ptardiff-2.240.0-perl-5.26.2 to //usr/bin/ptardiff (relative)
+ * Linking //usr/share/man/man1/ptardiff-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptardiff.1.bz2 (relative)
+ * Linking //usr/bin/ptargrep-2.240.0-perl-5.26.2 to //usr/bin/ptargrep (relative)
+ * Linking //usr/share/man/man1/ptargrep-2.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/ptargrep.1.bz2 (relative)
+ * Linking //usr/bin/cpan-2.180.0-perl-5.26.2 to //usr/bin/cpan (relative)
+ * Linking //usr/share/man/man1/cpan-2.180.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/cpan.1.bz2 (relative)
+ * Linking //usr/bin/shasum-5.960.0-perl-5.26.2 to //usr/bin/shasum (relative)
+ * Linking //usr/share/man/man1/shasum-5.960.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/shasum.1.bz2 (relative)
+ * Linking //usr/bin/enc2xs-2.880.0-perl-5.26.2 to //usr/bin/enc2xs (relative)
+ * Linking //usr/share/man/man1/enc2xs-2.880.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/enc2xs.1.bz2 (relative)
+ * Linking //usr/bin/piconv-2.880.0-perl-5.26.2 to //usr/bin/piconv (relative)
+ * Linking //usr/share/man/man1/piconv-2.880.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/piconv.1.bz2 (relative)
+ * Linking //usr/bin/instmodsh-7.240.0-perl-5.26.2 to //usr/bin/instmodsh (relative)
+ * Linking //usr/share/man/man1/instmodsh-7.240.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/instmodsh.1.bz2 (relative)
+ * Linking //usr/bin/xsubpp-3.340.0-perl-5.26.2 to //usr/bin/xsubpp (relative)
+ * Linking //usr/share/man/man1/xsubpp-3.340.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/xsubpp.1.bz2 (relative)
+ * Linking //usr/bin/zipdetails-2.74.0-perl-5.26.2 to //usr/bin/zipdetails (relative)
+ * Linking //usr/share/man/man1/zipdetails-2.74.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/zipdetails.1.bz2 (relative)
+ * Linking //usr/bin/json_pp-2.274.0.200_rc-perl-5.26.2 to //usr/bin/json_pp (relative)
+ * Linking //usr/share/man/man1/json_pp-2.274.0.200_rc-perl-5.26.2.1.bz2 to //usr/share/man/man1/json_pp.1.bz2 (relative)
+ * Linking //usr/bin/corelist-5.201.804.142.600_rc-perl-5.26.2 to //usr/bin/corelist (relative)
+ * Linking //usr/share/man/man1/corelist-5.201.804.142.600_rc-perl-5.26.2.1.bz2 to //usr/share/man/man1/corelist.1.bz2 (relative)
+ * Linking //usr/bin/pod2usage-1.630.0-perl-5.26.2 to //usr/bin/pod2usage (relative)
+ * Linking //usr/share/man/man1/pod2usage-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2usage.1.bz2 (relative)
+ * Linking //usr/bin/podchecker-1.630.0-perl-5.26.2 to //usr/bin/podchecker (relative)
+ * Linking //usr/share/man/man1/podchecker-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/podchecker.1.bz2 (relative)
+ * Linking //usr/bin/podselect-1.630.0-perl-5.26.2 to //usr/bin/podselect (relative)
+ * Linking //usr/share/man/man1/podselect-1.630.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/podselect.1.bz2 (relative)
+ * Linking //usr/bin/perldoc-3.280.0-perl-5.26.2 to //usr/bin/perldoc (relative)
+ * Linking //usr/share/man/man1/perldoc-3.280.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/perldoc.1.bz2 (relative)
+ * Linking //usr/bin/prove-3.380.0-perl-5.26.2 to //usr/bin/prove (relative)
+ * Linking //usr/share/man/man1/prove-3.380.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/prove.1.bz2 (relative)
+ * Linking //usr/bin/pod2man-4.90.0-perl-5.26.2 to //usr/bin/pod2man (relative)
+ * Linking //usr/share/man/man1/pod2man-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2man.1.bz2 (relative)
+ * Linking //usr/bin/pod2text-4.90.0-perl-5.26.2 to //usr/bin/pod2text (relative)
+ * Linking //usr/share/man/man1/pod2text-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/pod2text.1.bz2 (relative)
+ * Linking //usr/share/man/man1/perlpodstyle-4.90.0-perl-5.26.2.1.bz2 to //usr/share/man/man1/perlpodstyle.1.bz2 (relative)
+ * Removing old .ph files
+
+ * Messages for package virtual/pager-0:
+
+ * Package:    virtual/pager-0
+ * Repository: gentoo
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-kernel/linux-headers-4.17:
+
+ * Package:    sys-kernel/linux-headers-4.17
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 00_all_0001-linux-stat.h-remove-__GLIBC__-checks.patch ...
+ * Applying 00_all_0002-netfilter-pull-in-limits.h.patch ...
+ * Applying 00_all_0003-convert-PAGE_SIZE-usage.patch ...
+ * Applying 00_all_0004-asm-generic-fcntl.h-namespace-kernel-file-structs.patch ...
+ * Applying 00_all_0005-unifdef-drop-unused-errno.h-include.patch ...
+ * Applying 00_all_0006-x86-do-not-build-relocs-tool-when-installing-headers.patch ...
+ * Applying 00_all_0007-netlink-drop-int-cast-on-length-arg-in-NLMSG_OK.patch ...
+ * Applying 00_all_0008-uapi-fix-System-V-buf-header-includes.patch ...
+ * Final size of build directory: 70668 KiB (69.0 MiB)
+ * Final size of installed tree:   6764 KiB ( 6.6 MiB)
+
+ * Messages for package sys-apps/groff-1.22.3:
+
+ * Package:    sys-apps/groff-1.22.3
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux pie selinux ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying groff-1.19.2-man-unicode-dashes.patch ...
+ * Applying groff-1.22.3-parallel-mom.patch ...
+ * QA Notice: Unrecognized configure options:
+ * 
+ * 	--with-appresdir
+ * 	--without-x
+ * 	--with-appresdir
+ * 	--without-x
+ * Final size of build directory: 41132 KiB (40.1 MiB)
+ * Final size of installed tree:  14512 KiB (14.1 MiB)
+
+ * Messages for package sys-devel/autoconf-2.69-r4:
+
+ * Package:    sys-devel/autoconf-2.69-r4
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying autoconf-2.69-perl-5.26.patch ...
+ * Applying autoconf-2.69-fix-libtool-test.patch ...
+ * Applying autoconf-2.69-perl-5.26-2.patch ...
+ * Final size of build directory: 8184 KiB (7.9 MiB)
+ * Final size of installed tree:  3436 KiB (3.3 MiB)
+
+ * Messages for package virtual/perl-ExtUtils-MakeMaker-7.240.0:
+
+ * Package:    virtual/perl-ExtUtils-MakeMaker-7.240.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package dev-util/gtk-doc-am-1.25-r1:
+
+ * Package:    dev-util/gtk-doc-am-1.25-r1
+ * Repository: gentoo
+ * Maintainer: gnome@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 7640 KiB (7.4 MiB)
+ * Final size of installed tree:    36 KiB
+
+ * Messages for package virtual/perl-Parse-CPAN-Meta-2.150.10:
+
+ * Package:    virtual/perl-Parse-CPAN-Meta-2.150.10
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-CPAN-Meta-YAML-0.18.0-r2:
+
+ * Package:    virtual/perl-CPAN-Meta-YAML-0.18.0-r2
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Test-Harness-3.380.0:
+
+ * Package:    virtual/perl-Test-Harness-3.380.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-File-Spec-3.670.0:
+
+ * Package:    virtual/perl-File-Spec-3.670.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Data-Dumper-2.167.0:
+
+ * Package:    virtual/perl-Data-Dumper-2.167.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package dev-perl/Text-CharWidth-0.40.0-r1:
+
+ * Package:    dev-perl/Text-CharWidth-0.40.0-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/Text-CharWidth-0.40.0-r1/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 188 KiB
+ * Final size of installed tree:   80 KiB
+
+ * Messages for package perl-core/File-Temp-0.230.400-r1:
+
+ * Package:    perl-core/File-Temp-0.230.400-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying File-Temp-0.230.0-symlink-safety.patch ...
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/perl-core/File-Temp-0.230.400-r1/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 484 KiB
+ * Final size of installed tree:  172 KiB
+
+ * Messages for package virtual/perl-version-0.991.700:
+
+ * Package:    virtual/perl-version-0.991.700
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-podlators-4.90.0:
+
+ * Package:    virtual/perl-podlators-4.90.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Text-ParseWords-3.300.0-r3:
+
+ * Package:    virtual/perl-Text-ParseWords-3.300.0-r3
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Perl-OSType-1.10.0:
+
+ * Package:    virtual/perl-Perl-OSType-1.10.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Module-Metadata-1.0.33:
+
+ * Package:    virtual/perl-Module-Metadata-1.0.33
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-Getopt-Long-2.490.0:
+
+ * Package:    virtual/perl-Getopt-Long-2.490.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-ExtUtils-ParseXS-3.340.0:
+
+ * Package:    virtual/perl-ExtUtils-ParseXS-3.340.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-ExtUtils-Manifest-1.700.0-r4:
+
+ * Package:    virtual/perl-ExtUtils-Manifest-1.700.0-r4
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-ExtUtils-Install-2.40.0-r3:
+
+ * Package:    virtual/perl-ExtUtils-Install-2.40.0-r3
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-ExtUtils-CBuilder-0.280.225-r2:
+
+ * Package:    virtual/perl-ExtUtils-CBuilder-0.280.225-r2
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package virtual/perl-JSON-PP-2.274.0.200_rc:
+
+ * Package:    virtual/perl-JSON-PP-2.274.0.200_rc
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package sys-libs/libseccomp-2.3.3:
+
+ * Package:    sys-libs/libseccomp-2.3.3
+ * Repository: gentoo
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 4800 KiB (4.6 MiB)
+ * Final size of installed tree:   532 KiB
+
+ * Messages for package sys-libs/libcap-ng-0.7.9:
+
+ * Package:    sys-libs/libcap-ng-0.7.9
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_targets_python2_7 python_targets_python3_5 userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 3028 KiB (2.9 MiB)
+ * Final size of installed tree:   248 KiB
+
+ * Messages for package dev-perl/Text-Unidecode-1.300.0:
+
+ * Package:    dev-perl/Text-Unidecode-1.300.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/Text-Unidecode-1.300.0/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Fixing packlist file /usr/lib64/perl5/vendor_perl/5.26.2/x86_64-linux/auto/Text/Unidecode/.packlist
+ * Final size of build directory: 2392 KiB (2.3 MiB)
+ * Final size of installed tree:  1152 KiB (1.1 MiB)
+
+ * Messages for package dev-perl/Unicode-EastAsianWidth-1.330.0-r1:
+
+ * Package:    dev-perl/Unicode-EastAsianWidth-1.330.0-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying no-dot-inc.patch ...
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/Unicode-EastAsianWidth-1.330.0-r1/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 280 KiB
+ * Final size of installed tree:   60 KiB
+
+ * Messages for package dev-perl/TermReadKey-2.370.0:
+
+ * Package:    dev-perl/TermReadKey-2.370.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/TermReadKey-2.370.0/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Fixing packlist file /usr/lib64/perl5/vendor_perl/5.26.2/x86_64-linux/auto/Term/ReadKey/.packlist
+ * Final size of build directory: 640 KiB
+ * Final size of installed tree:  120 KiB
+
+ * Messages for package dev-perl/libintl-perl-1.280.0:
+
+ * Package:    dev-perl/libintl-perl-1.280.0
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying libintl-perl-1.280.0-sanity-2.patch ...
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/libintl-perl-1.280.0/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Fixing packlist file /usr/lib64/perl5/vendor_perl/5.26.2/x86_64-linux/auto/libintl-perl/.packlist
+ * Final size of build directory: 9640 KiB (9.4 MiB)
+ * Final size of installed tree:  3984 KiB (3.8 MiB)
+
+ * Messages for package dev-perl/Text-WrapI18N-0.60.0-r1:
+
+ * Package:    dev-perl/Text-WrapI18N-0.60.0-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using ExtUtils::MakeMaker
+ * perl Makefile.PL PREFIX=/usr INSTALLDIRS=vendor INSTALLMAN3DIR=none DESTDIR=/var/tmp/portage/dev-perl/Text-WrapI18N-0.60.0-r1/image/
+ * emake OTHERLDFLAGS=-Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 140 KiB
+ * Final size of installed tree:   56 KiB
+
+ * Messages for package virtual/perl-CPAN-Meta-2.150.10:
+
+ * Package:    virtual/perl-CPAN-Meta-2.150.10
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 4 KiB
+ * Final size of installed tree:  4 KiB
+
+ * Messages for package net-firewall/iptables-1.6.2-r2:
+
+ * Package:    net-firewall/iptables-1.6.2-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc ipv6 kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Removing unnecessary /usr/lib64/libip6tc.la (no static archive)
+ * Removing unnecessary /usr/lib64/libiptc.la (no static archive)
+ * Removing unnecessary /usr/lib64/libxtables.la (no static archive)
+ * Removing unnecessary /usr/lib64/libip4tc.la (no static archive)
+ * Final size of build directory: 10416 KiB (10.1 MiB)
+ * Final size of installed tree:   2472 KiB ( 2.4 MiB)
+
+ * Messages for package app-misc/pax-utils-1.2.3-r1:
+
+ * Package:    app-misc/pax-utils-1.2.3-r1
+ * Repository: gentoo
+ * Maintainer: slyfox@gentoo.org toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python_single_target_python3_5 python_targets_python2_7 python_targets_python3_5 seccomp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 6128 KiB (5.9 MiB)
+ * Final size of installed tree:   372 KiB
+
+ * Messages for package dev-perl/Module-Build-0.422.400:
+
+ * Package:    dev-perl/Module-Build-0.422.400
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using Module::Build
+ * perl Build.PL --installdirs=vendor --libdoc= --destdir=/var/tmp/portage/dev-perl/Module-Build-0.422.400/image/ --create_packlist=1
+ * ./Build install --pure
+ * Fixing packlist file /usr/lib64/perl5/vendor_perl/5.26.2/x86_64-linux/auto/Module/Build/.packlist
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::API.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Authoring.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Base.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Bundling.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Compat.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::ConfigData.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Cookbook.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Notes.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::PPMMaker.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::Default.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::MacOS.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::Unix.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::VMS.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::VOS.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::Windows.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::aix.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::cygwin.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::darwin.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/Module::Build::Platform::os2.3pm
+ * Final size of build directory: 1984 KiB (1.9 MiB)
+ * Final size of installed tree:   708 KiB
+
+ * Messages for package sys-apps/sandbox-2.13:
+
+ * Package:    sys-apps/sandbox-2.13
+ * Repository: gentoo
+ * Maintainer: sandbox@gentoo.org
+ * USE:        abi_x86_32 abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * abi_x86_32.x86: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_32.x86: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_32.x86: running multilib-minimal_abi_src_install
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 76272 KiB (74.4 MiB)
+ * Final size of installed tree:    704 KiB
+
+ * Messages for package dev-perl/SGMLSpm-1.1-r1:
+
+ * Package:    dev-perl/SGMLSpm-1.1-r1
+ * Repository: gentoo
+ * Maintainer: perl@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Using Module::Build
+ * perl Build.PL --installdirs=vendor --libdoc= --destdir=/var/tmp/portage/dev-perl/SGMLSpm-1.1-r1/image/ --create_packlist=1
+ * ./Build install --pure
+ * Fixing packlist file /usr/lib64/perl5/vendor_perl/5.26.2/x86_64-linux/auto/SGMLSpm/.packlist
+ * Pruning surplus packlist entry /usr/share/man/man3/SGMLS.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/SGMLS::Output.3pm
+ * Pruning surplus packlist entry /usr/share/man/man3/SGMLS::Refs.3pm
+ * Final size of build directory: 812 KiB
+ * Final size of installed tree:  144 KiB
+
+ * Messages for package dev-libs/openssl-1.0.2o-r6:
+
+ * Package:    dev-libs/openssl-1.0.2o-r6
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 asm cpu_flags_x86_sse2 elibc_glibc kernel_linux sslv3 tls-heartbeat userland_GNU zlib
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 010_all_openssl-1.0.2-respect-ldflags.patch ...
+ * Applying 011_all_openssl-1.0.2-fix-parallel-build.patch ...
+ * Applying 012_all_openssl-1.0.2-fix-parallel-obj-headers.patch ...
+ * Applying 013_all_openssl-1.0.2-fix-parallel-install-dirs.patch ...
+ * Applying 014_all_openssl-1.0.2-fix-parallel-symlinking.patch ...
+ * Applying 015_all_openssl-1.0.2-fix-parallel-install-dirs2.patch ...
+ * Applying 030_all_openssl-1.0.2-add-ipv6-support-in-s-client-server-r1.patch ...
+ * Applying 040_all_openssl-1.0.2-x32-asm.p
 ```
 
