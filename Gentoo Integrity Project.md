@@ -1569,6 +1569,1420 @@ We use `emerge-webrsync` with those options:
 
 Next we update the just installed `portage` with `emerge`. We've used in our `~/.bashrc` file the variable `EMERGE_DEFAULT_OPTS` where we already indicate to use `--ask` and `--verbose`. This time we add `-oneshot` that indicate *emerge as normal, but do not add the packages to the world file for later updating*.
 
+```sh
+livecd ~ # eselect profile list
+Available profile symlink targets:
+  [1]   default/linux/amd64/13.0 (stable)
+  [2]   default/linux/amd64/13.0/selinux (dev)
+  [3]   default/linux/amd64/13.0/desktop (stable)
+  [4]   default/linux/amd64/13.0/desktop/gnome (stable)
+  [5]   default/linux/amd64/13.0/desktop/gnome/systemd (stable)
+  [6]   default/linux/amd64/13.0/desktop/plasma (stable)
+  [7]   default/linux/amd64/13.0/desktop/plasma/systemd (stable)
+  [8]   default/linux/amd64/13.0/developer (stable)
+  [9]   default/linux/amd64/13.0/no-multilib (stable)
+  [10]  default/linux/amd64/13.0/systemd (stable)
+  [11]  default/linux/amd64/13.0/x32 (dev)
+  [12]  default/linux/amd64/17.0 (stable) *
+  [13]  default/linux/amd64/17.0/selinux (stable)
+  [14]  default/linux/amd64/17.0/hardened (stable)
+  [15]  default/linux/amd64/17.0/hardened/selinux (stable)
+  [16]  default/linux/amd64/17.0/desktop (stable)
+  [17]  default/linux/amd64/17.0/desktop/gnome (stable)
+  [18]  default/linux/amd64/17.0/desktop/gnome/systemd (stable)
+  [19]  default/linux/amd64/17.0/desktop/plasma (stable)
+  [20]  default/linux/amd64/17.0/desktop/plasma/systemd (stable)
+  [21]  default/linux/amd64/17.0/developer (stable)
+  [22]  default/linux/amd64/17.0/no-multilib (stable)
+  [23]  default/linux/amd64/17.0/no-multilib/hardened (stable)
+  [24]  default/linux/amd64/17.0/no-multilib/hardened/selinux (stable)
+  [25]  default/linux/amd64/17.0/systemd (stable)
+  [26]  default/linux/amd64/17.0/x32 (dev)
+  [27]  default/linux/amd64/17.1 (exp)
+  [28]  default/linux/amd64/17.1/selinux (exp)
+  [29]  default/linux/amd64/17.1/hardened (exp)
+  [30]  default/linux/amd64/17.1/hardened/selinux (exp)
+  [31]  default/linux/amd64/17.1/desktop (exp)
+  [32]  default/linux/amd64/17.1/desktop/gnome (exp)
+  [33]  default/linux/amd64/17.1/desktop/gnome/systemd (exp)
+  [34]  default/linux/amd64/17.1/desktop/plasma (exp)
+  [35]  default/linux/amd64/17.1/desktop/plasma/systemd (exp)
+  [36]  default/linux/amd64/17.1/developer (exp)
+  [37]  default/linux/amd64/17.1/no-multilib (exp)
+  [38]  default/linux/amd64/17.1/no-multilib/hardened (exp)
+  [39]  default/linux/amd64/17.1/no-multilib/hardened/selinux (exp)
+  [40]  default/linux/amd64/17.1/systemd (exp)
+  [41]  hardened/linux/amd64 (stable)
+  [42]  hardened/linux/amd64/selinux (stable)
+  [43]  hardened/linux/amd64/no-multilib (stable)
+  [44]  hardened/linux/amd64/no-multilib/selinux (stable)
+  [45]  hardened/linux/amd64/x32 (dev)
+  [46]  default/linux/musl/amd64 (exp)
+  [47]  hardened/linux/musl/amd64 (exp)
+  [48]  default/linux/musl/amd64/x32 (exp)
+  [49]  hardened/linux/musl/amd64/x32 (exp)
+  [50]  default/linux/amd64/17.0/musl (exp)
+  [51]  default/linux/amd64/17.0/musl/hardened (exp)
+  [52]  default/linux/amd64/17.0/musl/hardened/selinux (exp)
+  [53]  default/linux/uclibc/amd64 (exp)
+  [54]  hardened/linux/uclibc/amd64 (exp)
+livecd ~ # eselect profile set 15
+livecd ~ # eselect profile list | grep 15
+  [15]  default/linux/amd64/17.0/hardened/selinux (stable) *
+livecd ~ # cd /etc/portage/
+livecd /etc/portage # ls -al
+total 40
+drwxr-xr-x  8 root root 4096 Jul  6 20:42 .
+drwxr-xr-x 32 root root 4096 Jul  6 20:06 ..
+-rw-r--r--  1 root root 1468 Jul  6 19:24 make.conf
+lrwxrwxrwx  1 root root   68 Jul  6 20:42 make.profile -> ../../usr/portage/profiles/default/linux/amd64/17.0/hardened/selinux
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.accept_keywords
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.mask
+drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.use
+drwxr-xr-x  2 root root 4096 Jul  6 19:57 repo.postsync.d
+drwxr-xr-x  2 root root 4096 Jul  6 10:23 repos.conf
+drwxr-xr-x  3 root root 4096 Jun 25 00:57 savedconfig
+livecd /etc/portage #
+```
+
+With `eselect` we can *select* various options to configure our Gentoo system.
+
+With `eselect profile` we change the symbolic link `/etc/portage/make.profile` to indicate what kind of system we're going to install. There's a lot of.  In this case we're selecting an [hardened + selinux](https://wiki.gentoo.org/wiki/Project:Hardened) installation (*take care is different from the Sakaki EFI install guide*). We can visualize all the variables of this kind of `profile`:
+
+```sh
+livecd /etc/portage # emerge --info
+Portage 2.3.41 (python 3.6.6-final-0, default/linux/amd64/17.0/hardened/selinux, gcc-7.3.0, glibc-2.27-r5, 4.9.76-gentoo-r1 x86_64)
+=================================================================
+System uname: Linux-4.9.76-gentoo-r1-x86_64-Intel-R-_Core-TM-_i7-2620M_CPU_@_2.70GHz-with-gentoo-2.6
+KiB Mem:     3963424 total,   1381068 free
+KiB Swap:          0 total,         0 free
+Timestamp of repository gentoo: Fri, 06 Jul 2018 00:45:01 +0000
+Head commit of repository gentoo: f8f48a7991916da84d772315003d334f6c5a9699
+sh bash 4.4_p12
+ld GNU ld (Gentoo 2.30 p2) 2.30.0
+app-shells/bash:          4.4_p12::gentoo
+dev-lang/perl:            5.24.3-r1::gentoo
+dev-lang/python:          2.7.14-r1::gentoo, 3.6.6::gentoo
+dev-util/pkgconfig:       0.29.2::gentoo
+sys-apps/baselayout:      2.6::gentoo
+sys-apps/openrc:          0.34.11::gentoo
+sys-apps/sandbox:         2.13::gentoo
+sys-devel/autoconf:       2.69-r4::gentoo
+sys-devel/automake:       1.15.1-r2::gentoo
+sys-devel/binutils:       2.30-r2::gentoo
+sys-devel/gcc:            7.3.0-r3::gentoo
+sys-devel/gcc-config:     1.8-r1::gentoo
+sys-devel/libtool:        2.4.6-r3::gentoo
+sys-devel/make:           4.2.1::gentoo
+sys-kernel/linux-headers: 4.13::gentoo (virtual/os-headers)
+sys-libs/glibc:           2.27-r5::gentoo
+Repositories:
+
+gentoo
+    location: /usr/portage
+    sync-type: rsync
+    sync-uri: rsync://rsync.fr.gentoo.org/gentoo-portage
+    priority: -1000
+    sync-rsync-extra-opts: 
+    sync-rsync-verify-metamanifest: yes
+    sync-rsync-verify-jobs: 1
+    sync-rsync-verify-max-age: 24
+
+ABI="amd64"
+ABI_X86="64"
+ACCEPT_KEYWORDS="amd64 ~amd64"
+ACCEPT_LICENSE="@FREE CC-Sampling-Plus-1.0"
+ACCEPT_PROPERTIES="*"
+ACCEPT_RESTRICT="*"
+ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci"
+APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias"
+ARCH="amd64"
+AUTOCLEAN="yes"
+BOOTSTRAP_USE="cxx unicode internal-glib split-usr python_targets_python3_5 python_targets_python2_7 multilib hardened pic xtpax -jit -orc"
+BROOT=""
+CALLIGRA_FEATURES="karbon plan sheets stage words"
+CBUILD="x86_64-pc-linux-gnu"
+CFLAGS="-march=sandybridge -O2 -pipe"
+CFLAGS_amd64="-m64"
+CFLAGS_x32="-mx32"
+CFLAGS_x86="-m32"
+CHOST="x86_64-pc-linux-gnu"
+CHOST_amd64="x86_64-pc-linux-gnu"
+CHOST_x32="x86_64-pc-linux-gnux32"
+CHOST_x86="i686-pc-linux-gnu"
+CLEAN_DELAY="5"
+COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog"
+COLLISION_IGNORE="/lib/modules/* *.py[co] *$py.class */dropin.cache"
+CONFIG_PROTECT="/etc /usr/share/gnupg/qualified.txt"
+CONFIG_PROTECT_MASK="/etc/ca-certificates.conf /etc/env.d /etc/gconf /etc/gentoo-release /etc/sandbox.d /etc/terminfo"
+CPU_FLAGS_X86="mmx mmxext sse sse2"
+CXXFLAGS=""
+DEFAULT_ABI="amd64"
+DISTDIR="/usr/portage/distfiles"
+EDITOR="/bin/nano"
+ELIBC="glibc"
+EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=5 --load-average=4"
+EMERGE_WARNING_DELAY="10"
+ENV_UNSET="DBUS_SESSION_BUS_ADDRESS DISPLAY PERL5LIB PERL5OPT PERLPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
+EPREFIX=""
+EROOT="/"
+ESYSROOT="/"
+FCFLAGS="-O2 -pipe"
+FEATURES="assume-digests binpkg-logs buildpkg config-protect-if-modified distlocks ebuild-locks fixlafiles merge-sync multilib-strict news parallel-fetch preserve-libs protect-owned sandbox selinux sesandbox sfperms split-elog strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
+FETCHCOMMAND="wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
+FETCHCOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
+FETCHCOMMAND_SFTP="bash -c "x=\${2#sftp://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; eval \"declare -a ssh_opts=(\${3})\" ; exec sftp \${port:+-P \${port}} \"\${ssh_opts[@]}\" \"\${host}:/\${x#*/}\" \"\$1\"" sftp "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+FETCHCOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+FFLAGS="-O2 -pipe"
+GCC_SPECS=""
+GENTOO_MIRRORS="ftp://ftp.free.fr/mirrors/ftp.gentoo.org/ http://gentoo.modulix.net/gentoo/ http://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://mirrors.soeasyto.com/distfiles.gentoo.org/ http://mirrors.soeasyto.com/distfiles.gentoo.org/"
+GPG_TTY="/dev/pts/0"
+GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx"
+GRUB_PLATFORMS=""
+HOME="/root"
+INFOPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/info:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/info:/usr/share/info"
+INPUT_DEVICES="libinput"
+IUSE_IMPLICIT="abi_x86_64 prefix prefix-chain prefix-guest"
+KERNEL="linux"
+LANG="en_GB.utf8"
+LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text"
+LC_COLLATE="C"
+LC_MESSAGES="C"
+LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+LDFLAGS_amd64="-m elf_x86_64"
+LDFLAGS_x32="-m elf32_x86_64"
+LDFLAGS_x86="-m elf_i386"
+LESS="-R -M --shift 5"
+LESSOPEN="|lesspipe %s"
+LIBDIR_amd64="lib64"
+LIBDIR_x32="libx32"
+LIBDIR_x86="lib32"
+LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer"
+LOGNAME="root"
+LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.cfg=00;32:*.conf=00;32:*.diff=00;32:*.doc=00;32:*.ini=00;32:*.log=00;32:*.patch=00;32:*.pdf=00;32:*.ps=00;32:*.tex=00;32:*.txt=00;32:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
+MAIL="/var/mail/root"
+MAKEOPTS="-j5 -l4"
+MANPAGER="manpager"
+MANPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/man:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/man:/usr/local/share/man:/usr/share/man"
+MULTILIB_ABIS="amd64 x86"
+MULTILIB_STRICT_DENY="64-bit.*shared object"
+MULTILIB_STRICT_DIRS="/lib32 /lib /usr/lib32 /usr/lib /usr/kde/*/lib32 /usr/kde/*/lib /usr/qt/*/lib32 /usr/qt/*/lib /usr/X11R6/lib32 /usr/X11R6/lib"
+MULTILIB_STRICT_EXEMPT="(perl5|gcc|gcc-lib|binutils|eclipse-3|debug|portage|udev|systemd|clang|python-exec|llvm)"
+NETBEANS="apisupport cnd groovy gsf harness ide identity j2ee java mobility nb php profiler soa visualweb webcommon websvccommon xml"
+NUMCPUS="4"
+NUMCPUSPLUSONE="5"
+OFFICE_IMPLEMENTATION="libreoffice"
+OLDPWD="/etc/portage"
+PAGER="/usr/bin/less"
+PATH="/usr/x86_64-pc-linux-gnu/gcc-bin/6.4.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+PAX_MARKINGS="XT"
+PHP_TARGETS="php5-6 php7-0"
+PKGDIR="/usr/portage/packages"
+POLICY_TYPES="strict targeted"
+PORTAGE_ARCHLIST="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 arm64-linux hppa ia64 m68k m68k-mint mips ppc ppc-aix ppc-macos ppc64 ppc64-linux s390 sh sparc sparc-solaris sparc64-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
+PORTAGE_BIN_PATH="/usr/lib/portage/python3.6"
+PORTAGE_COMPRESS_EXCLUDE_SUFFIXES="css gif htm[l]? jp[e]?g js pdf png"
+PORTAGE_CONFIGROOT="/"
+PORTAGE_DEBUG="0"
+PORTAGE_DEPCACHEDIR="/var/cache/edb/dep"
+PORTAGE_ELOG_CLASSES="info warn error log qa"
+PORTAGE_ELOG_MAILFROM="portage@localhost"
+PORTAGE_ELOG_MAILSUBJECT="[portage] ebuild log for ${PACKAGE} on ${HOST}"
+PORTAGE_ELOG_MAILURI="root"
+PORTAGE_ELOG_SYSTEM="echo save"
+PORTAGE_FETCH_CHECKSUM_TRY_MIRRORS="5"
+PORTAGE_FETCH_RESUME_MIN_SIZE="350K"
+PORTAGE_FETCH_T="portage_fetch_t"
+PORTAGE_GID="250"
+PORTAGE_GPG_SIGNING_COMMAND="gpg --sign --digest-algo SHA256 --clearsign --yes --default-key "${PORTAGE_GPG_KEY}" --homedir "${PORTAGE_GPG_DIR}" "${FILE}""
+PORTAGE_INST_GID="0"
+PORTAGE_INST_UID="0"
+PORTAGE_INTERNAL_CALLER="1"
+PORTAGE_OVERRIDE_EPREFIX=""
+PORTAGE_PYM_PATH="/usr/lib64/python3.6/site-packages"
+PORTAGE_PYTHONPATH="/usr/lib64/python3.6/site-packages"
+PORTAGE_RSYNC_OPTS="--recursive --links --safe-links --perms --times --omit-dir-times --compress --force --whole-file --delete --stats --human-readable --timeout=180 --exclude=/distfiles --exclude=/local --exclude=/packages --exclude=/.git"
+PORTAGE_RSYNC_RETRIES="-1"
+PORTAGE_SANDBOX_T="portage_sandbox_t"
+PORTAGE_SYNC_STALE="30"
+PORTAGE_T="portage_t"
+PORTAGE_TMPDIR="/var/tmp"
+PORTAGE_VERBOSE="1"
+PORTAGE_WORKDIR_MODE="0700"
+PORTAGE_XATTR_EXCLUDE="btrfs.* security.evm security.ima 	security.selinux system.nfs4_acl user.apache_handler 	user.Beagle.* user.dublincore.* user.mime_encoding user.xdg.*"
+PORT_LOGDIR_CLEAN="find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +7 -delete"
+POSTGRES_TARGETS="postgres9_5 postgres10"
+PROFILE_IS_HARDENED="1"
+PROFILE_ONLY_VARIABLES="ARCH ELIBC IUSE_IMPLICIT KERNEL USERLAND USE_EXPAND_IMPLICIT USE_EXPAND_UNPREFIXED USE_EXPAND_VALUES_ARCH USE_EXPAND_VALUES_ELIBC USE_EXPAND_VALUES_KERNEL USE_EXPAND_VALUES_USERLAND"
+PWD="/etc/portage"
+PYTHONDONTWRITEBYTECODE="1"
+PYTHON_SINGLE_TARGET="python3_6"
+PYTHON_TARGETS="python2_7 python3_6"
+RESUMECOMMAND="wget -c -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
+RESUMECOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
+RESUMECOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
+ROOT="/"
+ROOTPATH="/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+RPMDIR="/usr/portage/rpm"
+RUBY_TARGETS="ruby23"
+SHELL="/bin/bash"
+SHLVL="2"
+SSH_CLIENT="10.3.30.1 35898 22"
+SSH_CONNECTION="10.3.30.1 35898 10.3.30.2 22"
+SSH_TTY="/dev/pts/0"
+SYMLINK_LIB="yes"
+SYSROOT="/"
+TERM="xterm-256color"
+TWISTED_DISABLE_WRITING_OF_PLUGIN_CACHE="1"
+UNINSTALL_IGNORE="/lib/modules/* /var/run /var/lock"
+USE="acl amd64 bzip2 crypt cxx hardened iconv ipv6 libtirpc multilib ncurses nls nptl openmp pam pcre pie readline seccomp selinux ssl ssp unicode xattr xtpax zlib" ABI_X86="64" ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias" CALLIGRA_FEATURES="karbon plan sheets stage words" COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog" CPU_FLAGS_X86="mmx mmxext sse sse2" ELIBC="glibc" GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx" INPUT_DEVICES="libinput" KERNEL="linux" LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer" OFFICE_IMPLEMENTATION="libreoffice" PHP_TARGETS="php5-6 php7-0" POSTGRES_TARGETS="postgres9_5 postgres10" PYTHON_SINGLE_TARGET="python3_6" PYTHON_TARGETS="python2_7 python3_6" RUBY_TARGETS="ruby23" USERLAND="GNU" VIDEO_CARDS="intel i915" XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
+USER="root"
+USERLAND="GNU"
+USE_EXPAND="ABI_MIPS ABI_PPC ABI_S390 ABI_X86 ALSA_CARDS APACHE2_MODULES APACHE2_MPMS CALLIGRA_EXPERIMENTAL_FEATURES CALLIGRA_FEATURES CAMERAS COLLECTD_PLUGINS CPU_FLAGS_ARM CPU_FLAGS_X86 CURL_SSL ELIBC ENLIGHTENMENT_MODULES FFTOOLS GPSD_PROTOCOLS GRUB_PLATFORMS INPUT_DEVICES KERNEL L10N LCD_DEVICES LIBREOFFICE_EXTENSIONS LIRC_DEVICES LLVM_TARGETS MONKEYD_PLUGINS NETBEANS_MODULES NGINX_MODULES_HTTP NGINX_MODULES_MAIL NGINX_MODULES_STREAM OFED_DRIVERS OFFICE_IMPLEMENTATION OPENMPI_FABRICS OPENMPI_OFED_FEATURES OPENMPI_RM PHP_TARGETS POSTGRES_TARGETS PYTHON_SINGLE_TARGET PYTHON_TARGETS QEMU_SOFTMMU_TARGETS QEMU_USER_TARGETS ROS_MESSAGES RUBY_TARGETS SANE_BACKENDS USERLAND UWSGI_PLUGINS VIDEO_CARDS VOICEMAIL_STORAGE XFCE_PLUGINS XTABLES_ADDONS"
+USE_EXPAND_HIDDEN="ABI_MIPS ABI_PPC ABI_S390 CPU_FLAGS_ARM ELIBC KERNEL USERLAND"
+USE_EXPAND_IMPLICIT="ARCH ELIBC KERNEL USERLAND"
+USE_EXPAND_UNPREFIXED="ARCH"
+USE_EXPAND_VALUES_ARCH="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 hppa ia64 m68k m68k-mint mips ppc ppc64 ppc64-linux ppc-aix ppc-macos s390 sh sparc sparc64-solaris sparc-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
+USE_EXPAND_VALUES_ELIBC="AIX bionic Cygwin Darwin DragonFly FreeBSD glibc HPUX Interix mingw mintlib musl NetBSD OpenBSD SunOS uclibc Winnt"
+USE_EXPAND_VALUES_KERNEL="AIX Darwin FreeBSD freemint HPUX linux NetBSD OpenBSD SunOS Winnt"
+USE_EXPAND_VALUES_USERLAND="BSD GNU"
+USE_ORDER="env:pkg:conf:defaults:pkginternal:repo:env.d"
+VIDEO_CARDS="intel i915"
+XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
+
+livecd /etc/portage #
+```
+
+Go ahead with the customization:
+
+```sh
+livecd /etc/portage # echo "Europe/Madrid" > /etc/timezone
+livecd /etc/portage # emerge --config timezone-data
+
+
+Ready to configure sys-libs/timezone-data-2018d? [Yes/No] Yes
+
+!!! SELinux module not found. Please verify that it was installed.
+ * Updating /etc/localtime with /usr/share/zoneinfo/Europe/Madrid
+
+livecd /etc/portage # 
+```
+
+We've configured local time to our current  zone. Then another type of `emerge` option:
+
+- `--config`: run package specific actions needed to be executed after the emerge process has completed.
+
+```sh
+livecd /etc # cat >> locale.gen <<EOF
+> en_GB ISO-8859-1
+> en_GB.UTF-8 UTF-8
+> EOF
+livecd /etc # cd conf.d
+livecd /etc/conf.d # sed -i 's/keymap="us"/keymap="es"/g' keymaps 
+livecd /etc/conf.d # emerge --verbose --oneshot app-portage/cpuid2cpuflags
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] app-portage/cpuid2cpuflags-5::gentoo  71 KiB
+
+Total: 1 package (1 new), Size of downloads: 71 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Emerging (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
+>>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.00, 0.00, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.08, 0.02, 0.01!!! SELinux module not found. Please verify that it was installed.
+>>> Installing (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
+>>> Jobs: 1 of 1 complete                           Load avg: 0.15, 0.03, 0.01
+
+ * Messages for package app-portage/cpuid2cpuflags-5:
+
+ * Package:    app-portage/cpuid2cpuflags-5
+ * Repository: gentoo
+ * Maintainer: mgorny@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 488 KiB
+ * Final size of installed tree:   44 KiB
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * GNU info directory index is up-to-date.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+livecd /etc/conf.d # cpuid2cpuflags
+CPU_FLAGS_X86: aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3
+livecd /etc/conf.d # cd ../portage/
+livecd /etc/portage # sed -i 's/CPU_FLAGS_X86=.*/CPU_FLAGS_X86="aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3"/g' make.conf
+livecd /etc/portage #
+```
+
+Next we add [english locale](https://en.wikipedia.org/wiki/Locale_(computer_software)) to our chroot subsystem and configure the keymap under `/etc/conf.d` with a `sed` (*stream editor for filtering and transforming text*) command:
+
+- `-i`: in-place (i.e. save back to the original file).
+- `s`: the substitute command.
+- `g`: global (i.e. replace all and not just the first occurrence).
+
+We also install `cpuid2cpuflags` to better identify `CPU_FLAGS_X86` variable depending on what processor are we using. The `sed` command is the same of the one before but the `.*` that is used to substitute all the line beggin with.
+
+Now we're going to bootstrap the Gentoo Linux [toolchain](https://elinux.org/Toolchains):
+
+```sh
+livecd /usr/portage/scripts # ./bootstrap.sh --pretend
+
+Gentoo Linux; http://www.gentoo.org/
+Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
+-------------------------------------------------------------------------------
+  [[ (0/3) Locating packages ]]
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+ * Using baselayout : >=sys-apps/baselayout-2
+ * Using portage    : portage
+ * Using os-headers : >=sys-kernel/linux-headers-4.17
+ * Using binutils   : sys-devel/binutils
+ * Using gcc        : sys-devel/gcc
+ * Using gettext    : gettext
+ * Using libc       : virtual/libc
+ * Using texinfo    : sys-apps/texinfo
+ * Using zlib       : zlib
+ * Using ncurses    : ncurses
+-------------------------------------------------------------------------------
+  [[ (1/3) Configuring environment ]]
+-------------------------------------------------------------------------------
+!!! SELinux module not found. Please verify that it was installed.
+  [[ (2/3) Updating portage ]]
+!!! CONFIG_PROTECT is empty
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
+[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
+[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+
+Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+  [[ (3/3) Emerging packages ]]
+!!! CONFIG_PROTECT is empty
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
+[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
+[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
+[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
+[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
+[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
+
+Total: 8 packages (5 upgrades, 3 reinstalls), Size of downloads: 113,345 KiB
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+livecd /usr/portage/scripts #
+```
+
+With `--pretend` we only visualize the upgoing work.
+
+ From the Sakaki Guide:
+
+> In Gentoo parlance, people speak of three ['stages'](http://en.wikipedia.org/wiki/Gentoo_Linux#Stages) of bootstrapping (and their corresponding file system tarballs):
+>
+> 1. **Stage 1**: When starting from a stage 1 tarball, the base toolchain (GCC, standard C libary etc.) must be built using the existing (binary) host system toolchain, under direction of the /usr/portage/scripts/bootstrap.sh script. This yields a:
+> 2. **Stage 2** system. Here, we still need to emerge (build) the core [@world](https://wiki.gentoo.org/wiki/World_set_(Portage)) package set, using our new toolchain. This yields a:
+> 3. **Stage 3** system, in which the toolchain has been bootstrapped, and the important system binaries and libraries have been compiled using it. A tarball of such a stage 3 system's directories is now provided as a default part of the Gentoo distribution (stage 1 and stage 2 tarballs are not available to end-users anymore).
+>
+> Although we have [already](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Installing_the_Gentoo_Stage_3_Files#download_stage_3_tarball) downloaded a stage 3 tarball, we're going to pretend we haven't, and instead build up from stage 1.
+
+[![asciicast](https://asciinema.org/a/190924.png)](https://asciinema.org/a/190924)
+
+In this rapid *asciicast* we edit `bootstrap.sh` file changing a line of text, explanation by Sakaki:
+
+> The Gentoo [FAQ](https://wiki.gentoo.org/wiki/FAQ#How_do_I_Install_Gentoo_Using_a_Stage1_or_Stage2_Tarball.3F) suggests you may wish to edit the /usr/portage/scripts/bootstrap.sh script after reviewing it - and indeed, we will do so, because there are two 'gotchas' lurking in the above proposed emerge list. The first problem is that the [C standard library](http://en.wikipedia.org/wiki/C_standard_library) that the bootstrap intends to rebuild is a [*virtual*](https://devmanual.gentoo.org/general-concepts/virtuals/) ([virtual/libc](https://packages.gentoo.org/packages/virtual/libc)); however, in Portage, emerging a virtual package does *not*, by default, cause any already-installed package that satisfies that virtual (in our case, [sys-libs/glibc](https://packages.gentoo.org/packages/sys-libs/glibc)) to be rebuilt - which we want.
+
+```sh
+livecd /usr/portage/scripts # ./bootstrap.sh 
+
+Gentoo Linux; http://www.gentoo.org/
+Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
+Starting Bootstrap of base system ...
+-------------------------------------------------------------------------------
+  [[ (0/3) Locating packages ]]
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+!!! SELinux module not found. Please verify that it was installed.
+ * Using baselayout : >=sys-apps/baselayout-2
+ * Using portage    : portage
+ * Using os-headers : >=sys-kernel/linux-headers-4.17
+ * Using binutils   : sys-devel/binutils
+ * Using gcc        : sys-devel/gcc
+ * Using gettext    : gettext
+ * Using libc       : sys-libs/glibc:2.2
+ * Using texinfo    : sys-apps/texinfo
+ * Using zlib       : zlib
+ * Using ncurses    : ncurses
+-------------------------------------------------------------------------------
+  [[ (1/3) Configuring environment ]]
+-------------------------------------------------------------------------------
+!!! SELinux module not found. Please verify that it was installed.
+  [[ (2/3) Updating portage ]]
+!!! CONFIG_PROTECT is empty
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
+[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
+[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+
+Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Emerging (1 of 4) sys-libs/libsepol-2.8::gentoo
+>>> Emerging (2 of 4) dev-lang/swig-3.0.12::gentoo
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.08, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.07, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
+>>> Jobs: 0 of 4 complete, 2 running                Load avg: 1.92, 0.46, 0.14!!! SELinux module not found. Please verify that it was installed.
+>>> Installing (2 of 4) dev-lang/swig-3.0.12::gentoo
+>>> Installing (1 of 4) sys-libs/libsepol-2.8::gentoo
+>>> Emerging (3 of 4) sys-libs/libselinux-2.8::gentoo
+>>> Installing (3 of 4) sys-libs/libselinux-2.8::gentoo
+>>> Emerging (4 of 4) sys-apps/portage-2.3.41::gentoo
+>>> Installing (4 of 4) sys-apps/portage-2.3.41::gentoo
+>>> Jobs: 4 of 4 complete                           Load avg: 2.20, 0.99, 0.37
+
+ * Messages for package dev-lang/swig-3.0.12:
+
+ * Package:    dev-lang/swig-3.0.12
+ * Repository: gentoo
+ * Maintainer: radhermit@gentoo.org scheme@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Skipping make test/check due to ebuild restriction.
+ * Final size of build directory: 52588 KiB (51.3 MiB)
+ * Final size of installed tree:   8212 KiB ( 8.0 MiB)
+
+ * Messages for package sys-libs/libsepol-2.8:
+
+ * Package:    sys-libs/libsepol-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * Skipping make test/check due to ebuild restriction.
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 14300 KiB (13.9 MiB)
+ * Final size of installed tree:   2720 KiB ( 2.6 MiB)
+
+ * Messages for package sys-libs/libselinux-2.8:
+
+ * Package:    sys-libs/libselinux-2.8
+ * Repository: gentoo
+ * Maintainer: selinux@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python python_targets_python2_7 python_targets_python3_5 static-libs userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Will copy sources from /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8-abi_x86_64.amd64
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * python2_7: running building
+ * python3_5: running building
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * python2_7: running installation
+ * python3_5: running installation
+ * Final size of build directory: 8208 KiB (8.0 MiB)
+ * Final size of installed tree:  3740 KiB (3.6 MiB)
+
+ * Messages for package sys-apps/portage-2.3.41:
+
+ * Package:    sys-apps/portage-2.3.41
+ * Repository: gentoo
+ * Maintainer: dev-portage@gentoo.org
+ * Upstream:   dev-portage@gentoo.org
+ * USE:        abi_x86_64 amd64 build elibc_glibc ipc kernel_linux python_targets_python2_7 python_targets_python3_5 selinux userland_GNU xattr
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Adding FEATURES=xattr to make.globals ...
+ * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase distutils-r1_python_compile
+ * python3_5: running distutils-r1_run_phase python_compile_all
+ * python2_7: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install
+ * python3_5: running distutils-r1_run_phase python_install_all
+ * Moving admin scripts to the correct directory
+ * Moving /usr/bin/archive-conf to /usr/sbin/archive-conf
+ * Moving /usr/bin/dispatch-conf to /usr/sbin/dispatch-conf
+ * Moving /usr/bin/emaint to /usr/sbin/emaint
+ * Moving /usr/bin/env-update to /usr/sbin/env-update
+ * Moving /usr/bin/etc-update to /usr/sbin/etc-update
+ * Moving /usr/bin/fixpackages to /usr/sbin/fixpackages
+ * Moving /usr/bin/regenworld to /usr/sbin/regenworld
+ * Final size of build directory: 19728 KiB (19.2 MiB)
+ * Final size of installed tree:  35852 KiB (35.0 MiB)
+ * 
+ * This release of portage NO LONGER contains the repoman code base.
+ * Repoman has its own ebuild and release package.
+ * For repoman functionality please emerge app-portage/repoman
+ * Please report any bugs you may encounter.
+ * 
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * GNU info directory index is up-to-date.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+  [[ (3/3) Emerging packages ]]
+!!! CONFIG_PROTECT is empty
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
+[ebuild     U  ] sys-libs/glibc-2.27-r5:2.2::gentoo [2.26-r7:2.2::gentoo] USE="hardened* (multilib) (selinux*) -audit -caps (-compile-locales) -doc -gd -headers-only -multiarch% -nscd (-profile) -suid -systemtap (-vanilla) (-debug%)" 17,499 KiB
+[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
+[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
+[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
+[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
+
+Total: 8 packages (6 upgrades, 2 reinstalls), Size of downloads: 130,844 KiB
+
+Would you like to merge these packages? [Yes/No] Yes
+>>> Verifying ebuild manifests
+>>> Running pre-merge checks for sys-libs/glibc-2.27-r5
+ * Checking general environment sanity.
+make -j5 -l4 -s glibc-test 
+ * Checking that IA32 emulation is enabled in the running kernel ...                             [ ok ]
+ * Checking gcc for __thread support ...                                                         [ ok ]
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...                               [ ok ]
+ * Checking linux-headers version (4.13.0 >= 3.2.0) ...                                          [ ok ]
+>>> Running pre-merge checks for sys-devel/gcc-7.3.0-r3
+>>> Emerging (1 of 8) sys-kernel/linux-headers-4.17::gentoo
+>>> Installing (1 of 8) sys-kernel/linux-headers-4.17::gentoo
+>>> Emerging (2 of 8) sys-libs/glibc-2.27-r5::gentoo
+>>> Installing (2 of 8) sys-libs/glibc-2.27-r5::gentoo
+>>> Emerging (3 of 8) sys-apps/baselayout-2.6::gentoo
+>>> Installing (3 of 8) sys-apps/baselayout-2.6::gentoo
+>>> Emerging (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Installing (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
+>>> Emerging (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
+>>> Installing (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
+>>> Emerging (6 of 8) sys-devel/binutils-2.30-r3::gentoo
+>>> Installing (6 of 8) sys-devel/binutils-2.30-r3::gentoo
+>>> Emerging (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Jobs: 6 of 8 complete, 1 running                Load avg: 2.41, 3.27, 3.58
+>>> Installing (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
+>>> Emerging (8 of 8) sys-apps/texinfo-6.5::gentoo
+>>> Installing (8 of 8) sys-apps/texinfo-6.5::gentoo
+>>> Jobs: 8 of 8 complete                           Load avg: 1.60, 2.71, 3.27
+
+ * Messages for package sys-libs/glibc-2.27-r5:
+
+ * Package:    sys-libs/glibc-2.27-r5
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Checking general environment sanity.
+ * Checking that IA32 emulation is enabled in the running kernel ...
+ * Checking gcc for __thread support ...
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
+ * Checking linux-headers version (4.13.0 >= 3.2.0) ...
+
+ * Messages for package sys-devel/gcc-7.3.0-r3:
+
+ * Package:    sys-devel/gcc-7.3.0-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+
+ * Messages for package sys-kernel/linux-headers-4.17:
+
+ * Package:    sys-kernel/linux-headers-4.17
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying 00_all_0001-linux-stat.h-remove-__GLIBC__-checks.patch ...
+ * Applying 00_all_0002-netfilter-pull-in-limits.h.patch ...
+ * Applying 00_all_0003-convert-PAGE_SIZE-usage.patch ...
+ * Applying 00_all_0004-asm-generic-fcntl.h-namespace-kernel-file-structs.patch ...
+ * Applying 00_all_0005-unifdef-drop-unused-errno.h-include.patch ...
+ * Applying 00_all_0006-x86-do-not-build-relocs-tool-when-installing-headers.patch ...
+ * Applying 00_all_0007-netlink-drop-int-cast-on-length-arg-in-NLMSG_OK.patch ...
+ * Applying 00_all_0008-uapi-fix-System-V-buf-header-includes.patch ...
+ * Final size of build directory: 70664 KiB (69.0 MiB)
+ * Final size of installed tree:   6764 KiB ( 6.6 MiB)
+
+ * Messages for package sys-libs/glibc-2.27-r5:
+
+ * Package:    sys-libs/glibc-2.27-r5
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Checking that IA32 emulation is enabled in the running kernel ...
+ * Checking gcc for __thread support ...
+ * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
+ * Checking linux-headers version (4.17.0 >= 3.2.0) ...
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Applying Gentoo Glibc Patchset 2.27-2
+ * Applying patches from /var/tmp/portage/sys-libs/glibc-2.27-r5/work/patches ...
+ *   0001-Gentoo-disable-ldconfig-during-install.patch ...
+ *   0002-Gentoo-support-running-tests-under-sandbox.patch ...
+ *   0004-Revert-sysdeps-posix-getaddrinfo.c-gaih_inet-Only-us.patch ...
+ *   0005-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
+ *   0006-libidn-libidn-punycode.c-decode_digit-Fix-integer-ov.patch ...
+ *   0007-libidn-Fix-out-of-bounds-stack-read.-Report-and-patc.patch ...
+ *   0009-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
+ *   0010-Gentoo-Disable-test-that-fails-because-of-the-gethos.patch ...
+ *   0011-sparc-Check-PIC-instead-of-SHARED-in-start.S.patch ...
+ *   0012-sys-types.h-drop-sys-sysmacros.h-include.patch ...
+ *   0014-Record-CVE-2018-6551-in-NEWS-and-ChangeLog-BZ-22774.patch ...
+ *   0015-sparc-Check-PIC-instead-of-SHARED-in-start.S-BZ-2263.patch ...
+ *   0016-NEWS-add-an-entry-for-bug-22638.patch ...
+ *   0017-Add-a-missing-ChangeLog-item-in-commit-371b220f620.patch ...
+ *   0018-Linux-use-reserved-name-__key-in-pkey_get-BZ-22797.patch ...
+ *   0019-RISC-V-Fix-parsing-flags-in-ELF64-files.patch ...
+ *   0020-Update-SH-libm-tests-ulps.patch ...
+ *   0021-et_EE-Add-missing-reorder-end-keyword-bug-22861.patch ...
+ *   0022-NEWS-add-an-entry-for-bug-22827.patch ...
+ *   0023-linux-aarch64-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
+ *   0024-time-Reference-CLOCKS_PER_SEC-in-clock-comment-BZ-22.patch ...
+ *   0025-Fix-posix-tst-glob_lstat_compat-on-alpha-BZ-22818.patch ...
+ *   0026-manual-Fix-Texinfo-warnings-about-improper-node-name.patch ...
+ *   0027-manual-Fix-a-syntax-error.patch ...
+ *   0028-manual-Improve-documentation-of-get_current_dir_name.patch ...
+ *   0029-powerpc-Fix-TLE-build-for-SPE-BZ-22926.patch ...
+ *   0030-sparc32-Add-nop-before-__startcontext-to-stop-unwind.patch ...
+ *   0031-NEWS-add-entries-for-bugs-22919-and-22926.patch ...
+ *   0032-manual-Document-missing-feature-test-macros.patch ...
+ *   0033-manual-Update-the-_ISOC99_SOURCE-description.patch ...
+ *   0034-Fix-a-typo-in-a-comment.patch ...
+ *   0035-Add-missing-reorder-end-in-LC_COLLATE-of-et_EE-BZ-22.patch ...
+ *   0036-powerpc-Undefine-Linux-ptrace-macros-that-conflict-w.patch ...
+ *   0037-linux-powerpc-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
+ *   0038-BZ-22342-Fix-netgroup-cache-keys.patch ...
+ *   0039-Fix-multiple-definitions-of-__nss_-_database-bug-229.patch ...
+ *   0040-i386-Fix-i386-sigaction-sa_restorer-initialization-B.patch ...
+ *   0041-Update-translations-from-the-Translation-Project.patch ...
+ *   0042-ca_ES-locale-Update-LC_TIME-bug-22848.patch ...
+ *   0043-lt_LT-locale-Update-abbreviated-month-names-bug-2293.patch ...
+ *   0044-Greek-el_CY-el_GR-locales-Introduce-ab_alt_mon-bug-2.patch ...
+ *   0045-cs_CZ-locale-Add-alternative-month-names-bug-22963.patch ...
+ *   0046-NEWS-Add-entries-for-bugs-22848-22932-22937-22963.patch ...
+ *   0047-RISC-V-Do-not-initialize-gp-in-TLS-macros.patch ...
+ *   0048-RISC-V-fmax-fmin-Handle-signalling-NaNs-correctly.patch ...
+ *   0049-Update-ChangeLog-for-BZ-22884-riscv-fmax-fmin.patch ...
+ *   0050-Fix-i386-memmove-issue-bug-22644.patch ...
+ *   0051-Linux-i386-tst-bz21269-triggers-SIGBUS-on-some-kerne.patch ...
+ *   0052-RISC-V-fix-struct-kernel_sigaction-to-match-the-kern.patch ...
+ *   0053-Add-tst-sigaction.c-to-test-BZ-23069.patch ...
+ *   0054-Fix-signed-integer-overflow-in-random_r-bug-17343.patch ...
+ *   0055-Fix-crash-in-resolver-on-memory-allocation-failure-b.patch ...
+ *   0056-getlogin_r-return-early-when-linux-sentinel-value-is.patch ...
+ *   0057-Update-RWF_SUPPORTED-for-Linux-kernel-4.16-BZ-22947.patch ...
+ *   0058-manual-Move-mbstouwcs-to-an-example-C-file.patch ...
+ *   0059-manual-Various-fixes-to-the-mbstouwcs-example-and-mb.patch ...
+ *   0060-resolv-Fully-initialize-struct-mmsghdr-in-send_dg-BZ.patch ...
+ *   0061-Add-PTRACE_SECCOMP_GET_METADATA-from-Linux-4.16-to-s.patch ...
+ *   0062-Fix-blocking-pthread_join.-BZ-23137.patch ...
+ *   0063-Fix-stack-overflow-with-huge-PT_NOTE-segment-BZ-2041.patch ...
+ *   0064-Fix-path-length-overflow-in-realpath-BZ-22786.patch ...
+ *   0065-NEWS-add-entries-for-bugs-17343-20419-22644-22786-22.patch ...
+ *   0066-gd_GB-Fix-typo-in-abbreviated-May-bug-23152.patch ...
+ *   0067-sunrpc-Remove-stray-exports-without-enable-obsolete-.patch ...
+ * Done.
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating scripts/config.sub
+ *   Updating scripts/config.guess
+ * Adjusting to prefix /
+ *   locale-gen ...
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running do_src_configure for ABI x86
+ * Configuring glibc for nptl
+ *             ABI:   x86
+ *          CBUILD:   x86_64-pc-linux-gnu
+ *           CHOST:   x86_64-pc-linux-gnu
+ *         CTARGET:   x86_64-pc-linux-gnu
+ *      CBUILD_OPT:   i686-pc-linux-gnu
+ *     CTARGET_OPT:   i686-pc-linux-gnu
+ *              CC:   x86_64-pc-linux-gnu-gcc -m32
+ *             CXX:   
+ *              LD:   
+ *         ASFLAGS:   
+ *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *        CPPFLAGS:   
+ *        CXXFLAGS:   -O2 -fno-strict-aliasing
+ *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
+ *        MAKEINFO:   /dev/null
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
+ *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running do_src_configure for ABI amd64
+ * Configuring glibc for nptl
+ *             ABI:   amd64
+ *          CBUILD:   x86_64-pc-linux-gnu
+ *           CHOST:   x86_64-pc-linux-gnu
+ *         CTARGET:   x86_64-pc-linux-gnu
+ *      CBUILD_OPT:   x86_64-pc-linux-gnu
+ *     CTARGET_OPT:   x86_64-pc-linux-gnu
+ *              CC:   x86_64-pc-linux-gnu-gcc -m64
+ *             CXX:   
+ *              LD:   
+ *         ASFLAGS:   
+ *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *        CPPFLAGS:   
+ *        CXXFLAGS:   -O2 -fno-strict-aliasing
+ *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
+ *        MAKEINFO:   /dev/null
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
+ *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running do_src_compile for ABI x86
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running do_src_compile for ABI amd64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
+ * Running glibc_do_src_install for ABI x86
+ *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
+ * Running glibc_do_src_install for ABI amd64
+ * Final size of build directory: 552612 KiB (539.6 MiB)
+ * Final size of installed tree:   69248 KiB ( 67.6 MiB)
+ * Defaulting /etc/host.conf:multi to on
+ * Generating all locales; edit /etc/locale.gen to save time/space
+
+ * Messages for package sys-apps/baselayout-2.6:
+
+ * Package:    sys-apps/baselayout-2.6
+ * Repository: gentoo
+ * Maintainer: williamh@gentoo.org base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux split-usr userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 220 KiB
+ * Final size of installed tree:  168 KiB
+ * You should reboot now to get /run mounted with tmpfs!
+ * Please run env-update then log out and back in to
+ * update your path.
+
+ * Messages for package sys-libs/zlib-1.2.11-r2:
+
+ * Package:    sys-libs/zlib-1.2.11-r2
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying zlib-1.2.11-fix-deflateParams-usage.patch ...
+ * Applying zlib-1.2.11-minizip-drop-crypt-header.patch ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Final size of build directory: 4676 KiB (4.5 MiB)
+ * Final size of installed tree:   492 KiB
+
+ * Messages for package sys-devel/gettext-0.19.8.1:
+
+ * Package:    sys-devel/gettext-0.19.8.1
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying gettext-0.19.7-disable-libintl.patch ...
+ * Applying gettext-0.19.8.1-format-security.patch ...
+ * Removing useless C++ checks ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+ * Removing unnecessary /usr/lib64/libgettextpo.la (requested)
+ * Removing unnecessary /usr/lib64/libasprintf.la (requested)
+ * Removing unnecessary /usr/lib64/libgettextsrc.la (requested)
+ * Removing unnecessary /usr/lib64/libgettextlib.la (requested)
+ * Final size of build directory: 128212 KiB (125.2 MiB)
+ * Final size of installed tree:   10364 KiB ( 10.1 MiB)
+ * QA Notice: Missing soname symlink(s):
+ * 
+ * 	usr/lib64/libgnuintl.so.8 -> preloadable_libintl.so
+ * 
+
+ * Messages for package sys-devel/binutils-2.30-r3:
+
+ * Package:    sys-devel/binutils-2.30-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying binutils-2.30 patchset 3
+ * Applying 0001-Gentoo-ld-always-warn-about-textrels-in-files.patch ...
+ * Applying 0002-Gentoo-gold-ld-add-support-for-poisoned-system-direc.patch ...
+ * Applying 0003-Gentoo-ld-enable-new-dtags-by-default-for-linux-gnu-.patch ...
+ * Applying 0004-Gentoo-libiberty-install-PIC-version-of-libiberty.a.patch ...
+ * Applying 0005-Gentoo-opcodes-link-against-libbfd.la-for-rpath-deps.patch ...
+ * Applying 0007-Gentoo-Adapt-the-testsuite-to-our-enhanced-textrel-w.patch ...
+ * Applying 0008-Gentoo-Adapt-the-test-suite-to-our-changed-hash-styl.patch ...
+ * Applying 0009-Gentoo-We-can-t-test-for-textrel-warnings-if-we-regs.patch ...
+ * Applying 0010-Gentoo-Disable-failing-test-ld-x86-64-x86-64.exp-pie.patch ...
+ * Applying 0011-Revert-to-development-on-the-2.30-branch.-Set-the-ve.patch ...
+ * Applying 0013-Gentoo-Disable-another-test-that-checks-for-textrel-.patch ...
+ * Applying 0014-Gentoo-Disable-gold-test-suite-since-it-still-always.patch ...
+ * Applying 0015-Automatic-date-update-in-version.in.patch ...
+ * Applying 0016-Update-Russian-translation-for-the-gas-sub-directory.patch ...
+ * Applying 0017-Automatic-date-update-in-version.in.patch ...
+ * Applying 0018-Add-support-for-DWARF-4-line-number-tables.patch ...
+ * Applying 0019-Automatic-date-update-in-version.in.patch ...
+ * Applying 0020-Import-patch-from-mainline-to-remove-PROVODE-qualifi.patch ...
+ * Applying 0021-Updated-Brazillian-portuguese-and-Russian-translatio.patch ...
+ * Applying 0022-PR22764-LD-AARCH64-Allow-R_AARCH64_ABS16-and-R_AARCH.patch ...
+ * Applying 0023-Automatic-date-update-in-version.in.patch ...
+ * Applying 0024-Revert-PowerPC-PLT-speculative-execution-barriers.patch ...
+ * Applying 0025-Automatic-date-update-in-version.in.patch ...
+ * Applying 0026-Import-patch-from-mainline-to-fix-possible-seg-fault.patch ...
+ * Applying 0027-Fix-GOT-relocation-overflow-on-SPARC.patch ...
+ * Applying 0028-Fix-PR-gas-22738-.dc.a-directive-has-wrong-size-on-S.patch ...
+ * Applying 0029-Updated-Russian-translation-for-the-gas-sub-director.patch ...
+ * Applying 0030-gas-xtensa-fix-trampoline-placement.patch ...
+ * Applying 0031-PR-ld-22832-on-SPARC.patch ...
+ * Applying 0032-Import-patch-from-mainline-to-fix-a-bug-that-would-p.patch ...
+ * Applying 0033-Fix-AArch32-build-attributes-for-Armv8.4-A.patch ...
+ * Applying 0034-Import-patch-from-mainline-to-fix-memory-corruption-.patch ...
+ * Applying 0035-Automatic-date-update-in-version.in.patch ...
+ * Applying 0036-Gentoo-Restore-TEXTREL-warnings-for-non-shared-objec.patch ...
+ * Applying 0037-Gentoo-Properly-ignore-new-textrel-warnings-in-tests.patch ...
+ * Applying 0038-Gentoo-We-can-t-test-for-textrel-warnings-if-we-igno.patch ...
+ * Applying 0039-Updated-Russian-translation-for-the-gas-sub-director.patch ...
+ * Applying 0040-Enable-link-time-garbage-collection-for-the-IA64-tar.patch ...
+ * Applying 0041-IA-64-Fix-linker-error-with-no-keep-memory.patch ...
+ * Applying 0042-GC-Also-check-the-local-debug-definition-section.patch ...
+ * Applying 0043-ARM-Fix-bxns-mask.patch ...
+ * Applying 0044-PR22836-r-s-doesn-t-work-with-g3-using-GCC-7.patch ...
+ * Applying 0045-PR22836-testcases.patch ...
+ * Applying 0046-Set-non_ir_ref_dynamic-if-a-symbol-is-made-dynamic.patch ...
+ * Applying 0047-ld-testsuite-XFAIL-pr20995-2-on-aarch64-elf.patch ...
+ * Applying 0048-Remove-unnecessary-power9-group-terminating-nop.patch ...
+ * Applying 0049-Really-remove-unnecessary-power9-group-terminating-n.patch ...
+ * Applying 0050-PowerPC64-debian-bug-886264-out-of-line-save-restore.patch ...
+ * Applying 0051-x86-64-Add-ENDBR64-to-the-TLSDESC-PLT-entry.patch ...
+ * Applying 0052-gold-testsuite-Fix-bad-regexp-in-split_x86_64.sh.patch ...
+ * Applying 0053-PR-ld-22972-on-SPARC.patch ...
+ * Applying 0054-Fix-case-where-IR-file-provides-symbol-visibility-bu.patch ...
+ * Applying 0055-Automatic-date-update-in-version.in.patch ...
+ * Applying 0056-Import-patch-from-the-mainline-that-fixes-the-ARM-as.patch ...
+ * Applying 0057-i386-Clear-vex-instead-of-vex.evex.patch ...
+ * Applying 0058-Import-patch-from-mainline-sources-to-stop-the-linke.patch ...
+ * Applying 0059-Updated-Spanish-and-Russian-translations-for-the-gas.patch ...
+ * Applying 0060-Updated-Spanish-translations-for-the-gold-and-gprof-.patch ...
+ * Applying 0061-Updated-Spanish-translation-for-gas-sub-directory.patch ...
+ * Applying 0062-x86-Remove-the-unused-_GLOBAL_OFFSET_TABLE_.patch ...
+ * Applying 0063-x86-Keep-the-unused-_GLOBAL_OFFSET_TABLE_-for-Solari.patch ...
+ * Applying 0064-x86-Add-is_solaris-to-elf_x86_target_os.patch ...
+ * Applying 0065-Fix-the-mask-for-the-sqrdml-a-s-h-instructions.patch ...
+ * Applying 0066-PR23123-PowerPC32-ifunc-regression.patch ...
+ * Applying 0067-Automatic-date-update-in-version.in.patch ...
+ * Applying 0068-Prevent-attempts-to-call-strncpy-with-a-zero-length-.patch ...
+ * Applying 0069-PR22769-crash-when-running-32-bit-objdump-on-corrupt.patch ...
+ * Applying 0070-PR22887-null-pointer-dereference-in-aout_32_swap_std.patch ...
+ * Applying 0071-Prevent-illegal-memory-accesses-triggerd-by-intger-o.patch ...
+ * Applying 0072-Catch-integer-overflows-underflows-when-parsing-corr.patch ...
+ * Applying 0073-Fix-potential-integer-overflow-when-reading-corrupt-.patch ...
+ * Applying 0074-PR22741-objcopy-segfault-on-fuzzed-COFF-object.patch ...
+ * Applying 0075-Add-new-Portuguese-translation-for-the-bfd-sub-direc.patch ...
+ * Applying 0076-Fix-uninitialised-memory-acccess-in-COFF-bfd-backend.patch ...
+ * Applying 0077-Fix-disassembly-mask-for-vector-sdot-on-AArch64.patch ...
+ * Applying 0078-PR23199-Invalid-SHT_GROUP-entry-leads-to-group-confu.patch ...
+ * Applying 0079-x86-Don-t-set-eh-local_ref-to-1-for-linker-defined-s.patch ...
+ * Applying 0080-x86-Don-t-set-eh-local_ref-to-1-for-versioned-symbol.patch ...
+ * Applying 0081-Mark-section-in-a-section-group-with-SHF_GROUP.patch ...
+ * Applying 0082-Automatic-date-update-in-version.in.patch ...
+ * Applying 0083-Add-an-option-no-warn-shared-textrel-self-explanator.patch ...
+ * Applying 0084-Revert-Gentoo-Adapt-the-testsuite-to-our-enhanced-te.patch ...
+ * Applying 0085-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
+ * Applying 0086-Revert-Gentoo-Disable-failing-test-ld-x86-64-x86-64..patch ...
+ * Applying 0087-Revert-Gentoo-Disable-another-test-that-checks-for-t.patch ...
+ * Applying 0088-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
+ * Applying 0089-Pass-no-warn-shared-textrel-to-ld-in-its-testsuite.patch ...
+ * Applying 0090-Fix-test-for-precise-textrel-warning-message.patch ...
+ * Applying 0091-Fix-the-PR22983-test-so-that-it-will-work-regardless.patch ...
+ * Applying 0092-x86-64-Add-TLSDESC-fields-to-elf_x86_lazy_plt_layout.patch ...
+ * Applying 0093-Automatic-date-update-in-version.in.patch ...
+ * Applying 9999-Gentoo-We-make-a-release.patch ...
+ * Fixing misc issues in configure files
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating config.sub
+ *   Updating config.guess
+ *  CATEGORY: sys-devel
+ *    CBUILD: x86_64-pc-linux-gnu
+ *     CHOST: x86_64-pc-linux-gnu
+ *   CTARGET: x86_64-pc-linux-gnu
+ *    CFLAGS: -march=sandybridge -O2 -pipe
+ *   LDFLAGS: -Wl,-O1 -Wl,--as-needed
+ * Final size of build directory: 461180 KiB (450.3 MiB)
+ * Final size of installed tree:   59528 KiB ( 58.1 MiB)
+
+ * Messages for package sys-devel/gcc-7.3.0-r3:
+
+ * Package:    sys-devel/gcc-7.3.0-r3
+ * Repository: gentoo
+ * Maintainer: toolchain@gentoo.org
+ * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Applying Gentoo patches ...
+ *   10_all_default-fortify-source.patch ...
+ *   11_all_default-warn-format-security.patch ...
+ *   12_all_default-warn-trampolines.patch ...
+ *   13_all_default-ssp-fix.patch ...
+ *   25_all_alpha-mieee-default.patch ...
+ *   34_all_ia64_note.GNU-stack.patch ...
+ *   50_all_libiberty-asprintf.patch ...
+ *   51_all_libiberty-pic.patch ...
+ *   54_all_nopie-all-flags.patch ...
+ *   55_all_extra-options.patch ...
+ *   90_all_pr55930-dependency-tracking.patch ...
+ *   91_all_bmi-i386-PR-target-81763.patch ...
+ *   92_all_sh-drop-sysroot-suffix.patch ...
+ *   93_all_copy-constructible-fix.patch ...
+ * Done with patching
+ * Updating gcc to use automatic PIE building ...
+ * Updating gcc to use automatic SSP building ...
+ * updating multilib directories to be: ../lib64 ../lib32
+ * Using GNU config files from /usr/share/gnuconfig
+ *   Updating config.sub
+ *   Updating config.guess
+ * Fixing misc issues in configure files
+ * Applying gcc-configure-texinfo.patch ...
+ * Touching generated files
+ * CFLAGS="-march=sandybridge -O2 -pipe"
+ * CXXFLAGS=""
+ * LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+ * PREFIX:          /usr
+ * BINPATH:         /usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0
+ * LIBPATH:         /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0
+ * DATAPATH:        /usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0
+ * STDCXX_INCDIR:   /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7
+ * Languages:       c,c++
+ * Configuring GCC with: 
+ * 	--host=x86_64-pc-linux-gnu 
+ * 	--build=x86_64-pc-linux-gnu 
+ * 	--prefix=/usr 
+ * 	--bindir=/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0 
+ * 	--includedir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include 
+ * 	--datadir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0 
+ * 	--mandir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/man 
+ * 	--infodir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/info 
+ * 	--with-gxx-include-dir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7 
+ * 	--with-python-dir=/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/python 
+ * 	--enable-languages=c,c++ 
+ * 	--enable-obsolete 
+ * 	--enable-secureplt 
+ * 	--disable-werror 
+ * 	--with-system-zlib 
+ * 	--enable-nls 
+ * 	--without-included-gettext 
+ * 	--enable-checking=release 
+ * 	--with-bugurl=https://bugs.gentoo.org/ 
+ * 	--with-pkgversion=Gentoo Hardened 7.3.0-r3 p1.4 
+ * 	--enable-esp 
+ * 	--enable-libstdcxx-time 
+ * 	--disable-libstdcxx-pch 
+ * 	--enable-shared 
+ * 	--enable-threads=posix 
+ * 	--enable-__cxa_atexit 
+ * 	--enable-clocale=gnu 
+ * 	--enable-multilib 
+ * 	--with-multilib-list=m32,m64 
+ * 	--disable-altivec 
+ * 	--disable-fixed-point 
+ * 	--enable-targets=all 
+ * 	--disable-libgomp 
+ * 	--disable-libmudflap 
+ * 	--disable-libssp 
+ * 	--disable-libcilkrts 
+ * 	--disable-libmpx 
+ * 	--disable-vtable-verify 
+ * 	--disable-libvtv 
+ * 	--disable-libquadmath 
+ * 	--enable-lto 
+ * 	--without-isl 
+ * 	--disable-libsanitizer 
+ * 	--enable-default-pie 
+ * 	--enable-default-ssp
+ * Compiling gcc (bootstrap-lean)...
+ * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1 with setfattr
+ * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1plus with setfattr
+ * Final size of build directory: 1209936 KiB (  1.1 GiB)
+ * Final size of installed tree:   137816 KiB (134.5 MiB)
+ * If you have issues with packages unable to locate libstdc++.la,
+ * then try running 'fix_libtool_files.sh' on the old gcc versions.
+ * You might want to review the GCC upgrade guide when moving between
+ * major versions (like 4.2 to 4.3):
+ * https://wiki.gentoo.org/wiki/Upgrading_GCC
+
+ * Messages for package sys-apps/texinfo-6.5:
+
+ * Package:    sys-apps/texinfo-6.5
+ * Repository: gentoo
+ * Maintainer: base-system@gentoo.org
+ * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls userland_GNU
+ * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
+ * Final size of build directory: 93668 KiB (91.4 MiB)
+ * Final size of installed tree:   6980 KiB ( 6.8 MiB)
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * Regenerating GNU info directory index...
+ * Processed 89 info files.
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+-------------------------------------------------------------------------------
+!!! CONFIG_PROTECT is empty
+!!! You have no world file.
+
+Calculating dependencies... done!
+  sys-devel/gcc-7.3.0-r3 pulled in by:
+    @system requires sys-devel/gcc
+    sys-libs/glibc-2.27-r5 requires >=sys-devel/gcc-4.9
+
+>>> No packages selected for removal by prune
+>>> To ignore dependencies, use --nodeps
+-------------------------------------------------------------------------------
+ * Please note that you should now add the '-e' option for emerge system:
+
+ *   # emerge -e system
+
+livecd /usr/portage/scripts #
+
+```
+
+So with the `bootstrap.sh` script we've recompiled [Gentoo stage 2 toolchain](https://en.wikipedia.org/wiki/Gentoo_Linux#Stages). 
+
+Now with the *new toolchain* we're going recompile all the stage 3:
+
+*full output [here](https://raw.githubusercontent.com/noplacenoaddress/gentoo-integrity/master/emerge-stage3.txt)*
+
+```fsharp
+livecd /usr/portage/scripts # emerge --emptytree --with-bdeps=y @world
+
+ * IMPORTANT: 13 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild   R    ] virtual/libintl-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-lang/python-exec-2.4.6:2::gentoo [2.4.5:2::gentoo] PYTHON_TARGETS="(jython2_7) (pypy) (pypy3) (python2_7) (python3_4) (python3_5) (python3_6) (python3_7%*)" 86 KiB
+[ebuild     U  ] sys-libs/ncurses-6.1-r3:0/6::gentoo [6.1-r2:0/6::gentoo] USE="cxx unicode -ada -debug -doc -gpm -minimal (-profile) -static-libs {-test} -threads -tinfo -trace" ABI_X86="(64) -32 (-x32)" 3287 KiB
+[ebuild   R    ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-arch/bzip2-1.0.6-r9:0/1::gentoo  USE="-static -static-libs" ABI_X86="(64) -32 (-x32)" 764 KiB
+[ebuild     U  ] sys-devel/gnuconfig-20180101::gentoo [20170101::gentoo] 51 KiB
+[ebuild   R    ] sys-apps/gentoo-functions-0.12::gentoo  12 KiB
+[ebuild   R    ] virtual/libiconv-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-misc/c_rehash-1.7-r1::gentoo  5 KiB
+[ebuild   R    ] app-misc/mime-types-9::gentoo  16 KiB
+[ebuild     U  ] app-arch/gzip-1.9::gentoo [1.8::gentoo] USE="-pic -static" 745 KiB
+[ebuild     U  ] sys-apps/debianutils-4.8.6::gentoo [4.8.3::gentoo] USE="installkernel%* -static" 153 KiB
+[ebuild   R    ] app-misc/editor-wrapper-4::gentoo  0 KiB
+[ebuild  N     ] dev-libs/ustr-1.0.4-r8::gentoo  USE="-static-libs -ustr-import" ABI_X86="(64) -32 (-x32)" 229 KiB
+[ebuild   R    ] net-libs/libmnl-1.0.4:0/0.2.0::gentoo  USE="-examples -static-libs" 295 KiB
+[ebuild   R    ] app-text/manpager-1::gentoo  0 KiB
+[ebuild   R    ] app-crypt/openpgp-keys-gentoo-release-20180706::gentoo  USE="{-test}" 0 KiB
+[ebuild     U  ] sys-apps/install-xattr-0.5-r1::gentoo [0.5::gentoo] 16 KiB
+[ebuild   R    ] sys-apps/baselayout-2.6::gentoo  USE="split-usr -build" 0 KiB
+[ebuild   R    ] sys-apps/which-2.21::gentoo  146 KiB
+[ebuild   R    ] app-text/sgml-common-0.6.3-r6::gentoo  126 KiB
+[ebuild   R    ] sys-devel/autoconf-wrapper-13-r1::gentoo  0 KiB
+[ebuild     U  ] sys-devel/automake-wrapper-11::gentoo [10::gentoo] 0 KiB
+[ebuild     U  ] dev-util/gperf-3.1::gentoo [3.0.4::gentoo] 1188 KiB
+[ebuild     U  ] sys-devel/gcc-config-1.9.1::gentoo [1.8-r1::gentoo] 18 KiB
+[ebuild     U  ] sys-libs/timezone-data-2018e::gentoo [2018d::gentoo] USE="nls -leaps_timezone" 572 KiB
+[ebuild     U  ] sys-devel/binutils-config-5.1-r1::gentoo [5-r4::gentoo] 0 KiB
+[ebuild  N     ] sys-apps/semodule-utils-2.8::gentoo  13 KiB
+[ebuild   R    ] app-arch/unzip-6.0_p21-r2::gentoo  USE="bzip2 unicode -natspec" 1362 KiB
+[ebuild     U  ] virtual/os-headers-0-r1::gentoo [0::gentoo] 0 KiB
+[ebuild   R    ] virtual/pam-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/udev-217::gentoo  USE="(-systemd)" 0 KiB
+[ebuild   R    ] sys-fs/udev-init-scripts-32::gentoo  4 KiB
+[ebuild   R    ] virtual/dev-manager-0-r1::gentoo  0 KiB
+[ebuild   R    ] virtual/acl-0-r2::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/libffi-3.0.13-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] virtual/man-0-r1::gentoo  0 KiB
+[ebuild   R    ] sys-apps/man-pages-posix-2013a::gentoo  909 KiB
+[ebuild     U  ] sys-apps/man-pages-4.16::gentoo [4.14::gentoo] USE="nls" L10N="-da -de -fr -it -ja -nl -pl -ru -zh-CN" 1597 KiB
+[ebuild   R    ] virtual/shadow-0::gentoo  0 KiB
+[ebuild   R    ] app-eselect/eselect-python-20171204::gentoo  46 KiB
+[ebuild   R    ] virtual/tmpfiles-0::gentoo  0 KiB
+[ebuild   R    ] app-eselect/eselect-pinentry-0.7::gentoo  0 KiB
+[ebuild   R    ] virtual/mta-1::gentoo  0 KiB
+[ebuild   R    ] virtual/logger-0::gentoo  0 KiB
+[ebuild   R    ] virtual/pkgconfig-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] sys-libs/readline-7.0_p5:0/7::gentoo [7.0_p3:0/7::gentoo] USE="-static-libs -utils" ABI_X86="(64) -32 (-x32)" 2851 KiB
+[ebuild     U  ] sys-apps/hwids-20180518::gentoo [20171003::gentoo] USE="net pci udev usb" 3077 KiB
+[ebuild     U  ] dev-libs/libpipeline-1.5.0::gentoo [1.4.2::gentoo] USE="-static-libs {-test}" 810 KiB
+[ebuild   R    ] sys-apps/kbd-2.0.4::gentoo  USE="nls pam {-test}" 1008 KiB
+[ebuild     U  ] app-shells/bash-4.4_p23::gentoo [4.4_p12::gentoo] USE="net nls (readline) -afs -bashlogger -examples -mem-scramble -plugins" 9209 KiB
+[ebuild     U  ] net-misc/netifrc-0.6.0::gentoo [0.5.1::gentoo] 82 KiB
+[ebuild   R    ] app-text/docbook-xml-dtd-4.1.2-r6:4.1.2::gentoo  74 KiB
+[ebuild   R    ] app-text/docbook-xsl-stylesheets-1.79.1-r2::gentoo  USE="-ruby" 21454 KiB
+[ebuild   R    ] virtual/yacc-0::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-File-Temp-0.230.400-r5::gentoo  0 KiB
+[ebuild     U  ] app-admin/perl-cleaner-2.26-r1::gentoo [2.25::gentoo] 8 KiB
+[ebuild     U  ] app-arch/xz-utils-5.2.4-r2::gentoo [5.2.3::gentoo] USE="extra-filters nls threads -static-libs" ABI_X86="(64) -32 (-x32)" 1536 KiB
+[ebuild     U  ] app-portage/elt-patches-20170826.1::gentoo [20170815::gentoo] 28 KiB
+[ebuild     U  ] sys-devel/m4-1.4.18::gentoo [1.4.17::gentoo] USE="-examples" 1180 KiB
+[ebuild   R    ] dev-libs/libltdl-2.4.6::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 951 KiB
+[ebuild   R    ] sys-libs/zlib-1.2.11-r2:0/1::gentoo  USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-libs/gmp-6.1.2-r1:0/10.4::gentoo [6.1.2:0/10.4::gentoo] USE="asm cxx -doc -static-libs (-pgo%)" ABI_X86="(64) -32 (-x32)" 1901 KiB
+[ebuild   R    ] dev-libs/libunistring-0.9.10:0/2::gentoo  USE="-doc -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-libs/libffi-3.2.1-r2::gentoo [3.2.1::gentoo] USE="-debug -pax_kernel -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 919 KiB
+[ebuild   R    ] dev-libs/npth-1.5::gentoo  USE="-static-libs" 0 KiB
+[ebuild     U  ] dev-libs/libpcre-8.42:3::gentoo [8.41-r1:3::gentoo] USE="bzip2 cxx readline recursion-limit (static-libs) (unicode) zlib -jit* -libedit -pcre16 -pcre32" ABI_X86="(64) -32 (-x32)" 1534 KiB
+[ebuild   R    ] sys-apps/file-5.33-r2::gentoo  USE="zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 798 KiB
+[ebuild   R    ] sys-libs/cracklib-2.9.6-r1::gentoo  USE="nls zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 628 KiB
+[ebuild     U  ] dev-libs/mpfr-4.0.1:0/6::gentoo [3.1.6:0/4::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 1380 KiB
+[ebuild     U  ] sys-apps/kmod-25::gentoo [24::gentoo] USE="tools zlib -debug -doc -lzma -python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 533 KiB
+[ebuild     U  ] sys-apps/less-531::gentoo [529::gentoo] USE="pcre unicode" 333 KiB
+[ebuild     U  ] dev-libs/mpc-1.1.0-r1:0/3::gentoo [1.0.3:0/0::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 685 KiB
+[ebuild   R    ] app-admin/metalog-3-r2::gentoo  USE="unicode" 0 KiB
+[ebuild   R    ] virtual/modutils-0::gentoo  0 KiB
+[ebuild   R    ] dev-lang/swig-3.0.12::gentoo  USE="pcre* -ccache -doc" 0 KiB
+[ebuild   R    ] virtual/pager-0::gentoo  0 KiB
+[ebuild     U  ] dev-lang/perl-5.26.2:0/5.26::gentoo [5.24.3-r1:0/5.24::gentoo] USE="-berkdb* -debug -doc -gdbm* -ithreads" 11770 KiB
+[ebuild   R    ] sys-kernel/linux-headers-4.17::gentoo  USE="-headers-only" 0 KiB
+[ebuild     U  ] sys-apps/groff-1.22.3::gentoo [1.22.2::gentoo] USE="-X -examples" L10N="(-ja%)" 4091 KiB
+[ebuild   R    ] sys-devel/autoconf-2.69-r4:2.69::gentoo  USE="-emacs" 1187 KiB
+[ebuild     U  ] virtual/perl-ExtUtils-MakeMaker-7.240.0::gentoo [7.100.200_rc-r4::gentoo] 0 KiB
+[ebuild   R    ] dev-util/gtk-doc-am-1.25-r1::gentoo  658 KiB
+[ebuild     U  ] virtual/perl-Parse-CPAN-Meta-2.150.10::gentoo [1.441.700.100_rc-r4::gentoo] 0 KiB
+[ebuild   R    ] virtual/perl-CPAN-Meta-YAML-0.18.0-r2::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-Test-Harness-3.380.0::gentoo [3.360.100_rc-r3::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-File-Spec-3.670.0::gentoo [3.630.100_rc-r4::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Data-Dumper-2.167.0::gentoo [2.160.0-r1::gentoo] 0 KiB
+[ebuild   R    ] dev-perl/Text-CharWidth-0.40.0-r1::gentoo  9 KiB
+[ebuild   R    ] perl-core/File-Temp-0.230.400-r1::gentoo  59 KiB
+[ebuild     U  ] virtual/perl-version-0.991.700::gentoo [0.991.600-r1::gentoo] 0 KiB
+[ebuild  N     ] virtual/perl-podlators-4.90.0::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-Text-ParseWords-3.300.0-r3::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-Perl-OSType-1.10.0::gentoo [1.9.0-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Module-Metadata-1.0.33::gentoo [1.0.31-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-Getopt-Long-2.490.0::gentoo [2.480.0-r1::gentoo] 0 KiB
+[ebuild     U  ] virtual/perl-ExtUtils-ParseXS-3.340.0::gentoo [3.310.0-r1::gentoo] 0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-Manifest-1.700.0-r4::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-Install-2.40.0-r3::gentoo  0 KiB
+[ebuild   R    ] virtual/perl-ExtUtils-CBuilder-0.280.225-r2::gentoo  0 KiB
+[ebuild     U  ] virtual/perl-JSON-PP-2.274.0.200_rc::gentoo [2.273.0.100_rc-r6::gentoo] 0 KiB
+[ebuild   R    ] sys-libs/libseccomp-2.3.3::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 552 KiB
+[ebuild  N     ] sys-libs/libcap-ng-0.7.9::gentoo  USE="-python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 439 KiB
+[ebuild     U  ] net-firewall/iptables-1.6.2-r2:0/12::gentoo [1.6.1-r3:0/12::gentoo] USE="ipv6 -conntrack -netlink -nftables -pcap -static-libs" 625 KiB
+[ebuild     U  ] dev-perl/Text-Unidecode-1.300.0::gentoo [1.270.0::gentoo] 135 KiB
+[ebuild     U  ] dev-perl/libintl-perl-1.280.0::gentoo [1.240.0-r2::gentoo] 460 KiB
+[ebuild   R    ] dev-perl/Unicode-EastAsianWidth-1.330.0-r1::gentoo  31 KiB
+[ebuild     U  ] dev-perl/TermReadKey-2.370.0::gentoo [2.330.0::gentoo] USE="-examples%" 84 KiB
+[ebuild   R    ] dev-perl/Text-WrapI18N-0.60.0-r1::gentoo  4 KiB
+[ebuild     U  ] virtual/perl-CPAN-Meta-2.150.10::gentoo [2.150.5-r1::gentoo] 0 KiB
+[ebuild     U  ] app-misc/pax-utils-1.2.3-r1::gentoo [1.2.3::gentoo] USE="seccomp -caps -debug -python" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_4% -python3_6%" PYTHON_TARGETS="python2_7%* python3_5%* -python3_4% -python3_6%" 647 KiB
+[ebuild     U  ] dev-perl/Module-Build-0.422.400::gentoo [0.421.600::gentoo] USE="{-test}" 298 KiB
+[ebuild   R    ] sys-apps/sandbox-2.13::gentoo  ABI_X86="(32) (64) (-x32)" 416 KiB
+[ebuild     U  ] dev-perl/SGMLSpm-1.1-r1::gentoo [1.03-r7::gentoo] 112 KiB
+[ebuild     U  ] dev-libs/openssl-1.0.2o-r6::gentoo [1.0.2o-r3::gentoo] USE="asm sslv3 tls-heartbeat zlib -bindist* -gmp -kerberos -rfc3779 -sctp -sslv2 -static-libs {-test} -vanilla" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="(sse2)" 5218 KiB
+[ebuild   R    ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="ruby23*" 0 KiB
+[ebuild     U  ] sys-apps/net-tools-1.60_p20170221182432::gentoo [1.60_p20161110235919::gentoo] USE="arp hostname ipv6 nls (selinux*) -nis -plipconfig -slattach -static" 223 KiB
+[ebuild   R    ] sys-process/procps-3.3.15-r1:0/6::gentoo  USE="kill ncurses nls (selinux*) unicode -elogind -modern-top -static-libs (-systemd) {-test}" 884 KiB
+[ebuild     U  ] sys-apps/busybox-1.29.0::gentoo [1.28.0::gentoo] USE="ipv6 (selinux*) static -debug -livecd -make-symlinks -math -mdev -pam -savedconfig -sep-usr -syslog (-systemd)" 2250 KiB
+[ebuild     U  ] sys-apps/attr-2.4.48-r2::gentoo [2.4.47-r2::gentoo] USE="nls -debug% -static-libs" ABI_X86="(64) -32 (-x32)" 457 KiB
+[ebuild  N     ] sys-libs/libcap-2.25-r1::gentoo  USE="pam -static-libs" ABI_X86="(64) -32 (-x32)" 63 KiB
+[ebuild   R    ] sys-devel/patch-2.7.6-r1::gentoo  USE="xattr -static {-test}" 766 KiB
+[ebuild     U  ] net-misc/iputils-20171016_pre-r1::gentoo [20171016_pre::gentoo] USE="arping filecaps* ipv6 ssl -SECURITY_HAZARD -caps -clockdiff -doc -gcrypt -idn -libressl -nettle -rarpd -rdisc -static -tftpd -tracepath -traceroute (-openssl%*)" 220 KiB
+[ebuild     U  ] dev-python/setuptools-38.6.1::gentoo [36.7.2::gentoo] USE="{-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 722 KiB
+[ebuild   R    ] dev-libs/libgpg-error-1.29::gentoo  USE="nls -common-lisp -static-libs" ABI_X86="(64) -32 (-x32)" 874 KiB
+[ebuild   R    ] dev-libs/libassuan-2.5.1::gentoo  USE="-static-libs" 0 KiB
+[ebuild   R    ] dev-libs/libksba-1.3.5-r1::gentoo  USE="-static-libs" 0 KiB
+[ebuild   R    ] sys-apps/sed-4.5::gentoo  USE="acl nls (selinux*) -forced-sandbox -static" 1245 KiB
+[ebuild     U  ] sys-apps/util-linux-2.32-r3::gentoo [2.30.2-r1::gentoo] USE="cramfs ncurses nls pam readline (selinux*) suid unicode -build -caps -fdformat -kill -python -slang -static-libs (-systemd) {-test} -tty-helpers -udev" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5 -python2_7 -python3_4 -python3_6" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 4444 KiB
+[ebuild     U  ] sys-libs/pam-1.3.0-r2::gentoo [1.2.1-r2::gentoo] USE="cracklib filecaps* nls (pie) (selinux*) -audit -berkdb* -debug -nis {-test} -vim-syntax%" ABI_X86="(64) -32 (-x32)" 1754 KiB
+[ebuild   R    ] sys-auth/pambase-20150213-r1::gentoo  USE="cracklib nullok (selinux*) sha512 -consolekit -debug -elogind -gnome-keyring -minimal -mktemp -pam_krb5 -pam_ssh -passwdqc -securetty (-systemd)" 4 KiB
+[ebuild     U  ] sys-apps/acl-2.2.53::gentoo [2.2.52-r1::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 513 KiB
+[ebuild     U  ] sys-apps/coreutils-8.30::gentoo [8.28-r1::gentoo] USE="acl nls (selinux*) split-usr%* (xattr) -caps -gmp -hostname -kill -multicall -static {-test} -vanilla" 5240 KiB
+[ebuild     U  ] app-admin/eselect-1.4.13::gentoo [1.4.12::gentoo] USE="-doc -emacs -vim-syntax" 174 KiB
+[ebuild   R    ] app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo  0 KiB
+[ebuild   R    ] sys-libs/glibc-2.27-r5:2.2::gentoo  USE="hardened multiarch* (multilib) (selinux) -audit -caps (-compile-locales) -doc -gd -headers-only -nscd (-profile) -suid -systemtap (-vanilla)" 0 KiB
+[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
+[ebuild   R    ] sys-devel/binutils-2.30-r3:2.30::gentoo  USE="cxx nls -doc -multitarget -static-libs {-test}" 0 KiB
+[ebuild     U  ] app-misc/ca-certificates-20180409.3.37::gentoo [20170717.3.36.1::gentoo] USE="-cacert (-insecure_certs%)" 22729 KiB
+[ebuild  N     ] dev-python/ipy-0.83::gentoo  USE="-examples" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 32 KiB
+[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="(ipc) native-extensions* rsync-verify* (selinux) (xattr) -build* -doc -epydoc -gentoo-dev" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
+[ebuild   R    ] virtual/package-manager-1::gentoo  0 KiB
+[ebuild   R    ] dev-python/pyblake2-1.1.2::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 124 KiB
+[ebuild     U  ] sys-devel/make-4.2.1-r3::gentoo [4.2.1::gentoo] USE="nls -guile -static" 1375 KiB
+[ebuild   R    ] sys-process/psmisc-23.1-r1::gentoo  USE="ipv6 nls (selinux*) -X" 290 KiB
+[ebuild     U  ] sys-libs/e2fsprogs-libs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 699 KiB
+[ebuild   R    ] dev-libs/popt-1.16-r2::gentoo  USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 687 KiB
+[ebuild   R    ] net-misc/rsync-3.1.3::gentoo  USE="acl iconv ipv6 xattr -examples -static -stunnel" 885 KiB
+[ebuild  N     ] dev-python/decorator-4.2.1::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 33 KiB
+[ebuild  N     ] dev-python/networkx-1.11-r1::gentoo  USE="-doc -examples -scipy {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1285 KiB
+[ebuild  N     ] dev-python/pypax-0.9.2::gentoo  USE="xtpax -ptpax" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 390 KiB
+[ebuild  N     ] sys-apps/elfix-0.9.2::gentoo  USE="xtpax -ptpax" 0 KiB
+[ebuild  N     ] dev-python/enum34-1.1.6::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 -pypy -pypy3" 40 KiB
+[ebuild  N     ] virtual/python-enum34-1::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 0 KiB
+[ebuild  N     ] app-admin/setools-4.1.1::gentoo  USE="-X -debug {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 451 KiB
+[ebuild   R    ] dev-python/bz2file-0.98::gentoo  PYTHON_TARGETS="python2_7 -pypy" 0 KiB
+[ebuild   R    ] dev-libs/libtasn1-4.13:0/6::gentoo  USE="-doc -static-libs -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] net-dns/libidn2-2.0.5::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] app-editors/nano-2.9.8::gentoo [2.8.7::gentoo] USE="magic ncurses nls spell unicode -debug -justify -minimal -slang -static" 2838 KiB
+[ebuild   R    ] virtual/editor-0-r1::gentoo  0 KiB
+[ebuild  NS    ] sys-devel/automake-1.16.1-r1:1.16::gentoo [1.15.1-r2:1.15::gentoo] USE="{-test}" 1499 KiB
+[ebuild     U  ] sys-devel/libtool-2.4.6-r5:2::gentoo [2.4.6-r3:2::gentoo] USE="-vanilla" 0 KiB
+[ebuild   R    ] dev-libs/libxml2-2.9.8:2::gentoo  USE="ipv6 readline -debug -examples -icu -lzma -python -static-libs {-test}" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 5341 KiB
+[ebuild   R    ] dev-libs/expat-2.2.5::gentoo  USE="unicode -examples -static-libs" ABI_X86="(64) -32 (-x32)" 499 KiB
+[ebuild     U  ] sys-libs/gdbm-1.16:0/6::gentoo [1.13-r2:0/1.13::gentoo] USE="berkdb nls readline -static-libs (-exporter%)" ABI_X86="(64) -32 (-x32)" 915 KiB
+[ebuild   R    ] dev-libs/libgcrypt-1.8.3:0/20::gentoo  USE="-doc -o-flag-munging -static-libs" ABI_X86="(64) -32 (-x32)" 2920 KiB
+[ebuild  N     ] sys-process/audit-2.8.3::gentoo  USE="-gssapi -ldap -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1082 KiB
+[ebuild     U  ] net-misc/openssh-7.7_p1-r6::gentoo [7.7_p1-r5::gentoo] USE="pam (pie) (selinux*) ssl -X -X509 -audit -bindist* -debug -hpn -kerberos -ldap -ldns -libedit -libressl -livecd -sctp -skey -static {-test}" 1517 KiB
+[ebuild   R    ] net-misc/curl-7.60.0-r1::gentoo  USE="ipv6 ssl -adns -brotli -http2 -idn -kerberos -ldap -metalink -rtmp -samba -ssh -static-libs {-test} -threads" ABI_X86="(64) -32 (-x32)" CURL_SSL="openssl -axtls -gnutls -libressl -mbedtls -nss (-winssl)" 0 KiB
+[ebuild   R    ] dev-libs/nettle-3.4:0/6.2::gentoo  USE="gmp -doc (-neon) -static-libs {-test}" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="aes*" 0 KiB
+[ebuild   R    ] dev-libs/iniparser-3.1-r1::gentoo  USE="-doc -examples -static-libs" ABI_X86="(64) -32 (-x32)" 39 KiB
+[ebuild     U  ] net-libs/libtirpc-1.0.3:0/3::gentoo [1.0.2-r1:0/3::gentoo] USE="ipv6 -kerberos -static-libs" ABI_X86="(64) -32 (-x32)" 507 KiB
+[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="acl* cxx ncurses* nls openmp* -cvs -doc -emacs -git -java -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild     U  ] dev-lang/python-2.7.15:2.7::gentoo [2.7.14-r1:2.7::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (wide-unicode) (xml) (-berkdb) -bluetooth% -build -doc -examples -libressl -sqlite -tk -wininst" 12362 KiB
+[ebuild     U  ] dev-lang/python-3.5.5-r1:3.5/3.5m::gentoo [3.5.5:3.5/3.5m::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (xml) -bluetooth% -build -examples -libressl -sqlite {-test} -tk -wininst" 15004 KiB
+[ebuild   R    ] virtual/ssh-0::gentoo  USE="-minimal" 0 KiB
+[ebuild     U  ] app-portage/portage-utils-0.71::gentoo [0.64::gentoo] USE="nls -static" 543 KiB
+[ebuild   R    ] dev-libs/libxslt-1.1.32::gentoo  USE="crypt -debug -examples -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7" 3361 KiB
+[ebuild   R    ] app-text/build-docbook-catalog-1.21::gentoo  5 KiB
+[ebuild   R    ] dev-perl/XML-Parser-2.440.0::gentoo  232 KiB
+[ebuild   R    ] net-libs/libnsl-1.2.0:0/2::gentoo  ABI_X86="(64) -32 (-x32)" 205 KiB
+[ebuild   R    ] net-libs/gnutls-3.5.18:0/30::gentoo  USE="cxx idn nls openssl seccomp tls-heartbeat zlib -dane -doc -examples -guile -openpgp -pkcs11 -sslv2 -sslv3 -static-libs {-test} -test-full -tools -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
+[ebuild   R    ] app-arch/tar-1.30::gentoo  USE="acl nls (selinux*) (xattr) -minimal -static" 2792 KiB
+[ebuild   R    ] dev-python/certifi-2018.4.16::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 147 KiB
+[ebuild     U  ] dev-python/pyxattr-0.6.0-r1::gentoo [0.5.5::gentoo] USE="-doc {-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6%" 31 KiB
+[ebuild   R    ] app-crypt/pinentry-1.1.0-r2::gentoo  USE="ncurses -caps -emacs -fltk -gnome-keyring -gtk -qt5 -static" 0 KiB
+[ebuild   R    ] sys-apps/findutils-4.6.0-r1::gentoo  USE="nls (selinux*) -static {-test}" 3692 KiB
+[ebuild     U  ] sys-apps/grep-3.1::gentoo [3.0::gentoo] USE="nls pcre -static" 1339 KiB
+[ebuild     U  ] sys-apps/gawk-4.2.1-r1::gentoo [4.1.4::gentoo] USE="nls readline -forced-sandbox% -mpfr" 2916 KiB
+[ebuild     U  ] sys-apps/diffutils-3.6-r1::gentoo [3.5::gentoo] USE="nls -static" 1366 KiB
+[ebuild   R    ] net-misc/wget-1.19.5::gentoo  USE="ipv6 nls pcre ssl zlib -debug -gnutls -idn -libressl -ntlm -static {-test} -uuid" 4352 KiB
+[ebuild   R    ] sys-devel/flex-2.6.4-r1::gentoo  USE="nls -static {-test}" ABI_X86="(64) -32 (-x32)" 1386 KiB
+[ebuild   R    ] dev-perl/Locale-gettext-1.70.0::gentoo  9 KiB
+[ebuild   R    ] dev-util/intltool-0.51.0-r2::gentoo  159 KiB
+[ebuild   R    ] sys-apps/texinfo-6.5::gentoo  USE="nls -static" 0 KiB
+[ebuild     U  ] app-text/opensp-1.5.2-r6::gentoo [1.5.2-r3::gentoo] USE="nls -doc -static-libs {-test}" 1486 KiB
+[ebuild   R    ] sys-fs/eudev-3.2.5::gentoo  USE="hwdb kmod (selinux*) -introspection -rule-generator -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 1814 KiB
+[ebuild   R    ] mail-mta/nullmailer-2.0-r2::gentoo  USE="ssl {-test}" 0 KiB
+[ebuild     U  ] sys-fs/e2fsprogs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -fuse -static-libs" 7386 KiB
+[ebuild     U  ] sys-devel/bison-3.0.5::gentoo [3.0.4-r1::gentoo] USE="nls -examples -static {-test}" 1915 KiB
+[ebuild     U  ] sys-apps/help2man-1.47.6::gentoo [1.47.4::gentoo] USE="nls" 189 KiB
+[ebuild   R    ] app-text/openjade-1.3.2-r7::gentoo  USE="-static-libs" 874 KiB
+[ebuild  N     ] sys-libs/libsemanage-2.8::gentoo  USE="(python)" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 151 KiB
+[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened (multilib) nls nptl openmp* (pie) (ssp) vtv* (-altivec) -cilk -debug -doc (-fixed-point) -fortran -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc (-pch) -pgo -regression-test (-sanitize) -vanilla" 0 KiB
+[ebuild     U  ] sys-apps/iproute2-4.17.0::gentoo [4.14.1-r2::gentoo] USE="iptables ipv6 (selinux*) -atm -berkdb* -elf% -minimal" 660 KiB
+[ebuild   R    ] app-text/po4a-0.47-r1::gentoo  USE="{-test}" 2334 KiB
+[ebuild  N     ] sys-apps/checkpolicy-2.8::gentoo  USE="-debug" 65 KiB
+[ebuild  N     ] sys-apps/selinux-python-2.8::gentoo  PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2020 KiB
+[ebuild   R    ] sys-apps/shadow-4.6::gentoo  USE="acl cracklib nls pam (selinux*) xattr -audit -skey" 3716 KiB
+[ebuild  N     ] sys-apps/policycoreutils-2.8::gentoo  USE="pam -audit -dbus" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2740 KiB
+[ebuild  N     ] sec-policy/selinux-base-2.20180114-r3::gentoo  USE="open_perms peer_perms ubac unconfined -doc (-systemd)" 1022 KiB
+[ebuild  N     ] sec-policy/selinux-base-policy-2.20180114-r3::gentoo  USE="unconfined (-systemd)" 0 KiB
+[ebuild  N     ] sec-policy/selinux-unconfined-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-openrc-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-shutdown-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/opentmpfiles-0.1.3-r1::gentoo [0.1.3::gentoo] USE="(selinux*)" 6 KiB
+[ebuild  N     ] sec-policy/selinux-mandb-2.20180114-r3::gentoo  0 KiB
+[ebuild  N     ] sec-policy/selinux-dirmngr-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/sysvinit-2.90::gentoo [2.88-r9::gentoo] USE="(selinux*) (-ibm) -static" 111 KiB
+[ebuild     U  ] sys-apps/man-db-2.8.3::gentoo [2.7.6.1-r2::gentoo] USE="manpager nls seccomp%* (selinux*) zlib -berkdb* -gdbm* -static-libs" 1587 KiB
+[ebuild  N     ] sec-policy/selinux-gpg-2.20180114-r3::gentoo  0 KiB
+[ebuild     U  ] sys-apps/openrc-0.38.1::gentoo [0.34.11::gentoo] USE="ncurses netifrc pam (selinux*) unicode -audit -debug -newnet (-prefix) -static-libs" 236 KiB
+[ebuild   R    ] app-crypt/gnupg-2.2.8::gentoo  USE="bzip2 nls readline (selinux*) smartcard ssl -doc -ldap -tofu -tools -usb -wks-server" 0 KiB
+[ebuild   R    ] app-portage/gemato-13.1::gentoo  USE="blake2 bzip2 gpg -lzma -sha3 {-test} -tools" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 0 KiB
+[ebuild   R    ] virtual/service-manager-0::gentoo  USE="(-prefix)" 0 KiB
+[ebuild     U  ] dev-libs/glib-2.54.3-r6:2::gentoo [2.52.3:2::gentoo] USE="mime (selinux*) xattr -dbus -debug (-fam) -static-libs -systemtap {-test} -utils" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_6%" PYTHON_TARGETS="python2_7 python3_5%* -python3_6%" 9578 KiB
+[ebuild   R    ] dev-util/pkgconfig-0.29.2::gentoo  USE="hardened* -internal-glib" ABI_X86="(64) -32 (-x32)" 1970 KiB
+[ebuild     U  ] x11-misc/shared-mime-info-1.10::gentoo [1.9::gentoo] USE="{-test}" 603 KiB
+
+Total: 228 packages (87 upgrades, 26 new, 1 in new slot, 114 reinstalls), Size of downloads: 245719 KiB
+.
+. 
+.
+livecd /usr/portage/scripts #
+```
+
+This is the `emerge` options:
+
+- `--emptytree`: Reinstalls target atoms and their entire deep dependency tree, as  though  no  packages are  currently  installed.
+-  `--with-bdeps=y`: In  dependency  calculations,  pull  in  build  time dependencies that are not strictly required.
+- `@world`: is one of the six *sets* available in Gentoo Linux; all the packages listed on `/var/lib/portage/world`
+
+After recompile the *stage 3* we've got to *clean the system by removing packages that are not associated with  explicitly  merged packages*.
+
+*full output [here](https://raw.githubusercontent.com/noplacenoaddress/gentoo-integrity/master/emerge-stage3-depclean.txt)*
+
+```sh
+livecd /usr/portage/scripts # emerge --depclean
+
+ * Always study the list of packages to be cleaned for any obvious
+ * mistakes. Packages that are part of the world set will always
+ * be kept.  They can be manually added to this set with
+ * `emerge --noreplace <atom>`.  Packages that are listed in
+ * package.provided (see portage(5)) will be removed by
+ * depclean, even if they are part of the world set.
+ * 
+ * As a safety measure, depclean will not remove any packages
+ * unless *all* required dependencies have been resolved.  As a
+ * consequence of this, it often becomes necessary to run 
+ * `emerge --update --newuse --deep @world` prior to depclean.
+!!! You have no world file.
+
+Calculating dependencies... done!
+.
+.
+.
+livecd /usr/portage/scripts #
+```
+
 Because we've read *IMPORTANT: 13 news items need reading for repository 'gentoo'*, we can read them:
 
 ```sh
@@ -2847,1389 +4261,4 @@ To update our system we use `emerge` with differens options:
 - `-D`: the same as `--deep`, this  flag forces emerge to consider the entire dependency tree of packages, instead of checking only the immediate dependencies of the packages.
 
 We use `--deepclean` two times.
-
-```sh
-livecd ~ # eselect profile list
-Available profile symlink targets:
-  [1]   default/linux/amd64/13.0 (stable)
-  [2]   default/linux/amd64/13.0/selinux (dev)
-  [3]   default/linux/amd64/13.0/desktop (stable)
-  [4]   default/linux/amd64/13.0/desktop/gnome (stable)
-  [5]   default/linux/amd64/13.0/desktop/gnome/systemd (stable)
-  [6]   default/linux/amd64/13.0/desktop/plasma (stable)
-  [7]   default/linux/amd64/13.0/desktop/plasma/systemd (stable)
-  [8]   default/linux/amd64/13.0/developer (stable)
-  [9]   default/linux/amd64/13.0/no-multilib (stable)
-  [10]  default/linux/amd64/13.0/systemd (stable)
-  [11]  default/linux/amd64/13.0/x32 (dev)
-  [12]  default/linux/amd64/17.0 (stable) *
-  [13]  default/linux/amd64/17.0/selinux (stable)
-  [14]  default/linux/amd64/17.0/hardened (stable)
-  [15]  default/linux/amd64/17.0/hardened/selinux (stable)
-  [16]  default/linux/amd64/17.0/desktop (stable)
-  [17]  default/linux/amd64/17.0/desktop/gnome (stable)
-  [18]  default/linux/amd64/17.0/desktop/gnome/systemd (stable)
-  [19]  default/linux/amd64/17.0/desktop/plasma (stable)
-  [20]  default/linux/amd64/17.0/desktop/plasma/systemd (stable)
-  [21]  default/linux/amd64/17.0/developer (stable)
-  [22]  default/linux/amd64/17.0/no-multilib (stable)
-  [23]  default/linux/amd64/17.0/no-multilib/hardened (stable)
-  [24]  default/linux/amd64/17.0/no-multilib/hardened/selinux (stable)
-  [25]  default/linux/amd64/17.0/systemd (stable)
-  [26]  default/linux/amd64/17.0/x32 (dev)
-  [27]  default/linux/amd64/17.1 (exp)
-  [28]  default/linux/amd64/17.1/selinux (exp)
-  [29]  default/linux/amd64/17.1/hardened (exp)
-  [30]  default/linux/amd64/17.1/hardened/selinux (exp)
-  [31]  default/linux/amd64/17.1/desktop (exp)
-  [32]  default/linux/amd64/17.1/desktop/gnome (exp)
-  [33]  default/linux/amd64/17.1/desktop/gnome/systemd (exp)
-  [34]  default/linux/amd64/17.1/desktop/plasma (exp)
-  [35]  default/linux/amd64/17.1/desktop/plasma/systemd (exp)
-  [36]  default/linux/amd64/17.1/developer (exp)
-  [37]  default/linux/amd64/17.1/no-multilib (exp)
-  [38]  default/linux/amd64/17.1/no-multilib/hardened (exp)
-  [39]  default/linux/amd64/17.1/no-multilib/hardened/selinux (exp)
-  [40]  default/linux/amd64/17.1/systemd (exp)
-  [41]  hardened/linux/amd64 (stable)
-  [42]  hardened/linux/amd64/selinux (stable)
-  [43]  hardened/linux/amd64/no-multilib (stable)
-  [44]  hardened/linux/amd64/no-multilib/selinux (stable)
-  [45]  hardened/linux/amd64/x32 (dev)
-  [46]  default/linux/musl/amd64 (exp)
-  [47]  hardened/linux/musl/amd64 (exp)
-  [48]  default/linux/musl/amd64/x32 (exp)
-  [49]  hardened/linux/musl/amd64/x32 (exp)
-  [50]  default/linux/amd64/17.0/musl (exp)
-  [51]  default/linux/amd64/17.0/musl/hardened (exp)
-  [52]  default/linux/amd64/17.0/musl/hardened/selinux (exp)
-  [53]  default/linux/uclibc/amd64 (exp)
-  [54]  hardened/linux/uclibc/amd64 (exp)
-livecd ~ # eselect profile set 15
-livecd ~ # eselect profile list | grep 15
-  [15]  default/linux/amd64/17.0/hardened/selinux (stable) *
-livecd ~ # cd /etc/portage/
-livecd /etc/portage # ls -al
-total 40
-drwxr-xr-x  8 root root 4096 Jul  6 20:42 .
-drwxr-xr-x 32 root root 4096 Jul  6 20:06 ..
--rw-r--r--  1 root root 1468 Jul  6 19:24 make.conf
-lrwxrwxrwx  1 root root   68 Jul  6 20:42 make.profile -> ../../usr/portage/profiles/default/linux/amd64/17.0/hardened/selinux
-drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.accept_keywords
-drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.mask
-drwxr-xr-x  2 root root 4096 Jun 25 02:34 package.use
-drwxr-xr-x  2 root root 4096 Jul  6 19:57 repo.postsync.d
-drwxr-xr-x  2 root root 4096 Jul  6 10:23 repos.conf
-drwxr-xr-x  3 root root 4096 Jun 25 00:57 savedconfig
-livecd /etc/portage #
-```
-
-With `eselect` we can *select* various options to configure our Gentoo system.
-
-With `eselect profile` we change the symbolic link `/etc/portage/make.profile` to indicate what kind of system we're going to install. There's a lot of.  In this case we're selecting an [hardened + selinux](https://wiki.gentoo.org/wiki/Project:Hardened) installation (*take care is different from the Sakaki EFI install guide*). We can visualize all the variables of this kind of `profile`:
-
-```sh
-livecd /etc/portage # emerge --info
-Portage 2.3.41 (python 3.6.6-final-0, default/linux/amd64/17.0/hardened/selinux, gcc-7.3.0, glibc-2.27-r5, 4.9.76-gentoo-r1 x86_64)
-=================================================================
-System uname: Linux-4.9.76-gentoo-r1-x86_64-Intel-R-_Core-TM-_i7-2620M_CPU_@_2.70GHz-with-gentoo-2.6
-KiB Mem:     3963424 total,   1381068 free
-KiB Swap:          0 total,         0 free
-Timestamp of repository gentoo: Fri, 06 Jul 2018 00:45:01 +0000
-Head commit of repository gentoo: f8f48a7991916da84d772315003d334f6c5a9699
-sh bash 4.4_p12
-ld GNU ld (Gentoo 2.30 p2) 2.30.0
-app-shells/bash:          4.4_p12::gentoo
-dev-lang/perl:            5.24.3-r1::gentoo
-dev-lang/python:          2.7.14-r1::gentoo, 3.6.6::gentoo
-dev-util/pkgconfig:       0.29.2::gentoo
-sys-apps/baselayout:      2.6::gentoo
-sys-apps/openrc:          0.34.11::gentoo
-sys-apps/sandbox:         2.13::gentoo
-sys-devel/autoconf:       2.69-r4::gentoo
-sys-devel/automake:       1.15.1-r2::gentoo
-sys-devel/binutils:       2.30-r2::gentoo
-sys-devel/gcc:            7.3.0-r3::gentoo
-sys-devel/gcc-config:     1.8-r1::gentoo
-sys-devel/libtool:        2.4.6-r3::gentoo
-sys-devel/make:           4.2.1::gentoo
-sys-kernel/linux-headers: 4.13::gentoo (virtual/os-headers)
-sys-libs/glibc:           2.27-r5::gentoo
-Repositories:
-
-gentoo
-    location: /usr/portage
-    sync-type: rsync
-    sync-uri: rsync://rsync.fr.gentoo.org/gentoo-portage
-    priority: -1000
-    sync-rsync-extra-opts: 
-    sync-rsync-verify-metamanifest: yes
-    sync-rsync-verify-jobs: 1
-    sync-rsync-verify-max-age: 24
-
-ABI="amd64"
-ABI_X86="64"
-ACCEPT_KEYWORDS="amd64 ~amd64"
-ACCEPT_LICENSE="@FREE CC-Sampling-Plus-1.0"
-ACCEPT_PROPERTIES="*"
-ACCEPT_RESTRICT="*"
-ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci"
-APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias"
-ARCH="amd64"
-AUTOCLEAN="yes"
-BOOTSTRAP_USE="cxx unicode internal-glib split-usr python_targets_python3_5 python_targets_python2_7 multilib hardened pic xtpax -jit -orc"
-BROOT=""
-CALLIGRA_FEATURES="karbon plan sheets stage words"
-CBUILD="x86_64-pc-linux-gnu"
-CFLAGS="-march=sandybridge -O2 -pipe"
-CFLAGS_amd64="-m64"
-CFLAGS_x32="-mx32"
-CFLAGS_x86="-m32"
-CHOST="x86_64-pc-linux-gnu"
-CHOST_amd64="x86_64-pc-linux-gnu"
-CHOST_x32="x86_64-pc-linux-gnux32"
-CHOST_x86="i686-pc-linux-gnu"
-CLEAN_DELAY="5"
-COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog"
-COLLISION_IGNORE="/lib/modules/* *.py[co] *$py.class */dropin.cache"
-CONFIG_PROTECT="/etc /usr/share/gnupg/qualified.txt"
-CONFIG_PROTECT_MASK="/etc/ca-certificates.conf /etc/env.d /etc/gconf /etc/gentoo-release /etc/sandbox.d /etc/terminfo"
-CPU_FLAGS_X86="mmx mmxext sse sse2"
-CXXFLAGS=""
-DEFAULT_ABI="amd64"
-DISTDIR="/usr/portage/distfiles"
-EDITOR="/bin/nano"
-ELIBC="glibc"
-EMERGE_DEFAULT_OPTS="--ask --verbose --jobs=5 --load-average=4"
-EMERGE_WARNING_DELAY="10"
-ENV_UNSET="DBUS_SESSION_BUS_ADDRESS DISPLAY PERL5LIB PERL5OPT PERLPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
-EPREFIX=""
-EROOT="/"
-ESYSROOT="/"
-FCFLAGS="-O2 -pipe"
-FEATURES="assume-digests binpkg-logs buildpkg config-protect-if-modified distlocks ebuild-locks fixlafiles merge-sync multilib-strict news parallel-fetch preserve-libs protect-owned sandbox selinux sesandbox sfperms split-elog strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
-FETCHCOMMAND="wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
-FETCHCOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
-FETCHCOMMAND_SFTP="bash -c "x=\${2#sftp://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; eval \"declare -a ssh_opts=(\${3})\" ; exec sftp \${port:+-P \${port}} \"\${ssh_opts[@]}\" \"\${host}:/\${x#*/}\" \"\$1\"" sftp "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
-FETCHCOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
-FFLAGS="-O2 -pipe"
-GCC_SPECS=""
-GENTOO_MIRRORS="ftp://ftp.free.fr/mirrors/ftp.gentoo.org/ http://gentoo.modulix.net/gentoo/ http://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://gentoo.mirrors.ovh.net/gentoo-distfiles/ ftp://mirrors.soeasyto.com/distfiles.gentoo.org/ http://mirrors.soeasyto.com/distfiles.gentoo.org/"
-GPG_TTY="/dev/pts/0"
-GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx"
-GRUB_PLATFORMS=""
-HOME="/root"
-INFOPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/info:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/info:/usr/share/info"
-INPUT_DEVICES="libinput"
-IUSE_IMPLICIT="abi_x86_64 prefix prefix-chain prefix-guest"
-KERNEL="linux"
-LANG="en_GB.utf8"
-LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text"
-LC_COLLATE="C"
-LC_MESSAGES="C"
-LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-LDFLAGS_amd64="-m elf_x86_64"
-LDFLAGS_x32="-m elf32_x86_64"
-LDFLAGS_x86="-m elf_i386"
-LESS="-R -M --shift 5"
-LESSOPEN="|lesspipe %s"
-LIBDIR_amd64="lib64"
-LIBDIR_x32="libx32"
-LIBDIR_x86="lib32"
-LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer"
-LOGNAME="root"
-LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.cfg=00;32:*.conf=00;32:*.diff=00;32:*.doc=00;32:*.ini=00;32:*.log=00;32:*.patch=00;32:*.pdf=00;32:*.ps=00;32:*.tex=00;32:*.txt=00;32:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
-MAIL="/var/mail/root"
-MAKEOPTS="-j5 -l4"
-MANPAGER="manpager"
-MANPATH="/usr/share/gcc-data/x86_64-pc-linux-gnu/6.4.0/man:/usr/share/binutils-data/x86_64-pc-linux-gnu/2.29.1/man:/usr/local/share/man:/usr/share/man"
-MULTILIB_ABIS="amd64 x86"
-MULTILIB_STRICT_DENY="64-bit.*shared object"
-MULTILIB_STRICT_DIRS="/lib32 /lib /usr/lib32 /usr/lib /usr/kde/*/lib32 /usr/kde/*/lib /usr/qt/*/lib32 /usr/qt/*/lib /usr/X11R6/lib32 /usr/X11R6/lib"
-MULTILIB_STRICT_EXEMPT="(perl5|gcc|gcc-lib|binutils|eclipse-3|debug|portage|udev|systemd|clang|python-exec|llvm)"
-NETBEANS="apisupport cnd groovy gsf harness ide identity j2ee java mobility nb php profiler soa visualweb webcommon websvccommon xml"
-NUMCPUS="4"
-NUMCPUSPLUSONE="5"
-OFFICE_IMPLEMENTATION="libreoffice"
-OLDPWD="/etc/portage"
-PAGER="/usr/bin/less"
-PATH="/usr/x86_64-pc-linux-gnu/gcc-bin/6.4.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
-PAX_MARKINGS="XT"
-PHP_TARGETS="php5-6 php7-0"
-PKGDIR="/usr/portage/packages"
-POLICY_TYPES="strict targeted"
-PORTAGE_ARCHLIST="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 arm64-linux hppa ia64 m68k m68k-mint mips ppc ppc-aix ppc-macos ppc64 ppc64-linux s390 sh sparc sparc-solaris sparc64-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
-PORTAGE_BIN_PATH="/usr/lib/portage/python3.6"
-PORTAGE_COMPRESS_EXCLUDE_SUFFIXES="css gif htm[l]? jp[e]?g js pdf png"
-PORTAGE_CONFIGROOT="/"
-PORTAGE_DEBUG="0"
-PORTAGE_DEPCACHEDIR="/var/cache/edb/dep"
-PORTAGE_ELOG_CLASSES="info warn error log qa"
-PORTAGE_ELOG_MAILFROM="portage@localhost"
-PORTAGE_ELOG_MAILSUBJECT="[portage] ebuild log for ${PACKAGE} on ${HOST}"
-PORTAGE_ELOG_MAILURI="root"
-PORTAGE_ELOG_SYSTEM="echo save"
-PORTAGE_FETCH_CHECKSUM_TRY_MIRRORS="5"
-PORTAGE_FETCH_RESUME_MIN_SIZE="350K"
-PORTAGE_FETCH_T="portage_fetch_t"
-PORTAGE_GID="250"
-PORTAGE_GPG_SIGNING_COMMAND="gpg --sign --digest-algo SHA256 --clearsign --yes --default-key "${PORTAGE_GPG_KEY}" --homedir "${PORTAGE_GPG_DIR}" "${FILE}""
-PORTAGE_INST_GID="0"
-PORTAGE_INST_UID="0"
-PORTAGE_INTERNAL_CALLER="1"
-PORTAGE_OVERRIDE_EPREFIX=""
-PORTAGE_PYM_PATH="/usr/lib64/python3.6/site-packages"
-PORTAGE_PYTHONPATH="/usr/lib64/python3.6/site-packages"
-PORTAGE_RSYNC_OPTS="--recursive --links --safe-links --perms --times --omit-dir-times --compress --force --whole-file --delete --stats --human-readable --timeout=180 --exclude=/distfiles --exclude=/local --exclude=/packages --exclude=/.git"
-PORTAGE_RSYNC_RETRIES="-1"
-PORTAGE_SANDBOX_T="portage_sandbox_t"
-PORTAGE_SYNC_STALE="30"
-PORTAGE_T="portage_t"
-PORTAGE_TMPDIR="/var/tmp"
-PORTAGE_VERBOSE="1"
-PORTAGE_WORKDIR_MODE="0700"
-PORTAGE_XATTR_EXCLUDE="btrfs.* security.evm security.ima 	security.selinux system.nfs4_acl user.apache_handler 	user.Beagle.* user.dublincore.* user.mime_encoding user.xdg.*"
-PORT_LOGDIR_CLEAN="find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +7 -delete"
-POSTGRES_TARGETS="postgres9_5 postgres10"
-PROFILE_IS_HARDENED="1"
-PROFILE_ONLY_VARIABLES="ARCH ELIBC IUSE_IMPLICIT KERNEL USERLAND USE_EXPAND_IMPLICIT USE_EXPAND_UNPREFIXED USE_EXPAND_VALUES_ARCH USE_EXPAND_VALUES_ELIBC USE_EXPAND_VALUES_KERNEL USE_EXPAND_VALUES_USERLAND"
-PWD="/etc/portage"
-PYTHONDONTWRITEBYTECODE="1"
-PYTHON_SINGLE_TARGET="python3_6"
-PYTHON_TARGETS="python2_7 python3_6"
-RESUMECOMMAND="wget -c -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}""
-RESUMECOMMAND_RSYNC="rsync -avP "${URI}" "${DISTDIR}/${FILE}""
-RESUMECOMMAND_SSH="bash -c "x=\${2#ssh://} ; host=\${x%%/*} ; port=\${host##*:} ; host=\${host%:*} ; [[ \${host} = \${port} ]] && port= ; exec rsync --rsh=\"ssh \${port:+-p\${port}} \${3}\" -avP \"\${host}:/\${x#*/}\" \"\$1\"" rsync "${DISTDIR}/${FILE}" "${URI}" "${PORTAGE_SSH_OPTS}""
-ROOT="/"
-ROOTPATH="/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
-RPMDIR="/usr/portage/rpm"
-RUBY_TARGETS="ruby23"
-SHELL="/bin/bash"
-SHLVL="2"
-SSH_CLIENT="10.3.30.1 35898 22"
-SSH_CONNECTION="10.3.30.1 35898 10.3.30.2 22"
-SSH_TTY="/dev/pts/0"
-SYMLINK_LIB="yes"
-SYSROOT="/"
-TERM="xterm-256color"
-TWISTED_DISABLE_WRITING_OF_PLUGIN_CACHE="1"
-UNINSTALL_IGNORE="/lib/modules/* /var/run /var/lock"
-USE="acl amd64 bzip2 crypt cxx hardened iconv ipv6 libtirpc multilib ncurses nls nptl openmp pam pcre pie readline seccomp selinux ssl ssp unicode xattr xtpax zlib" ABI_X86="64" ALSA_CARDS="ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias" CALLIGRA_FEATURES="karbon plan sheets stage words" COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog" CPU_FLAGS_X86="mmx mmxext sse sse2" ELIBC="glibc" GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing tsip tripmate tnt ublox ubx" INPUT_DEVICES="libinput" KERNEL="linux" LCD_DEVICES="bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer" OFFICE_IMPLEMENTATION="libreoffice" PHP_TARGETS="php5-6 php7-0" POSTGRES_TARGETS="postgres9_5 postgres10" PYTHON_SINGLE_TARGET="python3_6" PYTHON_TARGETS="python2_7 python3_6" RUBY_TARGETS="ruby23" USERLAND="GNU" VIDEO_CARDS="intel i915" XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
-USER="root"
-USERLAND="GNU"
-USE_EXPAND="ABI_MIPS ABI_PPC ABI_S390 ABI_X86 ALSA_CARDS APACHE2_MODULES APACHE2_MPMS CALLIGRA_EXPERIMENTAL_FEATURES CALLIGRA_FEATURES CAMERAS COLLECTD_PLUGINS CPU_FLAGS_ARM CPU_FLAGS_X86 CURL_SSL ELIBC ENLIGHTENMENT_MODULES FFTOOLS GPSD_PROTOCOLS GRUB_PLATFORMS INPUT_DEVICES KERNEL L10N LCD_DEVICES LIBREOFFICE_EXTENSIONS LIRC_DEVICES LLVM_TARGETS MONKEYD_PLUGINS NETBEANS_MODULES NGINX_MODULES_HTTP NGINX_MODULES_MAIL NGINX_MODULES_STREAM OFED_DRIVERS OFFICE_IMPLEMENTATION OPENMPI_FABRICS OPENMPI_OFED_FEATURES OPENMPI_RM PHP_TARGETS POSTGRES_TARGETS PYTHON_SINGLE_TARGET PYTHON_TARGETS QEMU_SOFTMMU_TARGETS QEMU_USER_TARGETS ROS_MESSAGES RUBY_TARGETS SANE_BACKENDS USERLAND UWSGI_PLUGINS VIDEO_CARDS VOICEMAIL_STORAGE XFCE_PLUGINS XTABLES_ADDONS"
-USE_EXPAND_HIDDEN="ABI_MIPS ABI_PPC ABI_S390 CPU_FLAGS_ARM ELIBC KERNEL USERLAND"
-USE_EXPAND_IMPLICIT="ARCH ELIBC KERNEL USERLAND"
-USE_EXPAND_UNPREFIXED="ARCH"
-USE_EXPAND_VALUES_ARCH="alpha amd64 amd64-fbsd amd64-linux arm arm-linux arm64 hppa ia64 m68k m68k-mint mips ppc ppc64 ppc64-linux ppc-aix ppc-macos s390 sh sparc sparc64-solaris sparc-solaris x64-cygwin x64-macos x64-solaris x86 x86-cygwin x86-fbsd x86-linux x86-macos x86-solaris x86-winnt"
-USE_EXPAND_VALUES_ELIBC="AIX bionic Cygwin Darwin DragonFly FreeBSD glibc HPUX Interix mingw mintlib musl NetBSD OpenBSD SunOS uclibc Winnt"
-USE_EXPAND_VALUES_KERNEL="AIX Darwin FreeBSD freemint HPUX linux NetBSD OpenBSD SunOS Winnt"
-USE_EXPAND_VALUES_USERLAND="BSD GNU"
-USE_ORDER="env:pkg:conf:defaults:pkginternal:repo:env.d"
-VIDEO_CARDS="intel i915"
-XTABLES_ADDONS="quota2 psd pknock lscan length2 ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmark dhcpmac delude chaos account"
-
-livecd /etc/portage #
-```
-
-Go ahead with the customization:
-
-```sh
-livecd /etc/portage # echo "Europe/Madrid" > /etc/timezone
-livecd /etc/portage # emerge --config timezone-data
-
-
-Ready to configure sys-libs/timezone-data-2018d? [Yes/No] Yes
-
-!!! SELinux module not found. Please verify that it was installed.
- * Updating /etc/localtime with /usr/share/zoneinfo/Europe/Madrid
-
-livecd /etc/portage # 
-```
-
-We've configured local time to our current  zone. Then another type of `emerge` option:
-
-- `--config`: run package specific actions needed to be executed after the emerge process has completed.
-
-```sh
-livecd /etc # cat >> locale.gen <<EOF
-> en_GB ISO-8859-1
-> en_GB.UTF-8 UTF-8
-> EOF
-livecd /etc # cd conf.d
-livecd /etc/conf.d # sed -i 's/keymap="us"/keymap="es"/g' keymaps 
-livecd /etc/conf.d # emerge --verbose --oneshot app-portage/cpuid2cpuflags
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild  N     ] app-portage/cpuid2cpuflags-5::gentoo  71 KiB
-
-Total: 1 package (1 new), Size of downloads: 71 KiB
-
-Would you like to merge these packages? [Yes/No] Yes
->>> Verifying ebuild manifests
->>> Emerging (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
->>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.00, 0.00, 0.00!!! SELinux module not found. Please verify that it was installed.
->>> Jobs: 0 of 1 complete, 1 running                Load avg: 0.08, 0.02, 0.01!!! SELinux module not found. Please verify that it was installed.
->>> Installing (1 of 1) app-portage/cpuid2cpuflags-5::gentoo
->>> Jobs: 1 of 1 complete                           Load avg: 0.15, 0.03, 0.01
-
- * Messages for package app-portage/cpuid2cpuflags-5:
-
- * Package:    app-portage/cpuid2cpuflags-5
- * Repository: gentoo
- * Maintainer: mgorny@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Final size of build directory: 488 KiB
- * Final size of installed tree:   44 KiB
->>> Auto-cleaning packages...
-
->>> No outdated packages were found on your system.
-
- * GNU info directory index is up-to-date.
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
-livecd /etc/conf.d # cpuid2cpuflags
-CPU_FLAGS_X86: aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3
-livecd /etc/conf.d # cd ../portage/
-livecd /etc/portage # sed -i 's/CPU_FLAGS_X86=.*/CPU_FLAGS_X86="aes avx mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3"/g' make.conf
-livecd /etc/portage #
-```
-
-Next we add [english locale](https://en.wikipedia.org/wiki/Locale_(computer_software)) to our chroot subsystem and configure the keymap under `/etc/conf.d` with a `sed` (*stream editor for filtering and transforming text*) command:
-
-- `-i`: in-place (i.e. save back to the original file).
-- `s`: the substitute command.
-- `g`: global (i.e. replace all and not just the first occurrence).
-
-We also install `cpuid2cpuflags` to better identify `CPU_FLAGS_X86` variable depending on what processor are we using. The `sed` command is the same of the one before but the `.*` that is used to substitute all the line beggin with.
-
-Now we're going to bootstrap the Gentoo Linux [toolchain](https://elinux.org/Toolchains):
-
-```sh
-livecd /usr/portage/scripts # ./bootstrap.sh --pretend
-
-Gentoo Linux; http://www.gentoo.org/
-Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
--------------------------------------------------------------------------------
-  [[ (0/3) Locating packages ]]
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
- * Using baselayout : >=sys-apps/baselayout-2
- * Using portage    : portage
- * Using os-headers : >=sys-kernel/linux-headers-4.17
- * Using binutils   : sys-devel/binutils
- * Using gcc        : sys-devel/gcc
- * Using gettext    : gettext
- * Using libc       : virtual/libc
- * Using texinfo    : sys-apps/texinfo
- * Using zlib       : zlib
- * Using ncurses    : ncurses
--------------------------------------------------------------------------------
-  [[ (1/3) Configuring environment ]]
--------------------------------------------------------------------------------
-!!! SELinux module not found. Please verify that it was installed.
-  [[ (2/3) Updating portage ]]
-!!! CONFIG_PROTECT is empty
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
-[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
-[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
-[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
-
-Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
--------------------------------------------------------------------------------
-  [[ (3/3) Emerging packages ]]
-!!! CONFIG_PROTECT is empty
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
-[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
-[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
-[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
-[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
-[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
-[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
-[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
-
-Total: 8 packages (5 upgrades, 3 reinstalls), Size of downloads: 113,345 KiB
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
--------------------------------------------------------------------------------
-livecd /usr/portage/scripts #
-```
-
-With `--pretend` we only visualize the upgoing work.
-
- From the Sakaki Guide:
-
-> In Gentoo parlance, people speak of three ['stages'](http://en.wikipedia.org/wiki/Gentoo_Linux#Stages) of bootstrapping (and their corresponding file system tarballs):
->
-> 1. **Stage 1**: When starting from a stage 1 tarball, the base toolchain (GCC, standard C libary etc.) must be built using the existing (binary) host system toolchain, under direction of the /usr/portage/scripts/bootstrap.sh script. This yields a:
-> 2. **Stage 2** system. Here, we still need to emerge (build) the core [@world](https://wiki.gentoo.org/wiki/World_set_(Portage)) package set, using our new toolchain. This yields a:
-> 3. **Stage 3** system, in which the toolchain has been bootstrapped, and the important system binaries and libraries have been compiled using it. A tarball of such a stage 3 system's directories is now provided as a default part of the Gentoo distribution (stage 1 and stage 2 tarballs are not available to end-users anymore).
->
-> Although we have [already](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Installing_the_Gentoo_Stage_3_Files#download_stage_3_tarball) downloaded a stage 3 tarball, we're going to pretend we haven't, and instead build up from stage 1.
-
-[![asciicast](https://asciinema.org/a/190924.png)](https://asciinema.org/a/190924)
-
-In this rapid *asciicast* we edit `bootstrap.sh` file changing a line of text, explanation by Sakaki:
-
-> The Gentoo [FAQ](https://wiki.gentoo.org/wiki/FAQ#How_do_I_Install_Gentoo_Using_a_Stage1_or_Stage2_Tarball.3F) suggests you may wish to edit the /usr/portage/scripts/bootstrap.sh script after reviewing it - and indeed, we will do so, because there are two 'gotchas' lurking in the above proposed emerge list. The first problem is that the [C standard library](http://en.wikipedia.org/wiki/C_standard_library) that the bootstrap intends to rebuild is a [*virtual*](https://devmanual.gentoo.org/general-concepts/virtuals/) ([virtual/libc](https://packages.gentoo.org/packages/virtual/libc)); however, in Portage, emerging a virtual package does *not*, by default, cause any already-installed package that satisfies that virtual (in our case, [sys-libs/glibc](https://packages.gentoo.org/packages/sys-libs/glibc)) to be rebuilt - which we want.
-
-```sh
-livecd /usr/portage/scripts # ./bootstrap.sh 
-
-Gentoo Linux; http://www.gentoo.org/
-Copyright 1999-$ Gentoo Foundation; Distributed under the GPLv2
-Starting Bootstrap of base system ...
--------------------------------------------------------------------------------
-  [[ (0/3) Locating packages ]]
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
-!!! SELinux module not found. Please verify that it was installed.
- * Using baselayout : >=sys-apps/baselayout-2
- * Using portage    : portage
- * Using os-headers : >=sys-kernel/linux-headers-4.17
- * Using binutils   : sys-devel/binutils
- * Using gcc        : sys-devel/gcc
- * Using gettext    : gettext
- * Using libc       : sys-libs/glibc:2.2
- * Using texinfo    : sys-apps/texinfo
- * Using zlib       : zlib
- * Using ncurses    : ncurses
--------------------------------------------------------------------------------
-  [[ (1/3) Configuring environment ]]
--------------------------------------------------------------------------------
-!!! SELinux module not found. Please verify that it was installed.
-  [[ (2/3) Updating portage ]]
-!!! CONFIG_PROTECT is empty
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild  N     ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 463 KiB
-[ebuild  N     ] dev-lang/swig-3.0.12::gentoo  USE="-ccache -doc -pcre" 7,959 KiB
-[ebuild  N     ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="-ruby23" 184 KiB
-[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="build* (ipc) (selinux*) (xattr) -doc -epydoc -gentoo-dev -native-extensions* -rsync-verify*" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
-
-Total: 4 packages (3 new, 1 reinstall), Size of downloads: 8,605 KiB
-
-Would you like to merge these packages? [Yes/No] Yes
->>> Verifying ebuild manifests
->>> Emerging (1 of 4) sys-libs/libsepol-2.8::gentoo
->>> Emerging (2 of 4) dev-lang/swig-3.0.12::gentoo
->>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.08, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
->>> Jobs: 0 of 4 complete, 2 running                Load avg: 0.07, 0.04, 0.00!!! SELinux module not found. Please verify that it was installed.
->>> Jobs: 0 of 4 complete, 2 running                Load avg: 1.92, 0.46, 0.14!!! SELinux module not found. Please verify that it was installed.
->>> Installing (2 of 4) dev-lang/swig-3.0.12::gentoo
->>> Installing (1 of 4) sys-libs/libsepol-2.8::gentoo
->>> Emerging (3 of 4) sys-libs/libselinux-2.8::gentoo
->>> Installing (3 of 4) sys-libs/libselinux-2.8::gentoo
->>> Emerging (4 of 4) sys-apps/portage-2.3.41::gentoo
->>> Installing (4 of 4) sys-apps/portage-2.3.41::gentoo
->>> Jobs: 4 of 4 complete                           Load avg: 2.20, 0.99, 0.37
-
- * Messages for package dev-lang/swig-3.0.12:
-
- * Package:    dev-lang/swig-3.0.12
- * Repository: gentoo
- * Maintainer: radhermit@gentoo.org scheme@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Skipping make test/check due to ebuild restriction.
- * Final size of build directory: 52588 KiB (51.3 MiB)
- * Final size of installed tree:   8212 KiB ( 8.0 MiB)
-
- * Messages for package sys-libs/libsepol-2.8:
-
- * Package:    sys-libs/libsepol-2.8
- * Repository: gentoo
- * Maintainer: selinux@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Will copy sources from /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8
- * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libsepol-2.8/work/libsepol-2.8-abi_x86_64.amd64
- * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
- * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
- * Skipping make test/check due to ebuild restriction.
- * abi_x86_64.amd64: running multilib-minimal_abi_src_install
- * Final size of build directory: 14300 KiB (13.9 MiB)
- * Final size of installed tree:   2720 KiB ( 2.6 MiB)
-
- * Messages for package sys-libs/libselinux-2.8:
-
- * Package:    sys-libs/libselinux-2.8
- * Repository: gentoo
- * Maintainer: selinux@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux python python_targets_python2_7 python_targets_python3_5 static-libs userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Will copy sources from /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8
- * abi_x86_64.amd64: copying to /var/tmp/portage/sys-libs/libselinux-2.8/work/libselinux-2.8-abi_x86_64.amd64
- * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
- * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
- * python2_7: running building
- * python3_5: running building
- * abi_x86_64.amd64: running multilib-minimal_abi_src_install
- * python2_7: running installation
- * python3_5: running installation
- * Final size of build directory: 8208 KiB (8.0 MiB)
- * Final size of installed tree:  3740 KiB (3.6 MiB)
-
- * Messages for package sys-apps/portage-2.3.41:
-
- * Package:    sys-apps/portage-2.3.41
- * Repository: gentoo
- * Maintainer: dev-portage@gentoo.org
- * Upstream:   dev-portage@gentoo.org
- * USE:        abi_x86_64 amd64 build elibc_glibc ipc kernel_linux python_targets_python2_7 python_targets_python3_5 selinux userland_GNU xattr
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Adding FEATURES=xattr to make.globals ...
- * python2_7: running distutils-r1_run_phase distutils-r1_python_compile
- * python3_5: running distutils-r1_run_phase distutils-r1_python_compile
- * python3_5: running distutils-r1_run_phase python_compile_all
- * python2_7: running distutils-r1_run_phase python_install
- * python3_5: running distutils-r1_run_phase python_install
- * python3_5: running distutils-r1_run_phase python_install_all
- * Moving admin scripts to the correct directory
- * Moving /usr/bin/archive-conf to /usr/sbin/archive-conf
- * Moving /usr/bin/dispatch-conf to /usr/sbin/dispatch-conf
- * Moving /usr/bin/emaint to /usr/sbin/emaint
- * Moving /usr/bin/env-update to /usr/sbin/env-update
- * Moving /usr/bin/etc-update to /usr/sbin/etc-update
- * Moving /usr/bin/fixpackages to /usr/sbin/fixpackages
- * Moving /usr/bin/regenworld to /usr/sbin/regenworld
- * Final size of build directory: 19728 KiB (19.2 MiB)
- * Final size of installed tree:  35852 KiB (35.0 MiB)
- * 
- * This release of portage NO LONGER contains the repoman code base.
- * Repoman has its own ebuild and release package.
- * For repoman functionality please emerge app-portage/repoman
- * Please report any bugs you may encounter.
- * 
->>> Auto-cleaning packages...
-
->>> No outdated packages were found on your system.
-
- * GNU info directory index is up-to-date.
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
--------------------------------------------------------------------------------
-  [[ (3/3) Emerging packages ]]
-!!! CONFIG_PROTECT is empty
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild     U  ] sys-kernel/linux-headers-4.17::gentoo [4.13::gentoo] USE="-headers-only" 7,728 KiB
-[ebuild     U  ] sys-libs/glibc-2.27-r5:2.2::gentoo [2.26-r7:2.2::gentoo] USE="hardened* (multilib) (selinux*) -audit -caps (-compile-locales) -doc -gd -headers-only -multiarch% -nscd (-profile) -suid -systemtap (-vanilla) (-debug%)" 17,499 KiB
-[ebuild     U  ] sys-apps/baselayout-2.6::gentoo [2.4.1-r2::gentoo] USE="split-usr%* -build" 32 KiB
-[ebuild     U  ] sys-libs/zlib-1.2.11-r2:0/1::gentoo [1.2.11-r1:0/1::gentoo] USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 594 KiB
-[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="cxx nls -acl* -cvs -doc -emacs -git -java -ncurses* -openmp* -static-libs" ABI_X86="(64) -32 (-x32)" 19,243 KiB
-[ebuild     U  ] sys-devel/binutils-2.30-r3:2.30::gentoo [2.30-r2:2.30::gentoo] USE="cxx nls -doc -multitarget -static-libs {-test}" 20,348 KiB
-[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened* (multilib) nls nptl (pie) (ssp) (-altivec) -cilk -debug -doc (-fixed-point) -fortran* -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc -openmp* (-pch*) -pgo -regression-test (-sanitize*) -vanilla -vtv*" 61,007 KiB
-[ebuild     U  ] sys-apps/texinfo-6.5::gentoo [6.3::gentoo] USE="nls -static" 4,398 KiB
-
-Total: 8 packages (6 upgrades, 2 reinstalls), Size of downloads: 130,844 KiB
-
-Would you like to merge these packages? [Yes/No] Yes
->>> Verifying ebuild manifests
->>> Running pre-merge checks for sys-libs/glibc-2.27-r5
- * Checking general environment sanity.
-make -j5 -l4 -s glibc-test 
- * Checking that IA32 emulation is enabled in the running kernel ...                             [ ok ]
- * Checking gcc for __thread support ...                                                         [ ok ]
- * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...                               [ ok ]
- * Checking linux-headers version (4.13.0 >= 3.2.0) ...                                          [ ok ]
->>> Running pre-merge checks for sys-devel/gcc-7.3.0-r3
->>> Emerging (1 of 8) sys-kernel/linux-headers-4.17::gentoo
->>> Installing (1 of 8) sys-kernel/linux-headers-4.17::gentoo
->>> Emerging (2 of 8) sys-libs/glibc-2.27-r5::gentoo
->>> Installing (2 of 8) sys-libs/glibc-2.27-r5::gentoo
->>> Emerging (3 of 8) sys-apps/baselayout-2.6::gentoo
->>> Installing (3 of 8) sys-apps/baselayout-2.6::gentoo
->>> Emerging (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
->>> Installing (4 of 8) sys-libs/zlib-1.2.11-r2::gentoo
->>> Emerging (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
->>> Installing (5 of 8) sys-devel/gettext-0.19.8.1::gentoo
->>> Emerging (6 of 8) sys-devel/binutils-2.30-r3::gentoo
->>> Installing (6 of 8) sys-devel/binutils-2.30-r3::gentoo
->>> Emerging (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
->>> Jobs: 6 of 8 complete, 1 running                Load avg: 2.41, 3.27, 3.58
->>> Installing (7 of 8) sys-devel/gcc-7.3.0-r3::gentoo
->>> Emerging (8 of 8) sys-apps/texinfo-6.5::gentoo
->>> Installing (8 of 8) sys-apps/texinfo-6.5::gentoo
->>> Jobs: 8 of 8 complete                           Load avg: 1.60, 2.71, 3.27
-
- * Messages for package sys-libs/glibc-2.27-r5:
-
- * Package:    sys-libs/glibc-2.27-r5
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Checking general environment sanity.
- * Checking that IA32 emulation is enabled in the running kernel ...
- * Checking gcc for __thread support ...
- * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
- * Checking linux-headers version (4.13.0 >= 3.2.0) ...
-
- * Messages for package sys-devel/gcc-7.3.0-r3:
-
- * Package:    sys-devel/gcc-7.3.0-r3
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
-
- * Messages for package sys-kernel/linux-headers-4.17:
-
- * Package:    sys-kernel/linux-headers-4.17
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Applying 00_all_0001-linux-stat.h-remove-__GLIBC__-checks.patch ...
- * Applying 00_all_0002-netfilter-pull-in-limits.h.patch ...
- * Applying 00_all_0003-convert-PAGE_SIZE-usage.patch ...
- * Applying 00_all_0004-asm-generic-fcntl.h-namespace-kernel-file-structs.patch ...
- * Applying 00_all_0005-unifdef-drop-unused-errno.h-include.patch ...
- * Applying 00_all_0006-x86-do-not-build-relocs-tool-when-installing-headers.patch ...
- * Applying 00_all_0007-netlink-drop-int-cast-on-length-arg-in-NLMSG_OK.patch ...
- * Applying 00_all_0008-uapi-fix-System-V-buf-header-includes.patch ...
- * Final size of build directory: 70664 KiB (69.0 MiB)
- * Final size of installed tree:   6764 KiB ( 6.6 MiB)
-
- * Messages for package sys-libs/glibc-2.27-r5:
-
- * Package:    sys-libs/glibc-2.27-r5
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc hardened kernel_linux multilib selinux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Checking that IA32 emulation is enabled in the running kernel ...
- * Checking gcc for __thread support ...
- * Checking running kernel version (4.9.76-gentoo-r1 >= 3.2.0) ...
- * Checking linux-headers version (4.17.0 >= 3.2.0) ...
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- * Applying Gentoo Glibc Patchset 2.27-2
- * Applying patches from /var/tmp/portage/sys-libs/glibc-2.27-r5/work/patches ...
- *   0001-Gentoo-disable-ldconfig-during-install.patch ...
- *   0002-Gentoo-support-running-tests-under-sandbox.patch ...
- *   0004-Revert-sysdeps-posix-getaddrinfo.c-gaih_inet-Only-us.patch ...
- *   0005-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
- *   0006-libidn-libidn-punycode.c-decode_digit-Fix-integer-ov.patch ...
- *   0007-libidn-Fix-out-of-bounds-stack-read.-Report-and-patc.patch ...
- *   0009-Gentoo-disable-tests-that-fail-only-in-sandbox.patch ...
- *   0010-Gentoo-Disable-test-that-fails-because-of-the-gethos.patch ...
- *   0011-sparc-Check-PIC-instead-of-SHARED-in-start.S.patch ...
- *   0012-sys-types.h-drop-sys-sysmacros.h-include.patch ...
- *   0014-Record-CVE-2018-6551-in-NEWS-and-ChangeLog-BZ-22774.patch ...
- *   0015-sparc-Check-PIC-instead-of-SHARED-in-start.S-BZ-2263.patch ...
- *   0016-NEWS-add-an-entry-for-bug-22638.patch ...
- *   0017-Add-a-missing-ChangeLog-item-in-commit-371b220f620.patch ...
- *   0018-Linux-use-reserved-name-__key-in-pkey_get-BZ-22797.patch ...
- *   0019-RISC-V-Fix-parsing-flags-in-ELF64-files.patch ...
- *   0020-Update-SH-libm-tests-ulps.patch ...
- *   0021-et_EE-Add-missing-reorder-end-keyword-bug-22861.patch ...
- *   0022-NEWS-add-an-entry-for-bug-22827.patch ...
- *   0023-linux-aarch64-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
- *   0024-time-Reference-CLOCKS_PER_SEC-in-clock-comment-BZ-22.patch ...
- *   0025-Fix-posix-tst-glob_lstat_compat-on-alpha-BZ-22818.patch ...
- *   0026-manual-Fix-Texinfo-warnings-about-improper-node-name.patch ...
- *   0027-manual-Fix-a-syntax-error.patch ...
- *   0028-manual-Improve-documentation-of-get_current_dir_name.patch ...
- *   0029-powerpc-Fix-TLE-build-for-SPE-BZ-22926.patch ...
- *   0030-sparc32-Add-nop-before-__startcontext-to-stop-unwind.patch ...
- *   0031-NEWS-add-entries-for-bugs-22919-and-22926.patch ...
- *   0032-manual-Document-missing-feature-test-macros.patch ...
- *   0033-manual-Update-the-_ISOC99_SOURCE-description.patch ...
- *   0034-Fix-a-typo-in-a-comment.patch ...
- *   0035-Add-missing-reorder-end-in-LC_COLLATE-of-et_EE-BZ-22.patch ...
- *   0036-powerpc-Undefine-Linux-ptrace-macros-that-conflict-w.patch ...
- *   0037-linux-powerpc-sync-sys-ptrace.h-with-Linux-4.15-BZ-2.patch ...
- *   0038-BZ-22342-Fix-netgroup-cache-keys.patch ...
- *   0039-Fix-multiple-definitions-of-__nss_-_database-bug-229.patch ...
- *   0040-i386-Fix-i386-sigaction-sa_restorer-initialization-B.patch ...
- *   0041-Update-translations-from-the-Translation-Project.patch ...
- *   0042-ca_ES-locale-Update-LC_TIME-bug-22848.patch ...
- *   0043-lt_LT-locale-Update-abbreviated-month-names-bug-2293.patch ...
- *   0044-Greek-el_CY-el_GR-locales-Introduce-ab_alt_mon-bug-2.patch ...
- *   0045-cs_CZ-locale-Add-alternative-month-names-bug-22963.patch ...
- *   0046-NEWS-Add-entries-for-bugs-22848-22932-22937-22963.patch ...
- *   0047-RISC-V-Do-not-initialize-gp-in-TLS-macros.patch ...
- *   0048-RISC-V-fmax-fmin-Handle-signalling-NaNs-correctly.patch ...
- *   0049-Update-ChangeLog-for-BZ-22884-riscv-fmax-fmin.patch ...
- *   0050-Fix-i386-memmove-issue-bug-22644.patch ...
- *   0051-Linux-i386-tst-bz21269-triggers-SIGBUS-on-some-kerne.patch ...
- *   0052-RISC-V-fix-struct-kernel_sigaction-to-match-the-kern.patch ...
- *   0053-Add-tst-sigaction.c-to-test-BZ-23069.patch ...
- *   0054-Fix-signed-integer-overflow-in-random_r-bug-17343.patch ...
- *   0055-Fix-crash-in-resolver-on-memory-allocation-failure-b.patch ...
- *   0056-getlogin_r-return-early-when-linux-sentinel-value-is.patch ...
- *   0057-Update-RWF_SUPPORTED-for-Linux-kernel-4.16-BZ-22947.patch ...
- *   0058-manual-Move-mbstouwcs-to-an-example-C-file.patch ...
- *   0059-manual-Various-fixes-to-the-mbstouwcs-example-and-mb.patch ...
- *   0060-resolv-Fully-initialize-struct-mmsghdr-in-send_dg-BZ.patch ...
- *   0061-Add-PTRACE_SECCOMP_GET_METADATA-from-Linux-4.16-to-s.patch ...
- *   0062-Fix-blocking-pthread_join.-BZ-23137.patch ...
- *   0063-Fix-stack-overflow-with-huge-PT_NOTE-segment-BZ-2041.patch ...
- *   0064-Fix-path-length-overflow-in-realpath-BZ-22786.patch ...
- *   0065-NEWS-add-entries-for-bugs-17343-20419-22644-22786-22.patch ...
- *   0066-gd_GB-Fix-typo-in-abbreviated-May-bug-23152.patch ...
- *   0067-sunrpc-Remove-stray-exports-without-enable-obsolete-.patch ...
- * Done.
- * Using GNU config files from /usr/share/gnuconfig
- *   Updating scripts/config.sub
- *   Updating scripts/config.guess
- * Adjusting to prefix /
- *   locale-gen ...
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
- * Running do_src_configure for ABI x86
- * Configuring glibc for nptl
- *             ABI:   x86
- *          CBUILD:   x86_64-pc-linux-gnu
- *           CHOST:   x86_64-pc-linux-gnu
- *         CTARGET:   x86_64-pc-linux-gnu
- *      CBUILD_OPT:   i686-pc-linux-gnu
- *     CTARGET_OPT:   i686-pc-linux-gnu
- *              CC:   x86_64-pc-linux-gnu-gcc -m32
- *             CXX:   
- *              LD:   
- *         ASFLAGS:   
- *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
- *        CPPFLAGS:   
- *        CXXFLAGS:   -O2 -fno-strict-aliasing
- *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
- *        MAKEINFO:   /dev/null
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
- *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m32 -march=sandybridge -pipe -O2 -fno-strict-aliasing
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- * Running do_src_configure for ABI amd64
- * Configuring glibc for nptl
- *             ABI:   amd64
- *          CBUILD:   x86_64-pc-linux-gnu
- *           CHOST:   x86_64-pc-linux-gnu
- *         CTARGET:   x86_64-pc-linux-gnu
- *      CBUILD_OPT:   x86_64-pc-linux-gnu
- *     CTARGET_OPT:   x86_64-pc-linux-gnu
- *              CC:   x86_64-pc-linux-gnu-gcc -m64
- *             CXX:   
- *              LD:   
- *         ASFLAGS:   
- *          CFLAGS:   -march=sandybridge -pipe -O2 -fno-strict-aliasing
- *        CPPFLAGS:   
- *        CXXFLAGS:   -O2 -fno-strict-aliasing
- *         LDFLAGS:   -Wl,-O1 -Wl,--as-needed
- *        MAKEINFO:   /dev/null
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing -Wl,-O1 -Wl,--as-needed
- *      Manual CXX:   x86_64-pc-linux-gnu-g++ -m64 -march=sandybridge -pipe -O2 -fno-strict-aliasing
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
- * Running do_src_compile for ABI x86
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- * Running do_src_compile for ABI amd64
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m32
- * Running glibc_do_src_install for ABI x86
- *       Manual CC:   x86_64-pc-linux-gnu-gcc -m64
- * Running glibc_do_src_install for ABI amd64
- * Final size of build directory: 552612 KiB (539.6 MiB)
- * Final size of installed tree:   69248 KiB ( 67.6 MiB)
- * Defaulting /etc/host.conf:multi to on
- * Generating all locales; edit /etc/locale.gen to save time/space
-
- * Messages for package sys-apps/baselayout-2.6:
-
- * Package:    sys-apps/baselayout-2.6
- * Repository: gentoo
- * Maintainer: williamh@gentoo.org base-system@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux split-usr userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Final size of build directory: 220 KiB
- * Final size of installed tree:  168 KiB
- * You should reboot now to get /run mounted with tmpfs!
- * Please run env-update then log out and back in to
- * update your path.
-
- * Messages for package sys-libs/zlib-1.2.11-r2:
-
- * Package:    sys-libs/zlib-1.2.11-r2
- * Repository: gentoo
- * Maintainer: base-system@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Applying zlib-1.2.11-fix-deflateParams-usage.patch ...
- * Applying zlib-1.2.11-minizip-drop-crypt-header.patch ...
- * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
- * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
- * abi_x86_64.amd64: running multilib-minimal_abi_src_install
- * Final size of build directory: 4676 KiB (4.5 MiB)
- * Final size of installed tree:   492 KiB
-
- * Messages for package sys-devel/gettext-0.19.8.1:
-
- * Package:    sys-devel/gettext-0.19.8.1
- * Repository: gentoo
- * Maintainer: base-system@gentoo.org
- * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Applying gettext-0.19.7-disable-libintl.patch ...
- * Applying gettext-0.19.8.1-format-security.patch ...
- * Removing useless C++ checks ...
- * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
- * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
- * abi_x86_64.amd64: running multilib-minimal_abi_src_install
- * Removing unnecessary /usr/lib64/libgettextpo.la (requested)
- * Removing unnecessary /usr/lib64/libasprintf.la (requested)
- * Removing unnecessary /usr/lib64/libgettextsrc.la (requested)
- * Removing unnecessary /usr/lib64/libgettextlib.la (requested)
- * Final size of build directory: 128212 KiB (125.2 MiB)
- * Final size of installed tree:   10364 KiB ( 10.1 MiB)
- * QA Notice: Missing soname symlink(s):
- * 
- * 	usr/lib64/libgnuintl.so.8 -> preloadable_libintl.so
- * 
-
- * Messages for package sys-devel/binutils-2.30-r3:
-
- * Package:    sys-devel/binutils-2.30-r3
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 cxx elibc_glibc kernel_linux nls userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Applying binutils-2.30 patchset 3
- * Applying 0001-Gentoo-ld-always-warn-about-textrels-in-files.patch ...
- * Applying 0002-Gentoo-gold-ld-add-support-for-poisoned-system-direc.patch ...
- * Applying 0003-Gentoo-ld-enable-new-dtags-by-default-for-linux-gnu-.patch ...
- * Applying 0004-Gentoo-libiberty-install-PIC-version-of-libiberty.a.patch ...
- * Applying 0005-Gentoo-opcodes-link-against-libbfd.la-for-rpath-deps.patch ...
- * Applying 0007-Gentoo-Adapt-the-testsuite-to-our-enhanced-textrel-w.patch ...
- * Applying 0008-Gentoo-Adapt-the-test-suite-to-our-changed-hash-styl.patch ...
- * Applying 0009-Gentoo-We-can-t-test-for-textrel-warnings-if-we-regs.patch ...
- * Applying 0010-Gentoo-Disable-failing-test-ld-x86-64-x86-64.exp-pie.patch ...
- * Applying 0011-Revert-to-development-on-the-2.30-branch.-Set-the-ve.patch ...
- * Applying 0013-Gentoo-Disable-another-test-that-checks-for-textrel-.patch ...
- * Applying 0014-Gentoo-Disable-gold-test-suite-since-it-still-always.patch ...
- * Applying 0015-Automatic-date-update-in-version.in.patch ...
- * Applying 0016-Update-Russian-translation-for-the-gas-sub-directory.patch ...
- * Applying 0017-Automatic-date-update-in-version.in.patch ...
- * Applying 0018-Add-support-for-DWARF-4-line-number-tables.patch ...
- * Applying 0019-Automatic-date-update-in-version.in.patch ...
- * Applying 0020-Import-patch-from-mainline-to-remove-PROVODE-qualifi.patch ...
- * Applying 0021-Updated-Brazillian-portuguese-and-Russian-translatio.patch ...
- * Applying 0022-PR22764-LD-AARCH64-Allow-R_AARCH64_ABS16-and-R_AARCH.patch ...
- * Applying 0023-Automatic-date-update-in-version.in.patch ...
- * Applying 0024-Revert-PowerPC-PLT-speculative-execution-barriers.patch ...
- * Applying 0025-Automatic-date-update-in-version.in.patch ...
- * Applying 0026-Import-patch-from-mainline-to-fix-possible-seg-fault.patch ...
- * Applying 0027-Fix-GOT-relocation-overflow-on-SPARC.patch ...
- * Applying 0028-Fix-PR-gas-22738-.dc.a-directive-has-wrong-size-on-S.patch ...
- * Applying 0029-Updated-Russian-translation-for-the-gas-sub-director.patch ...
- * Applying 0030-gas-xtensa-fix-trampoline-placement.patch ...
- * Applying 0031-PR-ld-22832-on-SPARC.patch ...
- * Applying 0032-Import-patch-from-mainline-to-fix-a-bug-that-would-p.patch ...
- * Applying 0033-Fix-AArch32-build-attributes-for-Armv8.4-A.patch ...
- * Applying 0034-Import-patch-from-mainline-to-fix-memory-corruption-.patch ...
- * Applying 0035-Automatic-date-update-in-version.in.patch ...
- * Applying 0036-Gentoo-Restore-TEXTREL-warnings-for-non-shared-objec.patch ...
- * Applying 0037-Gentoo-Properly-ignore-new-textrel-warnings-in-tests.patch ...
- * Applying 0038-Gentoo-We-can-t-test-for-textrel-warnings-if-we-igno.patch ...
- * Applying 0039-Updated-Russian-translation-for-the-gas-sub-director.patch ...
- * Applying 0040-Enable-link-time-garbage-collection-for-the-IA64-tar.patch ...
- * Applying 0041-IA-64-Fix-linker-error-with-no-keep-memory.patch ...
- * Applying 0042-GC-Also-check-the-local-debug-definition-section.patch ...
- * Applying 0043-ARM-Fix-bxns-mask.patch ...
- * Applying 0044-PR22836-r-s-doesn-t-work-with-g3-using-GCC-7.patch ...
- * Applying 0045-PR22836-testcases.patch ...
- * Applying 0046-Set-non_ir_ref_dynamic-if-a-symbol-is-made-dynamic.patch ...
- * Applying 0047-ld-testsuite-XFAIL-pr20995-2-on-aarch64-elf.patch ...
- * Applying 0048-Remove-unnecessary-power9-group-terminating-nop.patch ...
- * Applying 0049-Really-remove-unnecessary-power9-group-terminating-n.patch ...
- * Applying 0050-PowerPC64-debian-bug-886264-out-of-line-save-restore.patch ...
- * Applying 0051-x86-64-Add-ENDBR64-to-the-TLSDESC-PLT-entry.patch ...
- * Applying 0052-gold-testsuite-Fix-bad-regexp-in-split_x86_64.sh.patch ...
- * Applying 0053-PR-ld-22972-on-SPARC.patch ...
- * Applying 0054-Fix-case-where-IR-file-provides-symbol-visibility-bu.patch ...
- * Applying 0055-Automatic-date-update-in-version.in.patch ...
- * Applying 0056-Import-patch-from-the-mainline-that-fixes-the-ARM-as.patch ...
- * Applying 0057-i386-Clear-vex-instead-of-vex.evex.patch ...
- * Applying 0058-Import-patch-from-mainline-sources-to-stop-the-linke.patch ...
- * Applying 0059-Updated-Spanish-and-Russian-translations-for-the-gas.patch ...
- * Applying 0060-Updated-Spanish-translations-for-the-gold-and-gprof-.patch ...
- * Applying 0061-Updated-Spanish-translation-for-gas-sub-directory.patch ...
- * Applying 0062-x86-Remove-the-unused-_GLOBAL_OFFSET_TABLE_.patch ...
- * Applying 0063-x86-Keep-the-unused-_GLOBAL_OFFSET_TABLE_-for-Solari.patch ...
- * Applying 0064-x86-Add-is_solaris-to-elf_x86_target_os.patch ...
- * Applying 0065-Fix-the-mask-for-the-sqrdml-a-s-h-instructions.patch ...
- * Applying 0066-PR23123-PowerPC32-ifunc-regression.patch ...
- * Applying 0067-Automatic-date-update-in-version.in.patch ...
- * Applying 0068-Prevent-attempts-to-call-strncpy-with-a-zero-length-.patch ...
- * Applying 0069-PR22769-crash-when-running-32-bit-objdump-on-corrupt.patch ...
- * Applying 0070-PR22887-null-pointer-dereference-in-aout_32_swap_std.patch ...
- * Applying 0071-Prevent-illegal-memory-accesses-triggerd-by-intger-o.patch ...
- * Applying 0072-Catch-integer-overflows-underflows-when-parsing-corr.patch ...
- * Applying 0073-Fix-potential-integer-overflow-when-reading-corrupt-.patch ...
- * Applying 0074-PR22741-objcopy-segfault-on-fuzzed-COFF-object.patch ...
- * Applying 0075-Add-new-Portuguese-translation-for-the-bfd-sub-direc.patch ...
- * Applying 0076-Fix-uninitialised-memory-acccess-in-COFF-bfd-backend.patch ...
- * Applying 0077-Fix-disassembly-mask-for-vector-sdot-on-AArch64.patch ...
- * Applying 0078-PR23199-Invalid-SHT_GROUP-entry-leads-to-group-confu.patch ...
- * Applying 0079-x86-Don-t-set-eh-local_ref-to-1-for-linker-defined-s.patch ...
- * Applying 0080-x86-Don-t-set-eh-local_ref-to-1-for-versioned-symbol.patch ...
- * Applying 0081-Mark-section-in-a-section-group-with-SHF_GROUP.patch ...
- * Applying 0082-Automatic-date-update-in-version.in.patch ...
- * Applying 0083-Add-an-option-no-warn-shared-textrel-self-explanator.patch ...
- * Applying 0084-Revert-Gentoo-Adapt-the-testsuite-to-our-enhanced-te.patch ...
- * Applying 0085-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
- * Applying 0086-Revert-Gentoo-Disable-failing-test-ld-x86-64-x86-64..patch ...
- * Applying 0087-Revert-Gentoo-Disable-another-test-that-checks-for-t.patch ...
- * Applying 0088-Revert-Gentoo-We-can-t-test-for-textrel-warnings-if-.patch ...
- * Applying 0089-Pass-no-warn-shared-textrel-to-ld-in-its-testsuite.patch ...
- * Applying 0090-Fix-test-for-precise-textrel-warning-message.patch ...
- * Applying 0091-Fix-the-PR22983-test-so-that-it-will-work-regardless.patch ...
- * Applying 0092-x86-64-Add-TLSDESC-fields-to-elf_x86_lazy_plt_layout.patch ...
- * Applying 0093-Automatic-date-update-in-version.in.patch ...
- * Applying 9999-Gentoo-We-make-a-release.patch ...
- * Fixing misc issues in configure files
- * Using GNU config files from /usr/share/gnuconfig
- *   Updating config.sub
- *   Updating config.guess
- *  CATEGORY: sys-devel
- *    CBUILD: x86_64-pc-linux-gnu
- *     CHOST: x86_64-pc-linux-gnu
- *   CTARGET: x86_64-pc-linux-gnu
- *    CFLAGS: -march=sandybridge -O2 -pipe
- *   LDFLAGS: -Wl,-O1 -Wl,--as-needed
- * Final size of build directory: 461180 KiB (450.3 MiB)
- * Final size of installed tree:   59528 KiB ( 58.1 MiB)
-
- * Messages for package sys-devel/gcc-7.3.0-r3:
-
- * Package:    sys-devel/gcc-7.3.0-r3
- * Repository: gentoo
- * Maintainer: toolchain@gentoo.org
- * USE:        abi_x86_64 amd64 cxx elibc_glibc hardened kernel_linux multilib nls nptl pie ssp userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Applying Gentoo patches ...
- *   10_all_default-fortify-source.patch ...
- *   11_all_default-warn-format-security.patch ...
- *   12_all_default-warn-trampolines.patch ...
- *   13_all_default-ssp-fix.patch ...
- *   25_all_alpha-mieee-default.patch ...
- *   34_all_ia64_note.GNU-stack.patch ...
- *   50_all_libiberty-asprintf.patch ...
- *   51_all_libiberty-pic.patch ...
- *   54_all_nopie-all-flags.patch ...
- *   55_all_extra-options.patch ...
- *   90_all_pr55930-dependency-tracking.patch ...
- *   91_all_bmi-i386-PR-target-81763.patch ...
- *   92_all_sh-drop-sysroot-suffix.patch ...
- *   93_all_copy-constructible-fix.patch ...
- * Done with patching
- * Updating gcc to use automatic PIE building ...
- * Updating gcc to use automatic SSP building ...
- * updating multilib directories to be: ../lib64 ../lib32
- * Using GNU config files from /usr/share/gnuconfig
- *   Updating config.sub
- *   Updating config.guess
- * Fixing misc issues in configure files
- * Applying gcc-configure-texinfo.patch ...
- * Touching generated files
- * CFLAGS="-march=sandybridge -O2 -pipe"
- * CXXFLAGS=""
- * LDFLAGS="-Wl,-O1 -Wl,--as-needed"
- * PREFIX:          /usr
- * BINPATH:         /usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0
- * LIBPATH:         /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0
- * DATAPATH:        /usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0
- * STDCXX_INCDIR:   /usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7
- * Languages:       c,c++
- * Configuring GCC with: 
- * 	--host=x86_64-pc-linux-gnu 
- * 	--build=x86_64-pc-linux-gnu 
- * 	--prefix=/usr 
- * 	--bindir=/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0 
- * 	--includedir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include 
- * 	--datadir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0 
- * 	--mandir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/man 
- * 	--infodir=/usr/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/info 
- * 	--with-gxx-include-dir=/usr/lib/gcc/x86_64-pc-linux-gnu/7.3.0/include/g++-v7 
- * 	--with-python-dir=/share/gcc-data/x86_64-pc-linux-gnu/7.3.0/python 
- * 	--enable-languages=c,c++ 
- * 	--enable-obsolete 
- * 	--enable-secureplt 
- * 	--disable-werror 
- * 	--with-system-zlib 
- * 	--enable-nls 
- * 	--without-included-gettext 
- * 	--enable-checking=release 
- * 	--with-bugurl=https://bugs.gentoo.org/ 
- * 	--with-pkgversion=Gentoo Hardened 7.3.0-r3 p1.4 
- * 	--enable-esp 
- * 	--enable-libstdcxx-time 
- * 	--disable-libstdcxx-pch 
- * 	--enable-shared 
- * 	--enable-threads=posix 
- * 	--enable-__cxa_atexit 
- * 	--enable-clocale=gnu 
- * 	--enable-multilib 
- * 	--with-multilib-list=m32,m64 
- * 	--disable-altivec 
- * 	--disable-fixed-point 
- * 	--enable-targets=all 
- * 	--disable-libgomp 
- * 	--disable-libmudflap 
- * 	--disable-libssp 
- * 	--disable-libcilkrts 
- * 	--disable-libmpx 
- * 	--disable-vtable-verify 
- * 	--disable-libvtv 
- * 	--disable-libquadmath 
- * 	--enable-lto 
- * 	--without-isl 
- * 	--disable-libsanitizer 
- * 	--enable-default-pie 
- * 	--enable-default-ssp
- * Compiling gcc (bootstrap-lean)...
- * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1 with setfattr
- * XATTR_PAX marking -re /var/tmp/portage/sys-devel/gcc-7.3.0-r3/image//usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1plus with setfattr
- * Final size of build directory: 1209936 KiB (  1.1 GiB)
- * Final size of installed tree:   137816 KiB (134.5 MiB)
- * If you have issues with packages unable to locate libstdc++.la,
- * then try running 'fix_libtool_files.sh' on the old gcc versions.
- * You might want to review the GCC upgrade guide when moving between
- * major versions (like 4.2 to 4.3):
- * https://wiki.gentoo.org/wiki/Upgrading_GCC
-
- * Messages for package sys-apps/texinfo-6.5:
-
- * Package:    sys-apps/texinfo-6.5
- * Repository: gentoo
- * Maintainer: base-system@gentoo.org
- * USE:        abi_x86_64 amd64 elibc_glibc kernel_linux nls userland_GNU
- * FEATURES:   preserve-libs sandbox selinux sesandbox userpriv usersandbox
- * Final size of build directory: 93668 KiB (91.4 MiB)
- * Final size of installed tree:   6980 KiB ( 6.8 MiB)
->>> Auto-cleaning packages...
-
->>> No outdated packages were found on your system.
-
- * Regenerating GNU info directory index...
- * Processed 89 info files.
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
--------------------------------------------------------------------------------
-!!! CONFIG_PROTECT is empty
-!!! You have no world file.
-
-Calculating dependencies... done!
-  sys-devel/gcc-7.3.0-r3 pulled in by:
-    @system requires sys-devel/gcc
-    sys-libs/glibc-2.27-r5 requires >=sys-devel/gcc-4.9
-
->>> No packages selected for removal by prune
->>> To ignore dependencies, use --nodeps
--------------------------------------------------------------------------------
- * Please note that you should now add the '-e' option for emerge system:
-
- *   # emerge -e system
-
-livecd /usr/portage/scripts #
-
-```
-
-So with the `bootstrap.sh` script we've recompiled [Gentoo stage 2 toolchain](https://en.wikipedia.org/wiki/Gentoo_Linux#Stages). 
-
-Now with the *new toolchain* we're going recompile all the stage 3:
-
-```sh
-livecd /usr/portage/scripts # emerge --emptytree --with-bdeps=y @world
-
- * IMPORTANT: 13 news items need reading for repository 'gentoo'.
- * Use eselect news read to view new items.
-
-
-These are the packages that would be merged, in order:
-
-Calculating dependencies... done!
-[ebuild   R    ] virtual/libintl-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] dev-lang/python-exec-2.4.6:2::gentoo [2.4.5:2::gentoo] PYTHON_TARGETS="(jython2_7) (pypy) (pypy3) (python2_7) (python3_4) (python3_5) (python3_6) (python3_7%*)" 86 KiB
-[ebuild     U  ] sys-libs/ncurses-6.1-r3:0/6::gentoo [6.1-r2:0/6::gentoo] USE="cxx unicode -ada -debug -doc -gpm -minimal (-profile) -static-libs {-test} -threads -tinfo -trace" ABI_X86="(64) -32 (-x32)" 3287 KiB
-[ebuild   R    ] sys-libs/libsepol-2.8::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] app-arch/bzip2-1.0.6-r9:0/1::gentoo  USE="-static -static-libs" ABI_X86="(64) -32 (-x32)" 764 KiB
-[ebuild     U  ] sys-devel/gnuconfig-20180101::gentoo [20170101::gentoo] 51 KiB
-[ebuild   R    ] sys-apps/gentoo-functions-0.12::gentoo  12 KiB
-[ebuild   R    ] virtual/libiconv-0-r2::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] app-misc/c_rehash-1.7-r1::gentoo  5 KiB
-[ebuild   R    ] app-misc/mime-types-9::gentoo  16 KiB
-[ebuild     U  ] app-arch/gzip-1.9::gentoo [1.8::gentoo] USE="-pic -static" 745 KiB
-[ebuild     U  ] sys-apps/debianutils-4.8.6::gentoo [4.8.3::gentoo] USE="installkernel%* -static" 153 KiB
-[ebuild   R    ] app-misc/editor-wrapper-4::gentoo  0 KiB
-[ebuild  N     ] dev-libs/ustr-1.0.4-r8::gentoo  USE="-static-libs -ustr-import" ABI_X86="(64) -32 (-x32)" 229 KiB
-[ebuild   R    ] net-libs/libmnl-1.0.4:0/0.2.0::gentoo  USE="-examples -static-libs" 295 KiB
-[ebuild   R    ] app-text/manpager-1::gentoo  0 KiB
-[ebuild   R    ] app-crypt/openpgp-keys-gentoo-release-20180706::gentoo  USE="{-test}" 0 KiB
-[ebuild     U  ] sys-apps/install-xattr-0.5-r1::gentoo [0.5::gentoo] 16 KiB
-[ebuild   R    ] sys-apps/baselayout-2.6::gentoo  USE="split-usr -build" 0 KiB
-[ebuild   R    ] sys-apps/which-2.21::gentoo  146 KiB
-[ebuild   R    ] app-text/sgml-common-0.6.3-r6::gentoo  126 KiB
-[ebuild   R    ] sys-devel/autoconf-wrapper-13-r1::gentoo  0 KiB
-[ebuild     U  ] sys-devel/automake-wrapper-11::gentoo [10::gentoo] 0 KiB
-[ebuild     U  ] dev-util/gperf-3.1::gentoo [3.0.4::gentoo] 1188 KiB
-[ebuild     U  ] sys-devel/gcc-config-1.9.1::gentoo [1.8-r1::gentoo] 18 KiB
-[ebuild     U  ] sys-libs/timezone-data-2018e::gentoo [2018d::gentoo] USE="nls -leaps_timezone" 572 KiB
-[ebuild     U  ] sys-devel/binutils-config-5.1-r1::gentoo [5-r4::gentoo] 0 KiB
-[ebuild  N     ] sys-apps/semodule-utils-2.8::gentoo  13 KiB
-[ebuild   R    ] app-arch/unzip-6.0_p21-r2::gentoo  USE="bzip2 unicode -natspec" 1362 KiB
-[ebuild     U  ] virtual/os-headers-0-r1::gentoo [0::gentoo] 0 KiB
-[ebuild   R    ] virtual/pam-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] virtual/udev-217::gentoo  USE="(-systemd)" 0 KiB
-[ebuild   R    ] sys-fs/udev-init-scripts-32::gentoo  4 KiB
-[ebuild   R    ] virtual/dev-manager-0-r1::gentoo  0 KiB
-[ebuild   R    ] virtual/acl-0-r2::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] virtual/libffi-3.0.13-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] virtual/man-0-r1::gentoo  0 KiB
-[ebuild   R    ] sys-apps/man-pages-posix-2013a::gentoo  909 KiB
-[ebuild     U  ] sys-apps/man-pages-4.16::gentoo [4.14::gentoo] USE="nls" L10N="-da -de -fr -it -ja -nl -pl -ru -zh-CN" 1597 KiB
-[ebuild   R    ] virtual/shadow-0::gentoo  0 KiB
-[ebuild   R    ] app-eselect/eselect-python-20171204::gentoo  46 KiB
-[ebuild   R    ] virtual/tmpfiles-0::gentoo  0 KiB
-[ebuild   R    ] app-eselect/eselect-pinentry-0.7::gentoo  0 KiB
-[ebuild   R    ] virtual/mta-1::gentoo  0 KiB
-[ebuild   R    ] virtual/logger-0::gentoo  0 KiB
-[ebuild   R    ] virtual/pkgconfig-0-r1::gentoo  ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] sys-libs/readline-7.0_p5:0/7::gentoo [7.0_p3:0/7::gentoo] USE="-static-libs -utils" ABI_X86="(64) -32 (-x32)" 2851 KiB
-[ebuild     U  ] sys-apps/hwids-20180518::gentoo [20171003::gentoo] USE="net pci udev usb" 3077 KiB
-[ebuild     U  ] dev-libs/libpipeline-1.5.0::gentoo [1.4.2::gentoo] USE="-static-libs {-test}" 810 KiB
-[ebuild   R    ] sys-apps/kbd-2.0.4::gentoo  USE="nls pam {-test}" 1008 KiB
-[ebuild     U  ] app-shells/bash-4.4_p23::gentoo [4.4_p12::gentoo] USE="net nls (readline) -afs -bashlogger -examples -mem-scramble -plugins" 9209 KiB
-[ebuild     U  ] net-misc/netifrc-0.6.0::gentoo [0.5.1::gentoo] 82 KiB
-[ebuild   R    ] app-text/docbook-xml-dtd-4.1.2-r6:4.1.2::gentoo  74 KiB
-[ebuild   R    ] app-text/docbook-xsl-stylesheets-1.79.1-r2::gentoo  USE="-ruby" 21454 KiB
-[ebuild   R    ] virtual/yacc-0::gentoo  0 KiB
-[ebuild   R    ] virtual/perl-File-Temp-0.230.400-r5::gentoo  0 KiB
-[ebuild     U  ] app-admin/perl-cleaner-2.26-r1::gentoo [2.25::gentoo] 8 KiB
-[ebuild     U  ] app-arch/xz-utils-5.2.4-r2::gentoo [5.2.3::gentoo] USE="extra-filters nls threads -static-libs" ABI_X86="(64) -32 (-x32)" 1536 KiB
-[ebuild     U  ] app-portage/elt-patches-20170826.1::gentoo [20170815::gentoo] 28 KiB
-[ebuild     U  ] sys-devel/m4-1.4.18::gentoo [1.4.17::gentoo] USE="-examples" 1180 KiB
-[ebuild   R    ] dev-libs/libltdl-2.4.6::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 951 KiB
-[ebuild   R    ] sys-libs/zlib-1.2.11-r2:0/1::gentoo  USE="-minizip -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] dev-libs/gmp-6.1.2-r1:0/10.4::gentoo [6.1.2:0/10.4::gentoo] USE="asm cxx -doc -static-libs (-pgo%)" ABI_X86="(64) -32 (-x32)" 1901 KiB
-[ebuild   R    ] dev-libs/libunistring-0.9.10:0/2::gentoo  USE="-doc -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] dev-libs/libffi-3.2.1-r2::gentoo [3.2.1::gentoo] USE="-debug -pax_kernel -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 919 KiB
-[ebuild   R    ] dev-libs/npth-1.5::gentoo  USE="-static-libs" 0 KiB
-[ebuild     U  ] dev-libs/libpcre-8.42:3::gentoo [8.41-r1:3::gentoo] USE="bzip2 cxx readline recursion-limit (static-libs) (unicode) zlib -jit* -libedit -pcre16 -pcre32" ABI_X86="(64) -32 (-x32)" 1534 KiB
-[ebuild   R    ] sys-apps/file-5.33-r2::gentoo  USE="zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 798 KiB
-[ebuild   R    ] sys-libs/cracklib-2.9.6-r1::gentoo  USE="nls zlib -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 628 KiB
-[ebuild     U  ] dev-libs/mpfr-4.0.1:0/6::gentoo [3.1.6:0/4::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 1380 KiB
-[ebuild     U  ] sys-apps/kmod-25::gentoo [24::gentoo] USE="tools zlib -debug -doc -lzma -python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 533 KiB
-[ebuild     U  ] sys-apps/less-531::gentoo [529::gentoo] USE="pcre unicode" 333 KiB
-[ebuild     U  ] dev-libs/mpc-1.1.0-r1:0/3::gentoo [1.0.3:0/0::gentoo] USE="-static-libs" ABI_X86="(64) -32 (-x32)" 685 KiB
-[ebuild   R    ] app-admin/metalog-3-r2::gentoo  USE="unicode" 0 KiB
-[ebuild   R    ] virtual/modutils-0::gentoo  0 KiB
-[ebuild   R    ] dev-lang/swig-3.0.12::gentoo  USE="pcre* -ccache -doc" 0 KiB
-[ebuild   R    ] virtual/pager-0::gentoo  0 KiB
-[ebuild     U  ] dev-lang/perl-5.26.2:0/5.26::gentoo [5.24.3-r1:0/5.24::gentoo] USE="-berkdb* -debug -doc -gdbm* -ithreads" 11770 KiB
-[ebuild   R    ] sys-kernel/linux-headers-4.17::gentoo  USE="-headers-only" 0 KiB
-[ebuild     U  ] sys-apps/groff-1.22.3::gentoo [1.22.2::gentoo] USE="-X -examples" L10N="(-ja%)" 4091 KiB
-[ebuild   R    ] sys-devel/autoconf-2.69-r4:2.69::gentoo  USE="-emacs" 1187 KiB
-[ebuild     U  ] virtual/perl-ExtUtils-MakeMaker-7.240.0::gentoo [7.100.200_rc-r4::gentoo] 0 KiB
-[ebuild   R    ] dev-util/gtk-doc-am-1.25-r1::gentoo  658 KiB
-[ebuild     U  ] virtual/perl-Parse-CPAN-Meta-2.150.10::gentoo [1.441.700.100_rc-r4::gentoo] 0 KiB
-[ebuild   R    ] virtual/perl-CPAN-Meta-YAML-0.18.0-r2::gentoo  0 KiB
-[ebuild     U  ] virtual/perl-Test-Harness-3.380.0::gentoo [3.360.100_rc-r3::gentoo] 0 KiB
-[ebuild     U  ] virtual/perl-File-Spec-3.670.0::gentoo [3.630.100_rc-r4::gentoo] 0 KiB
-[ebuild     U  ] virtual/perl-Data-Dumper-2.167.0::gentoo [2.160.0-r1::gentoo] 0 KiB
-[ebuild   R    ] dev-perl/Text-CharWidth-0.40.0-r1::gentoo  9 KiB
-[ebuild   R    ] perl-core/File-Temp-0.230.400-r1::gentoo  59 KiB
-[ebuild     U  ] virtual/perl-version-0.991.700::gentoo [0.991.600-r1::gentoo] 0 KiB
-[ebuild  N     ] virtual/perl-podlators-4.90.0::gentoo  0 KiB
-[ebuild   R    ] virtual/perl-Text-ParseWords-3.300.0-r3::gentoo  0 KiB
-[ebuild     U  ] virtual/perl-Perl-OSType-1.10.0::gentoo [1.9.0-r1::gentoo] 0 KiB
-[ebuild     U  ] virtual/perl-Module-Metadata-1.0.33::gentoo [1.0.31-r1::gentoo] 0 KiB
-[ebuild     U  ] virtual/perl-Getopt-Long-2.490.0::gentoo [2.480.0-r1::gentoo] 0 KiB
-[ebuild     U  ] virtual/perl-ExtUtils-ParseXS-3.340.0::gentoo [3.310.0-r1::gentoo] 0 KiB
-[ebuild   R    ] virtual/perl-ExtUtils-Manifest-1.700.0-r4::gentoo  0 KiB
-[ebuild   R    ] virtual/perl-ExtUtils-Install-2.40.0-r3::gentoo  0 KiB
-[ebuild   R    ] virtual/perl-ExtUtils-CBuilder-0.280.225-r2::gentoo  0 KiB
-[ebuild     U  ] virtual/perl-JSON-PP-2.274.0.200_rc::gentoo [2.273.0.100_rc-r6::gentoo] 0 KiB
-[ebuild   R    ] sys-libs/libseccomp-2.3.3::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 552 KiB
-[ebuild  N     ] sys-libs/libcap-ng-0.7.9::gentoo  USE="-python -static-libs" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 439 KiB
-[ebuild     U  ] net-firewall/iptables-1.6.2-r2:0/12::gentoo [1.6.1-r3:0/12::gentoo] USE="ipv6 -conntrack -netlink -nftables -pcap -static-libs" 625 KiB
-[ebuild     U  ] dev-perl/Text-Unidecode-1.300.0::gentoo [1.270.0::gentoo] 135 KiB
-[ebuild     U  ] dev-perl/libintl-perl-1.280.0::gentoo [1.240.0-r2::gentoo] 460 KiB
-[ebuild   R    ] dev-perl/Unicode-EastAsianWidth-1.330.0-r1::gentoo  31 KiB
-[ebuild     U  ] dev-perl/TermReadKey-2.370.0::gentoo [2.330.0::gentoo] USE="-examples%" 84 KiB
-[ebuild   R    ] dev-perl/Text-WrapI18N-0.60.0-r1::gentoo  4 KiB
-[ebuild     U  ] virtual/perl-CPAN-Meta-2.150.10::gentoo [2.150.5-r1::gentoo] 0 KiB
-[ebuild     U  ] app-misc/pax-utils-1.2.3-r1::gentoo [1.2.3::gentoo] USE="seccomp -caps -debug -python" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_4% -python3_6%" PYTHON_TARGETS="python2_7%* python3_5%* -python3_4% -python3_6%" 647 KiB
-[ebuild     U  ] dev-perl/Module-Build-0.422.400::gentoo [0.421.600::gentoo] USE="{-test}" 298 KiB
-[ebuild   R    ] sys-apps/sandbox-2.13::gentoo  ABI_X86="(32) (64) (-x32)" 416 KiB
-[ebuild     U  ] dev-perl/SGMLSpm-1.1-r1::gentoo [1.03-r7::gentoo] 112 KiB
-[ebuild     U  ] dev-libs/openssl-1.0.2o-r6::gentoo [1.0.2o-r3::gentoo] USE="asm sslv3 tls-heartbeat zlib -bindist* -gmp -kerberos -rfc3779 -sctp -sslv2 -static-libs {-test} -vanilla" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="(sse2)" 5218 KiB
-[ebuild   R    ] sys-libs/libselinux-2.8::gentoo  USE="(python) (static-libs) -pcre2 -ruby" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" RUBY_TARGETS="ruby23*" 0 KiB
-[ebuild     U  ] sys-apps/net-tools-1.60_p20170221182432::gentoo [1.60_p20161110235919::gentoo] USE="arp hostname ipv6 nls (selinux*) -nis -plipconfig -slattach -static" 223 KiB
-[ebuild   R    ] sys-process/procps-3.3.15-r1:0/6::gentoo  USE="kill ncurses nls (selinux*) unicode -elogind -modern-top -static-libs (-systemd) {-test}" 884 KiB
-[ebuild     U  ] sys-apps/busybox-1.29.0::gentoo [1.28.0::gentoo] USE="ipv6 (selinux*) static -debug -livecd -make-symlinks -math -mdev -pam -savedconfig -sep-usr -syslog (-systemd)" 2250 KiB
-[ebuild     U  ] sys-apps/attr-2.4.48-r2::gentoo [2.4.47-r2::gentoo] USE="nls -debug% -static-libs" ABI_X86="(64) -32 (-x32)" 457 KiB
-[ebuild  N     ] sys-libs/libcap-2.25-r1::gentoo  USE="pam -static-libs" ABI_X86="(64) -32 (-x32)" 63 KiB
-[ebuild   R    ] sys-devel/patch-2.7.6-r1::gentoo  USE="xattr -static {-test}" 766 KiB
-[ebuild     U  ] net-misc/iputils-20171016_pre-r1::gentoo [20171016_pre::gentoo] USE="arping filecaps* ipv6 ssl -SECURITY_HAZARD -caps -clockdiff -doc -gcrypt -idn -libressl -nettle -rarpd -rdisc -static -tftpd -tracepath -traceroute (-openssl%*)" 220 KiB
-[ebuild     U  ] dev-python/setuptools-38.6.1::gentoo [36.7.2::gentoo] USE="{-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 722 KiB
-[ebuild   R    ] dev-libs/libgpg-error-1.29::gentoo  USE="nls -common-lisp -static-libs" ABI_X86="(64) -32 (-x32)" 874 KiB
-[ebuild   R    ] dev-libs/libassuan-2.5.1::gentoo  USE="-static-libs" 0 KiB
-[ebuild   R    ] dev-libs/libksba-1.3.5-r1::gentoo  USE="-static-libs" 0 KiB
-[ebuild   R    ] sys-apps/sed-4.5::gentoo  USE="acl nls (selinux*) -forced-sandbox -static" 1245 KiB
-[ebuild     U  ] sys-apps/util-linux-2.32-r3::gentoo [2.30.2-r1::gentoo] USE="cramfs ncurses nls pam readline (selinux*) suid unicode -build -caps -fdformat -kill -python -slang -static-libs (-systemd) {-test} -tty-helpers -udev" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5 -python2_7 -python3_4 -python3_6" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 4444 KiB
-[ebuild     U  ] sys-libs/pam-1.3.0-r2::gentoo [1.2.1-r2::gentoo] USE="cracklib filecaps* nls (pie) (selinux*) -audit -berkdb* -debug -nis {-test} -vim-syntax%" ABI_X86="(64) -32 (-x32)" 1754 KiB
-[ebuild   R    ] sys-auth/pambase-20150213-r1::gentoo  USE="cracklib nullok (selinux*) sha512 -consolekit -debug -elogind -gnome-keyring -minimal -mktemp -pam_krb5 -pam_ssh -passwdqc -securetty (-systemd)" 4 KiB
-[ebuild     U  ] sys-apps/acl-2.2.53::gentoo [2.2.52-r1::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 513 KiB
-[ebuild     U  ] sys-apps/coreutils-8.30::gentoo [8.28-r1::gentoo] USE="acl nls (selinux*) split-usr%* (xattr) -caps -gmp -hostname -kill -multicall -static {-test} -vanilla" 5240 KiB
-[ebuild     U  ] app-admin/eselect-1.4.13::gentoo [1.4.12::gentoo] USE="-doc -emacs -vim-syntax" 174 KiB
-[ebuild   R    ] app-eselect/eselect-lib-bin-symlink-0.1.1::gentoo  0 KiB
-[ebuild   R    ] sys-libs/glibc-2.27-r5:2.2::gentoo  USE="hardened multiarch* (multilib) (selinux) -audit -caps (-compile-locales) -doc -gd -headers-only -nscd (-profile) -suid -systemtap (-vanilla)" 0 KiB
-[ebuild   R    ] virtual/libc-1::gentoo  0 KiB
-[ebuild   R    ] sys-devel/binutils-2.30-r3:2.30::gentoo  USE="cxx nls -doc -multitarget -static-libs {-test}" 0 KiB
-[ebuild     U  ] app-misc/ca-certificates-20180409.3.37::gentoo [20170717.3.36.1::gentoo] USE="-cacert (-insecure_certs%)" 22729 KiB
-[ebuild  N     ] dev-python/ipy-0.83::gentoo  USE="-examples" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 32 KiB
-[ebuild   R    ] sys-apps/portage-2.3.41::gentoo  USE="(ipc) native-extensions* rsync-verify* (selinux) (xattr) -build* -doc -epydoc -gentoo-dev" PYTHON_TARGETS="python2_7 python3_5 (-pypy) -python3_4 -python3_6" 0 KiB
-[ebuild   R    ] virtual/package-manager-1::gentoo  0 KiB
-[ebuild   R    ] dev-python/pyblake2-1.1.2::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 124 KiB
-[ebuild     U  ] sys-devel/make-4.2.1-r3::gentoo [4.2.1::gentoo] USE="nls -guile -static" 1375 KiB
-[ebuild   R    ] sys-process/psmisc-23.1-r1::gentoo  USE="ipv6 nls (selinux*) -X" 290 KiB
-[ebuild     U  ] sys-libs/e2fsprogs-libs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 699 KiB
-[ebuild   R    ] dev-libs/popt-1.16-r2::gentoo  USE="nls -static-libs" ABI_X86="(64) -32 (-x32)" 687 KiB
-[ebuild   R    ] net-misc/rsync-3.1.3::gentoo  USE="acl iconv ipv6 xattr -examples -static -stunnel" 885 KiB
-[ebuild  N     ] dev-python/decorator-4.2.1::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 33 KiB
-[ebuild  N     ] dev-python/networkx-1.11-r1::gentoo  USE="-doc -examples -scipy {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1285 KiB
-[ebuild  N     ] dev-python/pypax-0.9.2::gentoo  USE="xtpax -ptpax" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 390 KiB
-[ebuild  N     ] sys-apps/elfix-0.9.2::gentoo  USE="xtpax -ptpax" 0 KiB
-[ebuild  N     ] dev-python/enum34-1.1.6::gentoo  USE="-doc" PYTHON_TARGETS="python2_7 -pypy -pypy3" 40 KiB
-[ebuild  N     ] virtual/python-enum34-1::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 0 KiB
-[ebuild  N     ] app-admin/setools-4.1.1::gentoo  USE="-X -debug {-test}" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 451 KiB
-[ebuild   R    ] dev-python/bz2file-0.98::gentoo  PYTHON_TARGETS="python2_7 -pypy" 0 KiB
-[ebuild   R    ] dev-libs/libtasn1-4.13:0/6::gentoo  USE="-doc -static-libs -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] net-dns/libidn2-2.0.5::gentoo  USE="-static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] app-editors/nano-2.9.8::gentoo [2.8.7::gentoo] USE="magic ncurses nls spell unicode -debug -justify -minimal -slang -static" 2838 KiB
-[ebuild   R    ] virtual/editor-0-r1::gentoo  0 KiB
-[ebuild  NS    ] sys-devel/automake-1.16.1-r1:1.16::gentoo [1.15.1-r2:1.15::gentoo] USE="{-test}" 1499 KiB
-[ebuild     U  ] sys-devel/libtool-2.4.6-r5:2::gentoo [2.4.6-r3:2::gentoo] USE="-vanilla" 0 KiB
-[ebuild   R    ] dev-libs/libxml2-2.9.8:2::gentoo  USE="ipv6 readline -debug -examples -icu -lzma -python -static-libs {-test}" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 5341 KiB
-[ebuild   R    ] dev-libs/expat-2.2.5::gentoo  USE="unicode -examples -static-libs" ABI_X86="(64) -32 (-x32)" 499 KiB
-[ebuild     U  ] sys-libs/gdbm-1.16:0/6::gentoo [1.13-r2:0/1.13::gentoo] USE="berkdb nls readline -static-libs (-exporter%)" ABI_X86="(64) -32 (-x32)" 915 KiB
-[ebuild   R    ] dev-libs/libgcrypt-1.8.3:0/20::gentoo  USE="-doc -o-flag-munging -static-libs" ABI_X86="(64) -32 (-x32)" 2920 KiB
-[ebuild  N     ] sys-process/audit-2.8.3::gentoo  USE="-gssapi -ldap -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 1082 KiB
-[ebuild     U  ] net-misc/openssh-7.7_p1-r6::gentoo [7.7_p1-r5::gentoo] USE="pam (pie) (selinux*) ssl -X -X509 -audit -bindist* -debug -hpn -kerberos -ldap -ldns -libedit -libressl -livecd -sctp -skey -static {-test}" 1517 KiB
-[ebuild   R    ] net-misc/curl-7.60.0-r1::gentoo  USE="ipv6 ssl -adns -brotli -http2 -idn -kerberos -ldap -metalink -rtmp -samba -ssh -static-libs {-test} -threads" ABI_X86="(64) -32 (-x32)" CURL_SSL="openssl -axtls -gnutls -libressl -mbedtls -nss (-winssl)" 0 KiB
-[ebuild   R    ] dev-libs/nettle-3.4:0/6.2::gentoo  USE="gmp -doc (-neon) -static-libs {-test}" ABI_X86="(64) -32 (-x32)" CPU_FLAGS_X86="aes*" 0 KiB
-[ebuild   R    ] dev-libs/iniparser-3.1-r1::gentoo  USE="-doc -examples -static-libs" ABI_X86="(64) -32 (-x32)" 39 KiB
-[ebuild     U  ] net-libs/libtirpc-1.0.3:0/3::gentoo [1.0.2-r1:0/3::gentoo] USE="ipv6 -kerberos -static-libs" ABI_X86="(64) -32 (-x32)" 507 KiB
-[ebuild   R    ] sys-devel/gettext-0.19.8.1::gentoo  USE="acl* cxx ncurses* nls openmp* -cvs -doc -emacs -git -java -static-libs" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild     U  ] dev-lang/python-2.7.15:2.7::gentoo [2.7.14-r1:2.7::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (wide-unicode) (xml) (-berkdb) -bluetooth% -build -doc -examples -libressl -sqlite -tk -wininst" 12362 KiB
-[ebuild     U  ] dev-lang/python-3.5.5-r1:3.5/3.5m::gentoo [3.5.5:3.5/3.5m::gentoo] USE="gdbm hardened* ipv6 ncurses readline ssl (threads) (xml) -bluetooth% -build -examples -libressl -sqlite {-test} -tk -wininst" 15004 KiB
-[ebuild   R    ] virtual/ssh-0::gentoo  USE="-minimal" 0 KiB
-[ebuild     U  ] app-portage/portage-utils-0.71::gentoo [0.64::gentoo] USE="nls -static" 543 KiB
-[ebuild   R    ] dev-libs/libxslt-1.1.32::gentoo  USE="crypt -debug -examples -python -static-libs" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7" 3361 KiB
-[ebuild   R    ] app-text/build-docbook-catalog-1.21::gentoo  5 KiB
-[ebuild   R    ] dev-perl/XML-Parser-2.440.0::gentoo  232 KiB
-[ebuild   R    ] net-libs/libnsl-1.2.0:0/2::gentoo  ABI_X86="(64) -32 (-x32)" 205 KiB
-[ebuild   R    ] net-libs/gnutls-3.5.18:0/30::gentoo  USE="cxx idn nls openssl seccomp tls-heartbeat zlib -dane -doc -examples -guile -openpgp -pkcs11 -sslv2 -sslv3 -static-libs {-test} -test-full -tools -valgrind" ABI_X86="(64) -32 (-x32)" 0 KiB
-[ebuild   R    ] app-arch/tar-1.30::gentoo  USE="acl nls (selinux*) (xattr) -minimal -static" 2792 KiB
-[ebuild   R    ] dev-python/certifi-2018.4.16::gentoo  PYTHON_TARGETS="python2_7 python3_5 -pypy -pypy3 -python3_4 -python3_6" 147 KiB
-[ebuild     U  ] dev-python/pyxattr-0.6.0-r1::gentoo [0.5.5::gentoo] USE="-doc {-test}" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6%" 31 KiB
-[ebuild   R    ] app-crypt/pinentry-1.1.0-r2::gentoo  USE="ncurses -caps -emacs -fltk -gnome-keyring -gtk -qt5 -static" 0 KiB
-[ebuild   R    ] sys-apps/findutils-4.6.0-r1::gentoo  USE="nls (selinux*) -static {-test}" 3692 KiB
-[ebuild     U  ] sys-apps/grep-3.1::gentoo [3.0::gentoo] USE="nls pcre -static" 1339 KiB
-[ebuild     U  ] sys-apps/gawk-4.2.1-r1::gentoo [4.1.4::gentoo] USE="nls readline -forced-sandbox% -mpfr" 2916 KiB
-[ebuild     U  ] sys-apps/diffutils-3.6-r1::gentoo [3.5::gentoo] USE="nls -static" 1366 KiB
-[ebuild   R    ] net-misc/wget-1.19.5::gentoo  USE="ipv6 nls pcre ssl zlib -debug -gnutls -idn -libressl -ntlm -static {-test} -uuid" 4352 KiB
-[ebuild   R    ] sys-devel/flex-2.6.4-r1::gentoo  USE="nls -static {-test}" ABI_X86="(64) -32 (-x32)" 1386 KiB
-[ebuild   R    ] dev-perl/Locale-gettext-1.70.0::gentoo  9 KiB
-[ebuild   R    ] dev-util/intltool-0.51.0-r2::gentoo  159 KiB
-[ebuild   R    ] sys-apps/texinfo-6.5::gentoo  USE="nls -static" 0 KiB
-[ebuild     U  ] app-text/opensp-1.5.2-r6::gentoo [1.5.2-r3::gentoo] USE="nls -doc -static-libs {-test}" 1486 KiB
-[ebuild   R    ] sys-fs/eudev-3.2.5::gentoo  USE="hwdb kmod (selinux*) -introspection -rule-generator -static-libs {-test}" ABI_X86="(64) -32 (-x32)" 1814 KiB
-[ebuild   R    ] mail-mta/nullmailer-2.0-r2::gentoo  USE="ssl {-test}" 0 KiB
-[ebuild     U  ] sys-fs/e2fsprogs-1.44.2::gentoo [1.43.9::gentoo] USE="nls -fuse -static-libs" 7386 KiB
-[ebuild     U  ] sys-devel/bison-3.0.5::gentoo [3.0.4-r1::gentoo] USE="nls -examples -static {-test}" 1915 KiB
-[ebuild     U  ] sys-apps/help2man-1.47.6::gentoo [1.47.4::gentoo] USE="nls" 189 KiB
-[ebuild   R    ] app-text/openjade-1.3.2-r7::gentoo  USE="-static-libs" 874 KiB
-[ebuild  N     ] sys-libs/libsemanage-2.8::gentoo  USE="(python)" ABI_X86="(64) -32 (-x32)" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 151 KiB
-[ebuild   R    ] sys-devel/gcc-7.3.0-r3:7.3.0::gentoo  USE="cxx hardened (multilib) nls nptl openmp* (pie) (ssp) vtv* (-altivec) -cilk -debug -doc (-fixed-point) -fortran -go -graphite (-jit) (-libssp) -mpx -objc -objc++ -objc-gc (-pch) -pgo -regression-test (-sanitize) -vanilla" 0 KiB
-[ebuild     U  ] sys-apps/iproute2-4.17.0::gentoo [4.14.1-r2::gentoo] USE="iptables ipv6 (selinux*) -atm -berkdb* -elf% -minimal" 660 KiB
-[ebuild   R    ] app-text/po4a-0.47-r1::gentoo  USE="{-test}" 2334 KiB
-[ebuild  N     ] sys-apps/checkpolicy-2.8::gentoo  USE="-debug" 65 KiB
-[ebuild  N     ] sys-apps/selinux-python-2.8::gentoo  PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2020 KiB
-[ebuild   R    ] sys-apps/shadow-4.6::gentoo  USE="acl cracklib nls pam (selinux*) xattr -audit -skey" 3716 KiB
-[ebuild  N     ] sys-apps/policycoreutils-2.8::gentoo  USE="pam -audit -dbus" PYTHON_TARGETS="python2_7 python3_5 -python3_4 -python3_6" 2740 KiB
-[ebuild  N     ] sec-policy/selinux-base-2.20180114-r3::gentoo  USE="open_perms peer_perms ubac unconfined -doc (-systemd)" 1022 KiB
-[ebuild  N     ] sec-policy/selinux-base-policy-2.20180114-r3::gentoo  USE="unconfined (-systemd)" 0 KiB
-[ebuild  N     ] sec-policy/selinux-unconfined-2.20180114-r3::gentoo  0 KiB
-[ebuild  N     ] sec-policy/selinux-openrc-2.20180114-r3::gentoo  0 KiB
-[ebuild  N     ] sec-policy/selinux-shutdown-2.20180114-r3::gentoo  0 KiB
-[ebuild     U  ] sys-apps/opentmpfiles-0.1.3-r1::gentoo [0.1.3::gentoo] USE="(selinux*)" 6 KiB
-[ebuild  N     ] sec-policy/selinux-mandb-2.20180114-r3::gentoo  0 KiB
-[ebuild  N     ] sec-policy/selinux-dirmngr-2.20180114-r3::gentoo  0 KiB
-[ebuild     U  ] sys-apps/sysvinit-2.90::gentoo [2.88-r9::gentoo] USE="(selinux*) (-ibm) -static" 111 KiB
-[ebuild     U  ] sys-apps/man-db-2.8.3::gentoo [2.7.6.1-r2::gentoo] USE="manpager nls seccomp%* (selinux*) zlib -berkdb* -gdbm* -static-libs" 1587 KiB
-[ebuild  N     ] sec-policy/selinux-gpg-2.20180114-r3::gentoo  0 KiB
-[ebuild     U  ] sys-apps/openrc-0.38.1::gentoo [0.34.11::gentoo] USE="ncurses netifrc pam (selinux*) unicode -audit -debug -newnet (-prefix) -static-libs" 236 KiB
-[ebuild   R    ] app-crypt/gnupg-2.2.8::gentoo  USE="bzip2 nls readline (selinux*) smartcard ssl -doc -ldap -tofu -tools -usb -wks-server" 0 KiB
-[ebuild   R    ] app-portage/gemato-13.1::gentoo  USE="blake2 bzip2 gpg -lzma -sha3 {-test} -tools" PYTHON_TARGETS="python2_7 python3_5 -pypy -python3_4 -python3_6" 0 KiB
-[ebuild   R    ] virtual/service-manager-0::gentoo  USE="(-prefix)" 0 KiB
-[ebuild     U  ] dev-libs/glib-2.54.3-r6:2::gentoo [2.52.3:2::gentoo] USE="mime (selinux*) xattr -dbus -debug (-fam) -static-libs -systemtap {-test} -utils" ABI_X86="(64) -32 (-x32)" PYTHON_SINGLE_TARGET="python3_5%* -python2_7% -python3_6%" PYTHON_TARGETS="python2_7 python3_5%* -python3_6%" 9578 KiB
-[ebuild   R    ] dev-util/pkgconfig-0.29.2::gentoo  USE="hardened* -internal-glib" ABI_X86="(64) -32 (-x32)" 1970 KiB
-[ebuild     U  ] x11-misc/shared-mime-info-1.10::gentoo [1.9::gentoo] USE="{-test}" 603 KiB
-
-Total: 228 packages (87 upgrades, 26 new, 1 in new slot, 114 reinstalls), Size of downloads: 245719 KiB
-.
-. 
-.
-livecd /usr/portage/scripts #
-```
-
-This is the `emerge` options:
-
-- `--emptytree`: Reinstalls target atoms and their entire deep dependency tree, as  though  no  packages are  currently  installed.
--  `--with-bdeps=y`: In  dependency  calculations,  pull  in  build  time dependencies that are not strictly required.
-- `@world`: is one of the six *sets* available in Gentoo Linux; all the packages listed on `/var/lib/portage/world`
 
